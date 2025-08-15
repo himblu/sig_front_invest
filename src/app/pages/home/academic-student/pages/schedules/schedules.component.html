@@ -1,0 +1,67 @@
+<div class="row">
+  <div class="col-md-12" style="text-align: center;">
+    <h2>Horario de clases</h2>
+  </div>
+</div>
+
+<section [formGroup]="filtersForm">
+  <div class="row pl-3 pr-3">
+    <div class="col-4">
+      <mat-form-field appearance="outline">
+        <mat-label>Periodo Académico</mat-label>
+        <mat-select formControlName="periodID" placeholder="Filtrar por Periodo Académico">
+          <mat-option *ngFor="let period of periods;" [value]="period.periodID" (click)="getSchedule(period.periodID)">
+            {{ period.periodName }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+</section>
+
+<div class="col-12">
+  <spinner-loader [absolute]="true" *ngIf="loadingSchedules">
+  </spinner-loader>
+  <table class="table-striped w-100 mat-elevation-z8">
+    <thead>
+      <tr>
+        <th>Horas</th>
+        <th>Lunes</th>
+        <th>Martes</th>
+        <th>Miércoles</th>
+        <th>Jueves</th>
+        <th>Viernes</th>
+        <th>Sábado</th>
+        <th>Domingo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of schedules; let i = index">
+        <td><!-- Horas -->
+          <label>{{item.startTime}} - {{item.endTime}}</label>
+        </td>
+        <td><!-- Lunes -->
+          <label>{{item.mon}}</label><br>
+        </td>
+        <td><!-- Martes -->
+          <label>{{item.tue}}</label><br>
+        </td>
+        <td><!-- Miércoles -->
+          <label>{{item.wed}}</label><br>
+        </td>
+        <td><!-- Jueves -->
+          <label>{{item.thu}}</label><br>
+        </td>
+        <td><!-- Viernes -->
+          <label>{{item.fri}}</label><br>
+        </td>
+        <td><!-- Sábado -->
+          <label>{{item.sat}}</label><br>
+        </td>
+        <td><!-- Domingo -->
+          <label>{{item.sun}}</label><br>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

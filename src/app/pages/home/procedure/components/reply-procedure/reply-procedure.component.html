@@ -1,0 +1,72 @@
+<div style="display: flex; justify-content: end; align-items: center; background: transparent;" class="p-2">
+  <mat-icon style="cursor: pointer; color: red;" [matDialogClose]="false" class="red-icon" matRipple>close</mat-icon>
+</div>
+
+<mat-dialog-content>
+  <div *ngIf="isLoading; else form;">
+    <spinner-loader></spinner-loader>
+  </div>
+
+  <ng-template #form>
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12">
+            <h2 style="color: #014898;">
+              <ng-container *ngIf="data.currentMessage; else reply;">{{data.currentMessage.documentManagementSubject}}</ng-container>
+              <ng-template #reply>{{data.reply.subject}}</ng-template>
+            </h2>
+          </div>
+        </div>
+        <div class="row" [formGroup]="responseForm">
+          <div class="col-6">
+            <h3>Mensaje:</h3>
+          </div>
+          <div class="col-4" style="text-align: right;">
+            <button (click)="input.click()" mat-raised-button class="styleButton_sml" style="height: 25px;" type="button" [disabled]="listFilesUpload.length >= 5">
+              Cargar archivos
+            </button>
+            <input type="file"
+              hidden
+              multiple
+              #input
+              style="cursor: pointer;"
+              autocomplete="off"
+              (change)="onChangeInput(input.files, input);"
+              accept="application/pdf">
+          </div>
+          <div class="col-2" style="text-align: left;">
+            <h4>Archivos: {{listFilesUpload.length}}</h4>
+          </div>
+          <div class="col-12">
+            <ngx-editor-menu [editor]="message" [toolbar]="toolbar"></ngx-editor-menu>
+            <ngx-editor placeholder="Escribe aquí..." [editor]="message" outputFormat="html" formControlName="message"></ngx-editor>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <div class="d-flex no-block w-100 justify-content-between">
+    <div class="pl-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="warn"
+        [mat-dialog-close]="false">
+        Cerrar
+      </button>
+    </div>
+    <div class="pr-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="primary"
+        (click)="onSubmit();">
+        Enviar
+      </button>
+    </div>
+  </div>
+</mat-dialog-actions>

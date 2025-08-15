@@ -1,0 +1,92 @@
+<div class="animated fadeIn fast ">
+  <div class="form-row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <i class="fa fa-cog mr-1"></i>Configuraciones
+        </div>
+        <div class="card-body p-2">
+          <div class="form-row">
+            <div class="col-3">
+              <ul class="list-group">
+                <li class="list-group-item hand" [ngClass]="{'list-group-item-selected': menuSelected.id === m.id, 'list-group-item-unselected': menuSelected.id !== m.id}" *ngFor="let m of menu" (click)="toggleSelect(m)">
+                  <i class="{{m.icon}} mr-1"></i>{{m.title}}
+                </li>
+              </ul>
+            </div>
+            <div class="col-9">
+              <div class="card">
+                <div class="card-body">
+                  <div class="form-row">
+                    <div class="col-12" *ngIf="menuSelected.id === 1">
+                      <div class="form-row">
+                        <div class="col-4 mb-2 text-center">
+                          <span>Foto de Perfil</span> <br>
+                          <img src="{{profile.avatar ? profile.avatar : 'assets/images/avatar.jpg'}}" width="170" height="170" class="rounded-circle" alt="@usuario">
+                        </div>
+                        <div class="col-8 mb-2 pt-4">
+                          <div class="form-row">
+                            <div class="col-4">
+                              <label for="">Nombre de Usuario</label>
+                              <input type="text" readonly name="profile.username" [(ngModel)]="profile.username" class="form-control">
+                            </div>
+                            <div class="col-8">
+                              <label for="names">Nombre Completo</label>
+                              <input type="text" readonly name="profile.fullName" [(ngModel)]="profile.fullName" class="form-control">
+                            </div>
+                            <div class="col-12">
+                              <label for="about">Acerca de Mi</label>
+                              <textarea name="about" class="form-control" placeholder="Acerca de mi" readonly>Pertenezco a ITCA.</textarea>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12" *ngIf="menuSelected.id === 99">
+                      <div class="form-row">
+                        <div class="col-12">
+                          <div class="alert alert-info">
+                            <i class="fa fa-info mr-1"></i>En esta sección podras cambiar la contraseña de inicio de sesión.
+                          </div>
+                        </div>
+                        <div class="col-6">
+                          <label class="text-primary-color" for="newPassword">Nueva Contraseña </label>
+                          <button class="btn btn-sm text-primary-color float-right hand" *ngIf="credentials.newPassword || credentials.repeatPassword
+                          " (click)="toggleShowPasswords()">
+                            <i class="fa" [ngClass]="{'fa-lock': !credentials.showPassword, 'fa-unlock': credentials.showPassword}"></i>
+                          </button>
+                          <input type="{{credentials.showPassword ? 'text' : 'password'}}" placeholder="********" name="newPassword" (keyup)="verifyPassword(credentials.newPassword, 'newPassword')" [(ngModel)]="credentials.newPassword" class="form-control form-control-sm">
+                          <small class="float-right" title="Las contraseñas deben ser por lo mínimo mayor a 60% de seguras." *ngIf="credentials.newPassword">Seguro: {{security.newPassword}}%<progress id="newPassword" max="100" [value]="security.newPassword"></progress></small>
+                        </div>
+                        <div class="col-6">
+                          <label class="text-primary-color" for="repeatPassword">Repita contraseña</label>
+                          <input type="{{credentials.showPassword ? 'text' : 'password'}}" placeholder="********" name="repeatPassword" (keyup)="verifyPassword(credentials.repeatPassword, 'repeatPassword')" [(ngModel)]="credentials.repeatPassword" class="form-control form-control-sm">
+                          <small class="float-right" title="Las contraseñas deben ser por lo mínimo mayor a 60% de seguras." *ngIf="credentials.repeatPassword">Seguro: {{security.repeatPassword}}%<progress id="repeatPassword" max="100" [value]="security.repeatPassword"></progress></small>
+                        </div>
+                        <div class="col-8">
+                          <div class="alert alert-danger p-2 m-0" *ngIf="!credentials.valid && credentials.newPassword && credentials.repeatPassword">
+                            <small *ngIf="security.newPassword < 60 || security.repeatPassword < 60">
+                              <i class="fa fa-info mr-1"></i>Las contraseñas deben ser por lo mínimo mayor a 60% de seguras. <br>
+                            </small>
+                            <small *ngIf="credentials.password !== credentials.newPassword">
+                              <i class="fa fa-info mr-1"></i>Las contraseñas no coinciden. 
+                            </small>
+                          </div>
+                        </div>
+                        <div class="col-4 text-right">
+                          <button class="btn btn-sm bg-primary-color mt-3" [disabled]="!credentials.valid" (click)="changePassword()">
+                            <i class="fa fa-save mr-1"></i>Cambiar Contraseña
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

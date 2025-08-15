@@ -1,0 +1,38 @@
+.full-width {
+	width: 100%;
+}
+
+.row {
+	display: flex;
+	flex-wrap: wrap;
+	margin-bottom: 4px; /* Reducir espacio vertical entre filas */
+}
+
+.col-md-3 {
+	flex: 0 0 25%;
+}
+
+/* Ajustar el espaciado de los mat-form-field */
+mat-form-field {
+	width: 100%;
+	margin-bottom: 4px; /* Reducir espacio vertical entre cada campo */
+}
+
+/* Contenedor del botón */
+.button-container {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 12px; /* Reducir margen superior */
+}
+
+/* ⚡ Resaltar campos deshabilitados */
+mat-form-field:has(input:disabled),
+mat-form-field:has(mat-select:disabled) {
+	opacity: 0.6;
+}
+
+/* ⚡ Asegurar que el borde de MatFormField también se pone rojo */
+mat-form-field.mat-form-field-invalid .mat-form-field-outline {
+	color: red !important;
+	border-color: red !important;
+}

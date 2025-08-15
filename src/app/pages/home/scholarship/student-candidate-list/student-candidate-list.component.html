@@ -1,0 +1,559 @@
+<div class="animated fadeIn fast">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-9">
+                            <i class="fa fa-list-alt mr-1"></i>Lista de Estudiantes Candidatos para Beneficios
+                        </div>
+                        <div class="col-3 text-right">
+                            <button class="btn btn-sm bg-primary-color" (click)="toggleAssignScholarship()">
+                                <i class="fa fa-plus mr-1"></i>Nueva Asignación
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-10 py-0">
+                            <div class="d-flex no-block">
+                                <div class="col-5">
+                                    <form [formGroup]="filtersForm">
+                                        <mat-form-field appearance="outline" >
+                                        <mat-label>Periodo Académico</mat-label>
+                                        <mat-select  formControlName="period" (selectionChange)="getStudentAssigneds()" placeholder="Filtrar por Periodo Académico">
+                                            <mat-option [value]="0">Todos</mat-option>
+                                            <mat-option *ngFor="let period of periods; trackBy: trackByPeriodId;" [value]="period.periodID">
+                                            {{ period.periodName }}
+                                            </mat-option>
+                                        </mat-select>
+                                        </mat-form-field>
+                                    </form>
+                                </div>
+                                <div class="col-5">
+                                    <form [formGroup]="filtersForm">
+                                        <mat-form-field appearance="outline" >
+                                            <input
+                                                matInput
+                                                type="text"
+                                                placeholder="BUSCAR POR TEXTO EN LOS ASIGNADOS"
+                                                formControlName="search"
+                                                class="text-uppercase"
+                                                (input)="getStudentAssigneds()"
+                                        />
+                                        </mat-form-field>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-2 text-right">
+                            <button
+                            class="btn btn-sm bg-secondary-color"
+                            (click)="buildReport('scholarship/report-Scholarship');">
+                            <i class="fa fa-file-excel-o green-icon mr-1"></i>Reporte excel
+                            </button>
+                        </div>
+                        <div class="col-12 text-center" *ngIf="!students.length">
+                            <i class="fa fa-times fa-2x"></i> <br>
+                            No se tienen registros en esta lista.
+                        </div>
+                        <ng-container *ngIf="students.length">
+                            <div class="col-4"></div>
+                            <div class="col-12 mt-2">
+                                <ul class="list-group">
+                                    <li class="list-group-item p-2 bg-primary-color">
+                                        <div class="row">
+                                            <div class="col-1">
+                                                <strong>Nro Documento</strong>
+                                            </div>
+                                            <div class="col-3">
+                                                <strong>Estudiante</strong>
+                                            </div>
+                                            <div class="col-2">
+                                                <strong>Escuela</strong>
+                                            </div>
+                                            <div class="col-2">
+                                                <strong>Carrera</strong>
+                                            </div>
+                                            <div class="col-2">
+                                                <strong>Beneficio</strong>
+                                            </div>
+                                            <div class="col-1">
+                                                <strong class="float-right">Estado</strong>
+                                            </div>
+                                            <div class="col-1 text-right">
+                                                <strong>Acciones</strong>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item p-2" *ngFor="let s of students | filter:filter.fullName">
+                                        <div class="row">
+                                            <div class="col-1">
+                                                {{s.personDocumentNumber}}
+                                            </div>
+                                            <div class="col-3">
+                                                {{s.fullName | uppercase}}
+                                            </div>
+                                            <div class="col-2">
+                                                {{s.schoolName | uppercase}}
+                                            </div>
+                                            <div class="col-2">
+                                                {{s.careerName | uppercase}}
+                                            </div>
+                                            <div class="col-2">
+                                                {{s.scholarshipName | uppercase}}
+                                            </div>
+                                            <div class="col-1">
+                                                <span class="float-right">
+                                                    <span *ngIf="s.statusID === 1">
+                                                        <i class="fa fa-circle mr-1" [ngClass]="{'text-primary-color': s.assignStudentID, 'text-danger': !s.assignStudentID}"></i>{{s.assignStudentID ? 'Asignado' : 'No Asignado'}}
+                                                    </span>
+                                                    <span *ngIf="s.statusID === 0">
+                                                        <i class="fa fa-circle mr-1 text-danger"></i>Beca Rechazada
+                                                    </span>
+
+                                                </span>
+                                            </div>
+                                            <div class="col-1 text-right">
+                                                <div class="btn-group" dropdown>
+                                                    <button id="button-basic" dropdownToggle type="button"
+                                                        class="btn btn-light btn-sm text-primary-color dropdown-toggle"
+                                                        aria-controls="dropdown-basic">
+                                                        Acciones <span class="caret"></span>
+                                                    </button>
+                                                    <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu"
+                                                        aria-labelledby="button-basic">
+                                                        <!-- <li role="menuitem" (click)="toggleAssignScholarship(s)" *ngIf="!s.assignStudentID"><a class="dropdown-item">Asignar Beca</a></li> -->
+                                                        <li role="menuitem" (click)="toggleRecordQualification(s)" *ngIf="s.assignStudentID"><a class="dropdown-item">Habilitar Ficha</a></li>
+                                                        <li role="menuitem" *ngIf="s.assignStudentID && !s.hasConfig" (click)="toggleConfigScholarship(s)"><a class="dropdown-item">Configurar Beca</a></li>
+                                                        <li role="menuitem" (click)="toggleGoToSheet(s)" *ngIf="s.assignStudentID && s.available == true"><a class="dropdown-item">Ficha de Beca</a></li>
+                                                        <li role="menuitem" *ngIf="s.assignStudentID" (click)="downloadSheetPDF(s)"><a class="dropdown-item">Ficha de Asignación de Beca (PDF)</a></li>
+                                                        <li role="menuitem" *ngIf="s.assignStudentID && s.statusID === 0" (click)="toggleScholarshipAction(s, true)"><a class="dropdown-item">Renovación de Beca</a>
+                                                        </li>
+                                                        <li role="menuitem" *ngIf="s.assignStudentID" (click)="toggleScholarshipHistory(s)"><a class="dropdown-item">Historial de Beca</a>
+                                                        </li>
+                                                        <li role="menuitem" *ngIf="s.assignStudentID && s.statusID === 1" (click)="toggleScholarshipAction(s, false)"><a class="dropdown-item text-danger">Rechazar Beca</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </ng-container>
+                        <div class="col-12 text-center mt-3">
+                            <mat-paginator
+                                #paginator
+                                [length]="length"
+                                [pageSize]="pageSize"
+                                [pageSizeOptions]="pageSizeOptions"
+                                (page)="getStudentsDetailFromPaginator($event)">
+                            </mat-paginator>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div bsModal #scholarshipActionModal="bs-modal" class="modal fade" tabindex="-1" role="dialog"
+    aria-labelledby="dialog-sizes-name2">
+    <div class="modal-dialog modal-lg" *ngIf="assignStudentSelected">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="dialog-sizes-name2" class="modal-title pull-left">
+                    {{assignStudentSelected.action ? 'Renovación' : 'Rechazo'}} de Asignación de Beca
+                </h4>
+                <button type="button" class="btn btn-light pull-right text-danger" aria-label="Close"
+                    (click)="toggleScholarshipAction()">
+                    <span aria-hidden="true"><i class="fa fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <i class="fa fa-info mr-1"></i>Esta opción modificará la Asignación de la Beca y hara necesaria un configuración adicional en los conceptos de pago.
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <small>Motivo</small>
+                        <textarea name="obs" [(ngModel)]="newAction.obs" id="" class="form-control"></textarea>
+                    </div>
+                    <div class="col-12 text-center mt-3">
+                        <button class="btn btn-sm" [ngClass]="{'btn-danger': !assignStudentSelected.action, 'bg-primary-color': assignStudentSelected.action }" (click)="scholarshipAction()">
+                            <i class="fa fa-save mr-1"></i>{{assignStudentSelected.action ? 'Renovar' : 'Rechazar'}}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div bsModal #scholarshipHistoryModal="bs-modal" class="modal fade" tabindex="-1" role="dialog"
+    aria-labelledby="dialog-sizes-name2">
+    <div class="modal-dialog modal-lg" *ngIf="assignStudentSelected">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="dialog-sizes-name2" class="modal-title pull-left">
+                    Historial de Becas
+                </h4>
+                <button type="button" class="btn btn-light pull-right text-danger" aria-label="Close"
+                    (click)="toggleScholarshipHistory()">
+                    <span aria-hidden="true"><i class="fa fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group">
+                    <li class="list-group-item bg-primary-color">
+                        <div class="row">
+                            <div class="col-5">
+                                Detalle de Beca
+                            </div>
+                            <div class="col-3">
+                                Porcentaje
+                            </div>
+                            <div class="col-4">
+                                Fecha de Registro
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item" *ngFor="let h of assigneds">
+                        <div class="row">
+                            <div class="col-5">
+                                <strong>{{h.scholarshipName}}</strong><br>
+                                <small>{{h.scholarshipDescription}}</small>
+                            </div>
+                            <div class="col-3">
+                                {{h.discountPercentage}}%
+                            </div>
+                            <div class="col-4">
+                                <i class="fa fa-calendar mr-1"></i>{{h.dateCreated | date: 'dd/MM/yyyy HH:mm a'}}
+                            </div>
+                            <div class="col-12" *ngIf="h.scholarshipConfig.length">
+                                <hr>
+                            </div>
+                            <div class="col-12" *ngIf="h.scholarshipConfig.length">
+                                <i class="fa fa-money mr-1"></i>Configuración de Descuento de la Asignación
+                            </div>
+                            <div class="col-12">
+                                <div class="row">
+                                    <div class="col-3" *ngFor="let c of h.scholarshipConfig">
+                                        <div class="card">
+                                            <div class="card-header p-2">
+                                                <i class="fa fa-hashtag mr-1"></i>{{c.conceptPaymentDesc | uppercase}}
+                                            </div>
+                                            <div class="card-body p-2">
+                                                <small class="text-primary-color">Monto Original</small> <br>
+                                                {{c.originalAmount | number:'1.2-2'}} <br>
+                                                <small class="text-primary-color">Monto a pagar</small> <br>
+                                                {{c.quotaAmount | number:'1.2-2'}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div bsModal #recordQualificationModal="bs-modal" class="modal fade" tabindex="-1" role="dialog"
+    aria-labelledby="dialog-sizes-name2">
+    <div class="modal-dialog modal-lg" *ngIf="assignStudentSelected">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="dialog-sizes-name2" class="modal-title pull-left">
+                    Habilitaciones de Ficha de Beca
+                </h4>
+                <button type="button" class="btn btn-light pull-right text-danger" aria-label="Close"
+                    (click)="toggleRecordQualification()">
+                    <span aria-hidden="true"><i class="fa fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group">
+                    <li class="list-group-item text-center">
+                        <button class="btn btn-sm" [ngClass]="{'btn-light text-primary-color': !newRecordQualification, 'btn-danger': newRecordQualification}" (click)="toggleAddRecordQualification()">
+                            <i class="fa mr-1" [ngClass]="{'fa-plus': !newRecordQualification, 'fa-times': newRecordQualification}"></i>{{newRecordQualification ? 'Cancelar' : 'Agregar Intento de Habilitación'}}
+                        </button>
+                    </li>
+                    <ng-container *ngIf="newRecordQualification">
+                        <li class="list-group-item bg-primary-color">
+                            <i class="fa fa-plus mr-1"></i>Nueva Habilitación de Ficha
+                        </li>
+                        <li class="list-group-item">
+                            <form #recordQualificationForm="ngForm">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <small>Número de Intento</small>
+                                        <input type="text" name="intentNumber" [(ngModel)]="newRecordQualification.intentNumber" readonly class="form-control form-control-sm">
+                                    </div>
+                                    <div class="col-12">
+                                        <small>Fecha Inicio</small>
+                                        <input type="date" name="startDate" [(ngModel)]="newRecordQualification.startDate" class="form-control form-control-sm" required>
+                                    </div>
+                                    <div class="col-12">
+                                        <small>Fecha Fin</small>
+                                        <input type="date" name="endDate" [min]="newRecordQualification.startDate" [disabled]="!newRecordQualification.startDate" [(ngModel)]="newRecordQualification.endDate" class="form-control form-control-sm" required>
+                                    </div>
+                                    <div class="col-12 mt-2 text-center">
+                                        <button class="btn btn-sm" [ngClass]="{'bg-primary-color': !newRecordQualification.editing, 'btn-success': newRecordQualification.editing}" [disabled]="recordQualificationForm.invalid" (click)="saveRecordQualification()">
+                                            <i class="fa fa-save mr-1"></i>Guardar cambios
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </li>
+                    </ng-container>
+                    <li class="list-group-item" *ngFor="let r of assignStudentSelected.details">
+                        <div class="row">
+                            <div class="col-9 pt-1">
+                                {{r.startDate | date:'dd/MM/yyyy'}} a {{r.endDate | date: 'dd/MM/yyyy'}}
+                            </div>
+                            <div class="col-3 text-right">
+                                <button class="btn btn-sm btn-light text-primary-color" (click)="toggleAddRecordQualification(r)">
+                                    <i class="fa fa-edit mr-1"></i>Editar
+                                </button>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div bsModal #configScholarshipModal="bs-modal" class="modal fade" tabindex="-1" role="dialog"
+    aria-labelledby="dialog-sizes-name2">
+    <div class="modal-dialog modal-lg" *ngIf="assignStudentSelected">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="dialog-sizes-name2" class="modal-title pull-left">
+                    Configuración de Beca
+                </h4>
+                <button type="button" class="btn btn-light pull-right text-danger" aria-label="Close"
+                    (click)="toggleConfigScholarship()">
+                    <span aria-hidden="true"><i class="fa fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <table class="table table-sm table-bordered">
+                            <tbody>
+                                <tr>
+                                    <th class="bg-secondary text-white">Estudiante</th>
+                                    <td>{{assignStudentSelected.fullName | uppercase}}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-secondary text-white">Nro de Documento</th>
+                                    <td>{{assignStudentSelected.personDocumentNumber}}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-secondary text-white">Tipo de Beca</th>
+                                    <td>{{assignStudentSelected.scholarshipName}} - {{assignStudentSelected.scholarshipDescription}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <i class="fa fa-info mr-1"></i>El Valor del Semestre del estudiante es: {{assignStudentSelected.charge || 500 | number: '1.2-2'}}
+                            <span class="float-right">Porcentaje de Descuento por Beneficio <span class="badge bg-primary-color">{{assignStudentSelected.discountPercentage}}%</span></span>
+                            <br>
+                            <i class="fa fa-info mr-1"></i>Saldo restante del Semestre: {{assignStudentSelected.rest || 0 | number: '1.2-2'}}
+                            <br>
+                            <i class="fa fa-info mr-1"></i>Descuento Beca Valor: {{assignStudentSelected.discount || 0 | number: '1.2-2'}}
+                            <br>
+                            <i class="fa fa-info mr-1"></i>Valor a Pagar con el Descuento: {{assignStudentSelected.totalPayment || 0 | number: '1.2-2'}}
+                            <hr>
+                            <span *ngIf="assignStudentSelected.paymentOption">
+                                <small>Opción de Pago del Estudiante:</small> <br>
+                                {{assignStudentSelected.paymentOption.paymentOptionDesc | uppercase}}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-4" *ngFor="let q of quotasRealizeds">
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <span class="text-primary-color">#{{q.conceptsPaymentDesc}}</span> <span class="float-right">{{q.amount | number:'1.2-2'}}</span>
+                            </div>
+                            <div class="card-body">
+                                Esta cuota fue realizada previamente: <br>
+                                MATR = Matricula <br>
+                                C01 = Cuota Nro 1
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4" *ngFor="let q of quotas">
+                        <div class="card mb-3" *ngIf="q.initial">
+                            <div class="card-header">
+                                #{{q.conceptsPaymentDesc}} <span class="float-right">{{q.amount | number:'1.2-2'}}</span>
+                            </div>
+                            <div class="card-body">
+                                Esta cuota fue realizada previamente: <br>
+                                MATR = Matricula <br>
+                                C01 = Cuota Nro 1
+                            </div>
+                        </div>
+                        <div class="card mb-3" *ngIf="!q.initial">
+                            <div class="card-header">
+                                <div class="row">
+                                    <div class="col-8 pt-1">
+                                        #{{q.conceptsPaymentDesc}}
+                                    </div>
+                                    <div class="col-4">
+                                        <button class="btn btn-sm btn-light text-danger" (click)="addQuota(q)">
+                                            <i class="fa fa-trash mr-1"></i>Quitar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <small>Monto asignado&nbsp;<i class="fa fa-info" title="Este solo es un monto asignado"></i></small>
+                                <input type="number" readonly name="q.assignAmount" [(ngModel)]="q.assignAmount" class="form-control form-control-sm">
+                                <ng-container *ngIf="q.editable">
+                                    <small>Porcentaje a Asignar&nbsp;<i class="fa fa-info" title="Este solo es un monto asignado"></i></small>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend" >
+                                            <button class="btn btn-light text-danger btn-sm" [disabled]="q.disableMinus" (click)="toggleQuota(q, false)" type="button" id="button-addon1"><i class="fa fa-minus"></i></button>
+                                        </div>
+
+                                        <input type="number" readonly name="q.assignPercent" [(ngModel)]="q.assignPercent" [min]="0" [max]="assignStudentSelected.discountPercentageWork" class="form-control form-control-sm">
+                                        <div class="input-group-append" >
+                                            <button class="btn btn-light text-primary-color btn-sm" [disabled]="q.disablePlus" (click)="toggleQuota(q, true)" type="button" id="button-addon1"><i class="fa fa-plus"></i></button>
+                                        </div>
+                                    </div>
+                                    <small>Monto Final&nbsp;<i class="fa fa-info" title="Este solo es un monto asignado"></i></small>
+                                    <input type="number" readonly name="q.quotaAmount" [(ngModel)]="q.quotaAmount" class="form-control form-control-sm">
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="card hand" (click)="addQuota()" *ngIf="quotas.length < 5">
+                            <div class="card-body bg-light text-center">
+                                <i class="fa fa-plus fa-3x"></i><br>
+                                Agregar Cuota
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 text-center">
+                    <button class="btn bg-primary-color" (click)="saveConfigQuota()">
+                        <i class="fa fa-save mr-1"></i>Guardar Configuración de Cuotas
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div bsModal #assignScholarshipModal="bs-modal" class="modal fade" tabindex="-1" role="dialog"
+    aria-labelledby="dialog-sizes-name2">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="dialog-sizes-name2" class="modal-title pull-left">
+                    Asignación de Beca
+                </h4>
+                <button type="button" class="btn btn-light pull-right text-danger" aria-label="Close"
+                    (click)="toggleAssignScholarship()">
+                    <span aria-hidden="true"><i class="fa fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form #assignForm="ngForm">
+                    <div class="row">
+                        <div class="col-9">
+                            <input type="text" name="filter.text" placeholder="Buscar Estudiante por Nombre o Documento" [(ngModel)]="filter.text" class="form-control">
+                        </div>
+                        <div class="col-3">
+                            <button class="btn btn-block btn bg-primary-color" [disabled]="!filter.text" (click)="searchStudent()">
+                                <i class="fa fa-search mr-1"></i>Buscar
+                            </button>
+                        </div>
+                        <ng-container *ngIf="!filter.searched">
+                            <div class="col-12 text-center" *ngIf="!filter.searching">
+                                <i class="fa fa-search mr-1"></i>Busca un o varios estudiantes para asignarles la beca.
+                            </div>
+                            <div class="col-12 text-center" *ngIf="filter.searching">
+                                <div class="spinner-grow text-primary" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                  </div>
+                                  <div class="spinner-grow text-secondary" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                  </div>
+                                  <div class="spinner-grow text-success" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                  </div> <br>
+                                  Buscando estudiantes.
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="filter.searched">
+                            <div class="col-12 text-center" *ngIf="!results.length">
+                                <i class="fa fa-times fa-2x"></i> <br>
+                                No se encontraron registros con ese parametro
+                            </div>
+                            <div class="col-12 mt-3" *ngIf="results.length">
+                                <ul class="list-group" style="max-height: 200px; overflow: auto;">
+                                    <li class="list-group-item p-2" *ngFor="let r of results">
+                                        <div class="row">
+                                            <div class="col-3">
+                                                <small>
+                                                    {{r.student | uppercase}} <br>
+                                                    {{r.documentNumber}}
+                                                </small>
+                                            </div>
+                                            <div class="col-2">
+                                                {{r.grade | number:'1.2-2'}}
+                                            </div>
+                                            <div class="col-2">
+                                                <small>
+                                                    {{r.modality | uppercase}}
+                                                </small>
+                                            </div>
+                                            <div class="col-3">
+                                                <small>
+                                                    {{r.career}}
+                                                </small>
+                                            </div>
+                                            <div class="col-2 text-right">
+                                                <button class="btn btn-sm" [ngClass]="{'btn-light text-primary': !r.selected, 'btn-danger': r.selected}" (click)="toggleSelectStudent(r)">
+                                                    <i class="fa mr-1" [ngClass]="{'fa-circle-o': !r.selected, 'fa-times': r.selected}"></i>{{r.selected ? 'Quitar' : 'Elegir'}}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="newAssignScholarship.existsStudentSelected">
+                            <div class="col-12">
+                                <small>Beca a Asignar</small>
+                                <select name="scholarshipID" name="scholarshipID" [(ngModel)]="newAssignScholarship.scholarshipID" class="form-control form-control-sm" required>
+                                    <option [ngValue]="undefined">--SELECCIONE--</option>
+                                    <option *ngFor="let s of scholarships" [ngValue]="s.scholarshipID">{{s.name | uppercase}} {{s.careerName | uppercase}}</option>
+                                </select>
+                            </div>
+                            <div class="col-12 mt-3 text-center">
+                                <button class="btn btn-sm bg-primary-color" [disabled]="assignForm.invalid" (click)="assignScholarship()">
+                                    <i class="fa fa-save mr-1"></i>Asignar Beca
+                                </button>
+                            </div>
+                        </ng-container>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,108 @@
+
+
+<div class="row animated fadeIn fast">
+    <div class="col-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <button mat-stroked-button class="styleButton" color="primary" disabled>Periodo Anterior</button>
+                    </div>
+                    <div class="col-md-6">
+                        <button mat-stroked-button class="styleButton" color="primary" disabled>Periodo Actual</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div>
+                    <form [formGroup]="selects">
+                        <div class="row animated fadeIn fast">
+                            <div class="col-md-4" >
+                                <div class="card">
+                                    <div class="card-body search">
+                                        <mat-form-field class="width" appearance="outline">
+                                            <mat-label>Plan de Estudio</mat-label>
+                                            <mat-select formControlName="studyPlan">
+                                                <mat-option>--</mat-option>
+                                                <mat-option *ngFor="let item of studyPlanList" [value]="item.studyPlanID">{{item.studyPlanDesc}}</mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4" >
+                                <div class="card">
+                                    <div class="card-body search">
+                                        <mat-form-field class="width" appearance="outline">
+                                            <mat-label>Carrera</mat-label>
+                                            <mat-select formControlName="career">
+                                                <mat-option>--</mat-option>
+                                                <mat-option *ngFor="let item of careerList" [value]="item.careerID">{{item.careerName}}</mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4" >
+                                <div class="card">
+                                    <div class="card-body search">
+                                        <mat-form-field class="width" appearance="outline">
+                                            <mat-label>Materias</mat-label>
+                                            <mat-select formControlName="matter">
+                                                <mat-option>--</mat-option>
+                                                <mat-option *ngFor="let item of careerDetailTable" [value]="item.courseID">{{item.courseName}}</mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <button mat-stroked-button class="styleButton" color="primary">Docencia</button>
+                    </div>
+                    <div class="col-md-4">
+                        <button mat-stroked-button class="styleButton" color="primary" disabled>Investigación</button>
+                    </div>
+                    <div class="col-md-4">
+                        <button mat-stroked-button class="styleButton" color="primary" disabled>Planificación</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Docente</th>
+                                <th>Horas</th>
+                                <th class="text-nowrap">Actualizar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of teacherTable">
+                                <td style="width: 25%;">{{item.teacherName | titlecase}}</td>
+                                <td style="width: 65%;">
+                                    <components-progress [totalHours]="item.hours" [busyHours]="item.startPeriod"></components-progress>
+                                </td>
+                                <td class="text-center" style="width: 10%;">
+                                    <a (click)="teacherUpdate(item)" style="cursor: pointer;" data-toggle="tooltip" data-original-title="Actualizar Información"> <i class="fa fa-check text-inverse m-r-10"></i></a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

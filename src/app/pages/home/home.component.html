@@ -1,0 +1,39 @@
+<div id="main-wrapper">
+
+    <shared-header></shared-header>
+    <shared-sidebar></shared-sidebar>
+    <div class="page-wrapper">
+        <div class="container-fluid">
+            <shared-breadcrumbs></shared-breadcrumbs>
+                <!-- ============================================================== -->
+                <!-- Start Page Content -->
+                <!-- ============================================================== -->
+                <!-- <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body"> -->
+                                <router-outlet></router-outlet>
+                            <!-- </div>
+                        </div>
+                    </div>
+                </div> -->
+                <!-- ============================================================== -->
+                <!-- End PAge Content -->
+                <!-- ============================================================== -->
+        </div>
+        <!-- ============================================================== -->
+            <!-- footer -->
+            <!-- ============================================================== -->
+            <footer class="footer">
+                © {{fecha}} 
+                <a href="https://encuba.academy" target="_blank"><strong>ENCUBA</strong></a>
+                <button (click)="goToTermsAndConditions()"  class="footer-button-no-outline"><strong>Términos y Condiciones</strong></button>
+                <button (click)="goToPoliciesPayment()"  class="footer-button-no-outline"><strong>Políticas de Pago</strong></button>
+                <button (click)="goToPoliciesShipping()"  class="footer-button-no-outline"><strong>Políticas de Envio</strong></button>
+            </footer>
+            <!-- ============================================================== -->
+            <!-- End footer -->
+            <!-- ============================================================== -->
+    </div>
+
+</div>

@@ -1,0 +1,21 @@
+<a mat-ripple
+   *ngIf="isExternalLink; else internalLink"
+   mat-list-item
+   [href]="link"
+   [attr.target]="target">
+	<ng-container *ngTemplateOutlet="templateContent"></ng-container>
+</a>
+
+<ng-template #internalLink>
+	<!--	   (isActiveChange)="isActive.emit($event)">-->
+	<a mat-list-item
+	   mat-ripple
+	   [routerLink]="link"
+	   routerLinkActive="active">
+		<ng-container *ngTemplateOutlet="templateContent"></ng-container>
+	</a>
+</ng-template>
+
+<ng-template #templateContent>
+	<ng-content></ng-content>
+</ng-template>

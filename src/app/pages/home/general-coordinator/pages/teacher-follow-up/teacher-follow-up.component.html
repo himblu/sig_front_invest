@@ -1,0 +1,139 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+<div class="row animated fadeIn fast" *ngIf="!charging">
+  <div class="col-md-12">
+    <div class="card" style="border-radius: 15px;">
+      <div class="card-body">
+        <div class="row pl-3 pr-3">
+          <div class="col-3">
+            <section [formGroup]="filtersForm">
+              <mat-form-field appearance="outline">
+                <mat-label>Periodo Académico</mat-label>
+                <mat-select formControlName="periodID" placeholder="Filtrar por Periodo Académico"
+                (selectionChange)="getActivities($event.value); getSchoolsByPeriod($event.value); careers=[]; studyPlans=[]; teachers=null;">
+                  <mat-option *ngFor="let period of periods;" [value]="period.periodID">{{ period.periodName }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </section>
+          </div>
+          <div class="col-3">
+            <section [formGroup]="filtersForm">
+              <mat-form-field appearance="outline">
+                <mat-label>Escuela</mat-label>
+                <mat-select formControlName="schoolID" placeholder="Filtrar por Escuela"
+                (selectionChange)="getCareersBySchool($event.value); studyPlans=[]; teachers=null;">
+                  <mat-option *ngFor="let item of schools" [value]="item.schoolID">{{item.schoolName}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </section>
+          </div>
+          <div class="col-3">
+            <section [formGroup]="filtersForm">
+              <mat-form-field appearance="outline">
+                <mat-label>Carrera</mat-label>
+                <mat-select formControlName="careerID" placeholder="Filtrar por Carrera"
+                (selectionChange)="getStudyPlansByCareer($event.value); teachers=null;">
+                  <mat-option *ngFor="let item of careers" [value]="item.careerID">{{item.careerName}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </section>
+          </div>
+          <div class="col-3">
+            <section [formGroup]="filtersForm">
+              <mat-form-field appearance="outline">
+                <mat-label>Malla curricular</mat-label>
+                <mat-select formControlName="studyPlanID" placeholder="Filtrar por Malla Curricular" (selectionChange)="searchTeachers()">
+                  <mat-option *ngFor="let item of studyPlans" [value]="item.studyPlanID">{{item.studyPlanDesc}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </section>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table mat-table *ngIf="componentPeriod"
+              [dataSource]="teachers" multiTemplateDataRows
+              class="mat-elevation-z8">
+
+          <ng-container matColumnDef="teacher">
+            <th mat-header-cell *matHeaderCellDef [style.background-color]="'#014898'"
+              [style.text-align]="'left'" [style.color]="'white'"> Docente </th>
+            <td mat-cell *matCellDef="let element"> {{element.teacher}} </td>
+          </ng-container>
+          <ng-container matColumnDef="documentNumber">
+            <th mat-header-cell *matHeaderCellDef [style.background-color]="'#014898'"
+              [style.text-align]="'left'" [style.color]="'white'"> Nro Documento </th>
+            <td mat-cell *matCellDef="let element"> {{element.documentNumber}} </td>
+          </ng-container>
+          <ng-container matColumnDef="amount">
+            <th mat-header-cell *matHeaderCellDef [style.background-color]="'#014898'"
+              [style.text-align]="'left'" [style.color]="'white'"> Horas docencia </th>
+            <td mat-cell *matCellDef="let element"> {{element.amount}} </td>
+          </ng-container>
+
+          <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
+          <ng-container matColumnDef="expandedDetail">
+            <td  mat-cell *matCellDef="let element" [attr.colspan]="columnsToDisplay.length">
+              <div class="example-element-detail"
+                [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+                <div *ngIf="partial1 && partial2">
+                  <table class="table table-striped">
+                    <thead>
+                      <tr style="font-size: 8px;">
+                        <th>Asignatura</th>
+                        <th style="max-width: 60px;">Paralelo</th>
+                        <th style="background-color: rgb(232, 255, 247);">P1 ({{partial1.activities[0].subComponentTypeName}})</th>
+                        <th style="background-color: rgb(232, 255, 247);">P1 ({{partial1.activities[1].subComponentTypeName}})</th>
+                        <th style="background-color: rgb(232, 255, 247);">P1 ({{partial1.activities[2].subComponentTypeName}})</th>
+                        <th style="background-color: rgb(232, 255, 247);">P1 ({{partial1.activities[3].subComponentTypeName}})</th>
+                        <th style="background-color: rgb(232, 255, 247);">P1 ({{partial1.activities[4].subComponentTypeName}})</th>
+                        <th style="background-color: rgb(241, 248, 223);">P2 ({{partial2.activities[0].subComponentTypeName}})</th>
+                        <th style="background-color: rgb(241, 248, 223);">P2 ({{partial2.activities[1].subComponentTypeName}})</th>
+                        <th style="background-color: rgb(241, 248, 223);">P2 ({{partial2.activities[2].subComponentTypeName}})</th>
+                        <th style="background-color: rgb(241, 248, 223);">P2 ({{partial2.activities[3].subComponentTypeName}})</th>
+                        <th style="background-color: rgb(241, 248, 223);">P2 ({{partial2.activities[4].subComponentTypeName}})</th>
+                        <th>Exámen logros</th>
+                      </tr>
+                    </thead>
+                    <tbody style="color: black;" *ngIf="teachingProcess">
+                      <tr *ngFor="let item of teachingProcess; let i=index">
+                        <td class="wrap">{{item.courseName}}</td>
+                        <td class="wrap" style="max-width: 60px;">{{item.parallelCode}}</td>
+                        <td colspan="11">
+                          <mat-progress-bar
+                            class="example-margin"
+                            color="blue"
+                            mode="determinate"
+                            [value]="(item.a1+item.a2+item.a3+item.a4+item.a5+item.a6+item.a7+item.a8+item.a9+item.a10)*10">
+                          </mat-progress-bar>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+          <tr mat-row *matRowDef="let element; columns: columnsToDisplay;"
+              style="cursor: pointer;"
+              class="example-element-row"
+              [class.example-expanded-row]="expandedElement === element"
+              (click)="expandedElement = expandedElement === element ? null : element"
+              (click)="getTeachingProcess(element.personID)">
+          </tr>
+          <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
+        </table>
+        </div>
+        <components-button-arrow *ngIf="componentPeriod && teachers" [actual]="actualTeachers" [totalPage]="totalPageTeachers" [count]="countTeachers" (result)="changePageTeachers($event)"></components-button-arrow>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,169 @@
+<div class="row animated fadeIn fast" *ngIf="loading">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<div class="row animated fadeIn fast" *ngIf="!loading">
+  <div class="col-md-12">
+    <div class="card" style="border-radius: 15px;">
+      <div class="card-body">
+        <section [formGroup]="filtersForm">
+          <div class="row pl-3 pr-3">
+            <div class="col-3">
+              <mat-form-field appearance="outline">
+                <mat-label>Estado</mat-label>
+                <mat-select formControlName="state" (selectionChange)="getApprovalRequest();">
+                  <mat-option [value]="'REVISION'">EN REVISIÓN</mat-option>
+                  <mat-option [value]="'APROBADO'">APROBADO</mat-option>
+                  <mat-option [value]="'RECHAZADO'">RECHAZADO</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-4">
+              <mat-form-field appearance="outline">
+                <mat-label>Buscar por nombre de empresa</mat-label>
+                <input matInput formControlName="search" autocomplete="off" (input)="getApprovalRequest();">
+                <mat-icon matSuffix>search</mat-icon>
+              </mat-form-field>
+            </div>
+            <div class="col-2">
+              <a
+                style="background-color: rgb(84, 158, 77);
+                color: white;"
+                mat-raised-button
+                matTooltipPosition="above"
+                matTooltip="Descargar"
+                href="https://tecnologicoitcaeduec-my.sharepoint.com/personal/encuba_itca_edu_ec/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fencuba%5Fitca%5Fedu%5Fec%2FDocuments%2FCONTRATO%20SISTEMA%20INFORM%C3%81TICO%20DE%20GESTI%C3%93N%20%28SIG%29%20%2D%20ENCUBA%2FMANUALES%20DE%20USUARIO%20%28SIG%29%2FVINCULACI%C3%93N%2F8%5FMU%5FPROCESO%5FAPROBACI%C3%93N%20DE%20EMPRESAS%5FROL%20COORDINADOR%20DE%20CARRERA%2Epdf&parent=%2Fpersonal%2Fencuba%5Fitca%5Fedu%5Fec%2FDocuments%2FCONTRATO%20SISTEMA%20INFORM%C3%81TICO%20DE%20GESTI%C3%93N%20%28SIG%29%20%2D%20ENCUBA%2FMANUALES%20DE%20USUARIO%20%28SIG%29%2FVINCULACI%C3%93N"
+                target="_blank">
+                <small>Manual Usuario</small>
+              </a>
+            </div>
+          </div>
+        </section>
+        <div>
+          <div id="add-contact" class="modal fade in" tabindex="-1" role="dialog"
+               aria-labelledby="myModalLabel" aria-hidden="true">
+          </div>
+          <table id="demo-foo-addrow"
+                 class="table m-t-0 table-hover no-wrap contact-list footable-loaded footable"
+                 data-page-size="5">
+            <thead style="background-color: #004899; color: white;">
+              <tr>
+                <th class="footable-sortable">
+                  Ruc
+                  <span class="footable-sort-indicator"></span>
+                </th>
+                <th class="footable-sortable wrap">
+                  Empresa
+                  <span class="footable-sort-indicator"></span>
+                </th>
+                <th class="footable-sortable wrap">
+                  Archivos habilitantes
+                  <span class="footable-sort-indicator"></span>
+                </th>
+                <th class="footable-sortable">
+                  SI/NO
+                  <span class="footable-sort-indicator"></span>
+                </th>
+                <th class="footable-sortable">
+                  Justificación
+                  <span class="footable-sort-indicator"></span>
+                </th>
+                <th class="footable-sortable" style="text-align: center;" *ngIf="filtersForm.get('state').value === 'REVISION' || filtersForm.get('state').value === 'APROBADO'">
+                  Acciones
+                  <span class="footable-sort-indicator"></span>
+                </th>
+              </tr>
+            </thead>
+            <ng-container [formGroup]="tableForm">
+              <tbody style="color: black;" formArrayName="news">
+                <tr *ngFor="let item of approvalRequest" [formGroupName]="item.index">
+                  <td>{{item.ruc}}</td>
+                  <td>{{item.bussinesName}}</td>
+                  <td>
+                    <a style="cursor: pointer;" [matMenuTriggerFor]="menu"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></a>
+                    <mat-menu #menu="matMenu">
+                      <a mat-menu-item
+                        *ngIf="item.appointmentFile"
+                        (click)="getApprovalRequestFileView(item, item.appointmentFile);">
+                        <mat-icon>link</mat-icon>
+                        <span>Nombramiento</span>
+                      </a>
+                      <a mat-menu-item
+                        *ngIf="item.cedulaBusinessFile"
+                        (click)="getApprovalRequestFileView(item, item.cedulaBusinessFile);">
+                        <mat-icon>link</mat-icon>
+                        <span>Cédula</span>
+                      </a>
+                      <a mat-menu-item
+                        *ngIf="item.rucBusinessFile"
+                        (click)="getApprovalRequestFileView(item, item.rucBusinessFile);">
+                        <mat-icon>link</mat-icon>
+                        <span>Ruc</span>
+                      </a>
+                      <a mat-menu-item
+                        *ngIf="item.sheetBusineesFile"
+                        (click)="getApprovalRequestFileView(item, item.sheetBusineesFile);">
+                        <mat-icon>link</mat-icon>
+                        <span>Planilla seguro social</span>
+                      </a>
+                      <a mat-menu-item
+                        *ngIf="item.signedFile"
+                        (click)="getApprovalRequestFileView(item, item.signedFile);">
+                        <mat-icon>link</mat-icon>
+                        <span>Documento firmado</span>
+                      </a>
+                    </mat-menu>
+                  </td>
+                  <td *ngIf="item.yesNot">{{item.yesNot}}</td>
+                  <td *ngIf="!item.yesNot">
+                    <div style="max-height: 10px; width: 70px;">
+                      <mat-form-field appearance="outline">
+                        <mat-select formControlName="p_yesNot">
+                          <mat-option value="SI" (onSelectionChange)="patchStateApproval($event, item.index, 'APROBADO')">Si</mat-option>
+                          <mat-option value="NO" (onSelectionChange)="patchStateApproval($event, item.index, 'RECHAZADO')">No</mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                  </td>
+                  <td *ngIf="item.justification">{{item.justification}}</td>
+                  <td *ngIf="!item.justification">
+                    <div style="max-height: 10px;">
+                      <mat-form-field appearance="outline">
+                        <input matInput autocomplete="off" formControlName="p_justification">
+                      </mat-form-field>
+                    </div>
+                  </td>
+                  <td style="text-align: center;" *ngIf="filtersForm.get('state').value === 'REVISION'">
+                    <a type="button"
+                      matTooltipPosition="above"
+                      matTooltip="Guardar"
+                      style="cursor: pointer; color: red;"
+                      (click)="updateApproval(item, item.index)">
+                      <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    </a>
+                  </td>
+                  <td style="text-align: center;" *ngIf="filtersForm.get('state').value === 'APROBADO'">
+                    <a style="cursor: pointer;"><i class="fa fa-plus-circle" aria-hidden="true" (click)="getBusinessByRuc(item);"></i></a>
+                  </td>
+                </tr>
+              </tbody>
+            </ng-container>
+          </table>
+        </div>
+        <mat-paginator
+          #paginator
+          [length]="length"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions"
+          (page)="pageEvent = getApprovalRequestPaginator($event)">
+        </mat-paginator>
+      </div>
+    </div>
+  </div>
+</div>

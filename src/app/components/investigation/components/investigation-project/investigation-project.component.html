@@ -1,0 +1,192 @@
+<!-- <div class="row animated fadeIn fast"> -->
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <form [formGroup]="myForm"
+                    autocomplete="off">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Nombre del Proyecto</mat-label>
+                                <input formControlName="projectName" type="text" matInput>
+                                <mat-error *ngIf="isValidField('projectName')">{{getFielError('projectName')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-4">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Institucion</mat-label>
+                                <input formControlName="investigationInstitution" type="text" matInput>
+                                <mat-error *ngIf="isValidField('investigationInstitution')">{{getFielError('investigationInstitution')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-4">
+                          <mat-form-field class="width" appearance="outline">
+                            <mat-label>Año de Convocatoria, fecha inicio</mat-label>
+                            <input matInput formControlName="initDate" [matDatepicker]="startPicker">
+                            <mat-hint>MM/DD/YYYY</mat-hint>
+                            <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+                            <mat-datepicker #startPicker></mat-datepicker>
+                            <mat-error *ngIf="isValidField('initDate')">{{getFielError('initDate')}}</mat-error>
+                          </mat-form-field>
+                        </div>
+                        <div class="col-md-4">
+                          <mat-form-field class="width" appearance="outline">
+                            <mat-label>Año de Convocatoria, fecha fin</mat-label>
+                            <input matInput formControlName="endDate" [matDatepicker]="endPicker">
+                            <mat-hint>MM/DD/YYYY</mat-hint>
+                            <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+                            <mat-datepicker #endPicker></mat-datepicker>
+                            <mat-error>Campo Obligatorio no puede ir en blanco!</mat-error>
+                          </mat-form-field>
+                        </div>
+                        <div class="col-md-4">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Numero de Participantes</mat-label>
+                                <input formControlName="investigationParticipantsNro" type="text" matInput mask="S*"
+                                [patterns]="phone" maxlength="4">
+                                <mat-error *ngIf="isValidField('investigationParticipantsNro')">{{getFielError('investigationParticipantsNro')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="col-md-4">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Cargo</mat-label>
+                                <mat-select formControlName="investigationProjectPositionID">
+                                    <mat-option value="">Seleccione una opción</mat-option>
+                                    <mat-option [value]="position.projectPositionID" *ngFor="let position of positions"> {{ position.projectPositionName }} </mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="isValidField('investigationProjectPositionID')">{{getFielError('investigationProjectPositionID')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="col-md-4">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Pais</mat-label>
+                                <mat-select formControlName="countryID">
+                                    <mat-option value="">Seleccione una opción</mat-option>
+                                    <mat-option [value]="country.countryID" *ngFor="let country of countries"> {{ country.countryName }} </mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="isValidField('countryID')">{{getFielError('countryID')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-10"></div>
+                        <div class="col-md-2">
+                            <button mat-raised-button class="styleButton_sml" style="max-width: 150px; min-width: 100px;" type="submit"  (click)="charge()">Agregar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div><br>
+    </div>
+    <form [formGroup]="societyForm">
+        <div *ngFor="let item of dynamicsArr.controls; let i = index">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div formArrayName="dynamics">
+                            <!-- <h1 class="text-warning">Proyecto de Investigacion N°:{{i + 1}}</h1> -->
+                            <div class="row" [formGroupName]="i">
+                                <div class="col-md-4">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Nombre del Proyecto</mat-label>
+                                        <input formControlName="projectName" type="text" matInput (blur)="putInvestigation(i);">
+                                        <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-4">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Institucion</mat-label>
+                                        <input formControlName="investigationInstitution" type="text" matInput (blur)="putInvestigation(i);">
+                                        <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-4">
+                                  <mat-form-field class="width" appearance="outline">
+                                    <mat-label>Año de Convocatoria, fecha inicio</mat-label>
+                                    <input type="date" formControlName="initDate" #initDate matInput (click)="initDate.showPicker()" (blur)="putInvestigation(i);">
+                                    <mat-icon style="cursor: pointer;" matSuffix (click)="initDate.showPicker()">calendar_month</mat-icon>
+                                    <mat-hint>MM/DD/YYYY</mat-hint>
+                                    <mat-error *ngIf="isValidField('initDate')">{{getFielError('initDate')}}</mat-error>
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-md-4">
+                                  <mat-form-field class="width" appearance="outline">
+                                    <mat-label>Año de Convocatoria, fecha fin</mat-label>
+                                    <input type="date" formControlName="endDate" #endDate matInput (click)="endDate.showPicker()" (blur)="putInvestigation(i);">
+                                    <mat-icon style="cursor: pointer;" matSuffix (click)="endDate.showPicker()">calendar_month</mat-icon>
+                                    <mat-hint>MM/DD/YYYY</mat-hint>
+                                    <mat-error>Campo Obligatorio no puede ir en blanco!</mat-error>
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-md-4">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Numero de Participantes</mat-label>
+                                        <input formControlName="investigationParticipantsNro" type="text" matInput (blur)="putInvestigation(i);">
+                                        <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-4">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Cargo</mat-label>
+                                        <mat-select formControlName="investigationProjectPositionID" (selectionChange)="putInvestigation(i);">
+                                            <mat-option value="">Seleccione una opción</mat-option>
+                                            <mat-option [value]="position.projectPositionID" *ngFor="let position of positions"> {{ position.projectPositionName }} </mat-option>
+                                        </mat-select>
+                                        <mat-error *ngIf="isValidField('investigationProjectPositionID')">{{getFielError('investigationProjectPositionID')}}</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-4">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Pais</mat-label>
+                                        <mat-select formControlName="countryID" (selectionChange)="putInvestigation(i);">
+                                            <mat-option value="">Seleccione una opción</mat-option>
+                                            <mat-option [value]="country.countryID" *ngFor="let country of countries"> {{ country.countryName }} </mat-option>
+                                        </mat-select>
+                                        <mat-error *ngIf="isValidField('countryID')">{{getFielError('countryID')}}</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-4">
+                                  <div style="border: 1px solid rgba(0, 0, 0, 0.315); height: 40px; display: flex; border-radius: 4px;">
+                                    <input
+                                      *ngIf="!investigations[i]?.urlDocument"
+                                      style="cursor: pointer; width: 250px;"
+                                      class="mt-1 mb-1 ml-2 align-self-center"
+                                      #input
+                                      (change)="onChangeInput(input.files, i, input);"
+                                      formControlName="fileInvestigation" type="file" accept="application/pdf">
+                                    <div *ngIf="investigations[i]?.urlDocument" class="w-100" (click)="openFile(investigations[i].urlDocument);" style="cursor: pointer;">
+                                      <img style="width: 20px;" src="assets/images/file.png" alt="Payment File">
+                                      <span style="color: #5090f5;">Ver Archivo</span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-4">
+                                  <mat-label>Estado</mat-label>
+                                  <mat-checkbox formControlName="statusID" color="primary" (change)="putInvestigation(i);"></mat-checkbox>
+                                </div>
+                                <div class="col-md-2">
+                                  <button mat-raised-button class="styleButton_sml" style="max-width: 150px; min-width: 100px;" type="button" (click)="deleteDynamic(i)" *ngIf="!isLoadingInfo">Eliminar</button>
+                              </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><br>
+        </div>
+    </form>
+    <div class="col-md-12">
+      <div class="col-12" style="position: relative;" *ngIf="isLoading; else row">
+        <spinner-loader></spinner-loader>
+      </div>
+      <ng-template #row>
+        <div class="row">
+            <div class="col-10"></div>
+            <div class="col-2" style="text-align: left;" *ngIf="dynamicsArr.length > 0">
+                <button mat-raised-button
+                matTooltip="Siguiente: Investigación" class="styleButton_sml" style="max-width: 150px; min-width: 100px;" type="button" (click)="saveRecord()" >Guardar</button>
+            </div>
+        </div>
+      </ng-template>
+    </div>
+
+<!-- </div> -->

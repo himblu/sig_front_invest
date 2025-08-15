@@ -1,0 +1,364 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+    <div class="col-md-12">
+        <div class="alert alert-info text-center">
+            <h4 class="alert-heading">Cargando</h4>
+            <i class="fa fa-spin fa-refresh fa-3x"></i>
+            <p class="mb-0">Por favor esperar...</p>
+        </div>
+    </div>
+</div>
+<div class="row text-center" *ngIf="!charging">
+  <div class="col">
+      <h2 class="text-center">Perfil Profesional</h2>
+  </div>
+</div>
+<div class="row animated fadeIn fast" *ngIf="!charging">
+    <div class="col-12">
+        <div>
+              <section [formGroup]="filtersForm">
+                <div class="row pl-4 pr-4">
+                  <div class="col-3">
+                      <mat-form-field appearance="outline">
+                          <mat-label>Estado</mat-label>
+                          <mat-select (selectionChange)="getFilterCollaborator($event.value);" formControlName="state"
+                              placeholder="Filtrar por Estado">
+                              <mat-option [value]='2'>Todos</mat-option>
+                              <mat-option [value]='1'>Activo</mat-option>
+                              <mat-option [value]='0'>Inactivo</mat-option>
+                          </mat-select>
+                      </mat-form-field>
+                  </div>
+                  <div class="col-5">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Buscar por Empleado</mat-label>
+                      <input matInput #search formControlName="search" autocomplete="off" (keyup)="getInputFilter(search.value)">
+                      <mat-icon matSuffix>search</mat-icon>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-2">
+                    <button type="button" data-toggle="modal" data-target="#teachersModal" mat-raised-button class="styleButton">
+                        <i class="fa fa-user-plus">&nbsp;&nbsp;</i> Agregar
+                    </button>
+                  </div>
+                  <div class="col-2">
+                    <a
+                      style="background-color: rgb(84, 158, 77);
+                      color: white;"
+                      mat-raised-button
+                      matTooltipPosition="above"
+                      matTooltip="Descargar"
+                      target="_blank"
+                      href="https://tecnologicoitcaeduec-my.sharepoint.com/:b:/r/personal/encuba_itca_edu_ec/Documents/CONTRATO%20SISTEMA%20INFORM%C3%81TICO%20DE%20GESTI%C3%93N%20(SIG)%20-%20ENCUBA/MANUALES%20DE%20USUARIO%20(SIG)/1.%20TALENTO%20HUMANO/12_MU_PROCESO_PERFIL%20PROFESIONA_TALENTO%20HUMANO.pdf?csf=1&web=1&e=aECI9i"
+                    >
+                      <small>Manual Usuario</small>
+                    </a>
+                  </div>
+               </div>
+              </section>
+              <div class="row">
+                    <div class="col p-4" *ngIf="collaborators">
+                        <table mat-table [dataSource]="collaborators">
+
+                            <!-- document -->
+                            <ng-container matColumnDef="PersonDocumentNumber">
+                                <th class="text-center" style="background-color: #004899;color:white;" mat-header-cell *matHeaderCellDef mat-sort-header>Documento Identificación</th>
+                                <th class="text-center" mat-cell *matCellDef="let row;"> {{ row.PersonDocumentNumber }} </th>
+                            </ng-container>
+
+                            <!-- studentNames -->
+                            <ng-container matColumnDef="fullName">
+                                <th class="text-center" style="background-color: #004899;color:white;" mat-header-cell *matHeaderCellDef mat-sort-header>Empleado</th>
+                                <th class="text-center" mat-cell *matCellDef="let row;"> {{ row.fullName }} </th>
+                            </ng-container>
+
+                            <!-- Career -->
+                            <ng-container matColumnDef="dateInit">
+                                <th class="text-center" style="background-color: #004899;color:white;" mat-header-cell *matHeaderCellDef mat-sort-header>Fecha Ingreso</th>
+                                <th class="text-center" mat-cell *matCellDef="let row"> {{ row.dateInit }} </th>
+                            </ng-container>
+
+                            <!-- Level -->
+                            <ng-container matColumnDef="dateContract">
+                                <th class="text-center" style="background-color: #004899;color:white;" mat-header-cell *matHeaderCellDef>Fecha de contratación</th>
+                                <th class="text-center" mat-cell *matCellDef="let row"> {{ row.dateContract }}</th>
+                            </ng-container>
+
+                            <!-- Scholarship -->
+                            <ng-container matColumnDef="status">
+                                <th mat-header-cell style="background-color: #004899;color:white;" *matHeaderCellDef>Estado</th>
+                                <th mat-cell *matCellDef="let row">{{ row.status }}</th>
+                            </ng-container>
+
+
+                            <!-- actions -->
+                            <ng-container matColumnDef="actions">
+                                <th class="text-center" style="background-color: #004899;color:white;" mat-header-cell *matHeaderCellDef><span>Acciones</span></th>
+                                <th class="text-center" mat-cell *matCellDef="let row">
+                                    <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+                                        <mat-icon>more_vert</mat-icon>
+                                      </button>
+                                    <mat-menu [xPosition]="'before'" #menu="matMenu">
+                                        <button mat-menu-item
+                                            (click)="validateFiles(row);">
+                                            <mat-icon style="color: #085394;">topic</mat-icon>
+                                            <span class="item">Validar archivos</span>
+                                        </button>
+                                        <button mat-menu-item (click)="qualities(row);" [disabled]="row.statusFileID === 1">
+                                          <mat-icon style="color: #085394;">assignment_ind</mat-icon>
+                                            <span class="item">Tipo de contratación</span>
+                                        </button>
+                                        <button mat-menu-item data-toggle="modal" data-target="#subjectsModal" [disabled]="row.expMatt === 0" (click)="currentTeacher = row; getTeacherSubjects(row.PersonId)">
+                                          <mat-icon style="color: #085394;">assignment_turned_in</mat-icon>
+                                            <span class="item">Asignaturas Afines</span>
+                                        </button>
+                                        <button mat-menu-item [disabled]="row.timeAv === 0" (click)="openSustantiveDialog(row.PersonId);">
+                                          <mat-icon style="color: #085394;">assignment</mat-icon>
+                                            <span class="item">Funciones sustantivas</span>
+                                        </button>
+                                        <button mat-menu-item [disabled]="!row.typeStaffID" (click)="openAdministrativeProvisionDialog(row);">
+                                          <mat-icon style="color: #085394;">assignment_ind</mat-icon>
+                                            <span class="item">Disposición administrativa</span>
+                                        </button>
+                                        <button mat-menu-item (click)="updateInformation(row);">
+                                          <mat-icon style="color: #085394;">edit</mat-icon>
+                                            <span class="item">Actualizar Información</span>
+                                        </button>
+                                        <button mat-menu-item (click)="downalodPdf(row);">
+                                          <mat-icon style="color: red;">picture_as_pdf</mat-icon>
+                                            <span class="item">Perfil Profesional</span>
+                                        </button>
+                                    </mat-menu>
+                                </th>
+                                <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+                            </ng-container>
+                            <tr mat-header-row *matHeaderRowDef="displayedColumns" [style.background-color]="color" style="color: white;"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumns;" style="text-transform: uppercase;"></tr>
+                        </table>
+                        <mat-paginator #paginator
+                                    [length]="totalPage"
+                                    [pageSize]="10"
+                                    [pageSizeOptions]="[10]"
+                                    (page)="onPageChange($event)"
+                                    aria-label="Select page">
+                        </mat-paginator>
+
+                    </div>
+              </div>
+        </div>
+    </div>
+</div>
+
+<!-- teachersModal -->
+<div class="modal fade" id="teachersModal" tabindex="-1" role="dialog" aria-labelledby="teachersModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header pl-4 pr-4" style="height: 40px;">
+        <div class="col-md-8">
+          <h3 class="modal-title" id="teachersModalLabel"><br>Creación de Perfil Personal</h3>
+        </div>
+        <div class="col-md-1">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="card">
+          <div class="card-body">
+            <form [formGroup]="formUser"
+              (submit)="saveUser()">
+                <div class="row m-1">
+                    <div class="col-md-6">
+                        <mat-form-field class="width" appearance="outline">
+                            <mat-label>Tipo de Documento</mat-label>
+                            <mat-select formControlName="typeDocId" (selectionChange)="formUser.get('personDocumentNumber').patchValue('');">
+                                <mat-option *ngFor="let item of identityList"
+                                    [value]="item.typeDocId">{{item.typeDocName}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-6">
+                        <ng-container *ngIf="formUser.get('typeDocId').value === 3; else document;">
+                          <mat-form-field class="width" appearance="outline">
+                            <mat-label>Nro de documento</mat-label>
+                            <input type="text" matInput formControlName="personDocumentNumber" #personDocumentNumber>
+                            <mat-error>Campo requerido</mat-error>
+                          </mat-form-field>
+                        </ng-container>
+                        <ng-template #document>
+                          <mat-form-field class="width" appearance="outline">
+                            <mat-label>Nro de documento</mat-label>
+                            <input type="text" matInput formControlName="personDocumentNumber" #personDocumentNumber [maxLength]="10"
+                            onKeypress="if (event.keyCode < 47 || event.keyCode > 57) event.returnValue = false;">
+                            <mat-error>Campo requerido</mat-error>
+                          </mat-form-field>
+                        </ng-template>
+                    </div>
+                    <div class="col-md-6">
+                        <mat-form-field class="width" appearance="outline">
+                            <mat-label>Nombres</mat-label>
+                            <input formControlName="personFirstName" type="text" matInput>
+                            <!-- <mat-error *ngIf="isValidField('personFirstName')">{{getFielError('personFirstName')}}</mat-error> -->
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-6">
+                        <mat-form-field class="width" appearance="outline">
+                            <mat-label>Apellido Paterno</mat-label>
+                            <input formControlName="personMiddleName" type="text" matInput>
+                            <mat-error *ngIf="isValidField('personMiddleName')">{{getFielError('personMiddleName')}}</mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-6">
+                        <mat-form-field class="width" appearance="outline">
+                            <mat-label>Apellido Materno</mat-label>
+                            <input formControlName="personLastName" type="text" matInput>
+                            <mat-error *ngIf="isValidField('personLastName')">{{getFielError('personLastName')}}</mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-6">
+                        <mat-form-field class="width" appearance="outline">
+                            <mat-label>Correo Electrónico</mat-label>
+                            <input formControlName="email" type="text" matInput>
+                            <mat-error *ngIf="isValidField('email')">{{getFielError('email')}}</mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-6">
+                        <mat-form-field class="width" appearance="outline">
+                            <mat-label><small>Fecha de Contratación</small></mat-label>
+                            <input formControlName="contratDate" readonly matInput [matDatepicker]="datepicker">
+                            <mat-hint>dd/mm/aaaa</mat-hint>
+                            <mat-error *ngIf="isValidField('contratDate')">{{getFielError('contratDate')}}</mat-error>
+                            <mat-datepicker-toggle matIconSuffix [for]="datepicker"></mat-datepicker-toggle>
+                            <mat-datepicker #datepicker>
+                            </mat-datepicker>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-6">
+                        <mat-form-field class="width" appearance="outline">
+                            <mat-label>Enviar Correo Electrónico</mat-label>
+                            <mat-select formControlName="sendMail">
+                                <mat-option [value]="0">NO</mat-option>
+                                <mat-option [value]="1">SÍ</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-3">
+                    <button type="submit" mat-raised-button class="styleButton_sml" style="width: 100px;">
+                      Guardar
+                    </button>
+                  </div>
+                  <div class="col-md-3">
+                    <button type="button" mat-raised-button class="styleButton_gray" style="width: 100px;" #modalClose data-dismiss="modal">Cerrar</button>
+                  </div>
+                </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- subjectsModal -->
+<div class="modal fade" id="subjectsModal" tabindex="-1" aria-labelledby="subjectsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="height: 40px;">
+        <div class="col-md-8">
+          <h3 class="modal-title" id="subjectsModalLabel"><br>Asignaturas Afines</h3>
+        </div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-body">
+              <form [formGroup]="subjectsForm"
+                    (submit)="onSubmitSubjects()">
+                <div class="row">
+                  <div class="col-12">
+                    <h4 style="color: #004899;">NOMBRE: <label style="color: black;">{{currentTeacher?.fullName}}</label></h4>
+                  </div>
+                  <div class="col-10">
+                    <h4 style="color: #004899;">NRO IDENTIFICACIÓN: <label style="color: black;">{{currentTeacher?.PersonDocumentNumber}}</label></h4>
+                  </div>
+                  <div class="col-2">
+                    <a style="color: #004899; font-size: 20px; cursor: pointer;"
+                      *ngIf="!addingSubjects"
+                      (click)="addingSubjects = !addingSubjects"
+                      matTooltip="Agregar asignaturas"
+                      matTooltipClass="blue-tooltip">
+                      <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                    </a>
+                    <a style="color: #004899; font-size: 20px; cursor: pointer;"
+                      *ngIf="addingSubjects"
+                      (click)="addingSubjects = !addingSubjects"
+                      matTooltip="Listado de asignaturas"
+                      matTooltipClass="blue-tooltip">
+                      <i class="fa fa-list" aria-hidden="true"></i>
+                    </a>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12" style="max-height: 200px; overflow-y: auto;" *ngIf="!addingSubjects">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th colspan="3">Lista de asignaturas</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let item of currentTeacherSubjects">
+                          <td>{{item.courseName}}</td>
+                          <td>{{item.state}}</td>
+                          <td>
+                            <a type="button"
+                              matTooltipPosition="above"
+                              matTooltip="Activar"
+                              style="cursor: pointer; color: red;" *ngIf="item.statusID === 0" (click)="statusSubject(item, 1)"><i class="fa fa-toggle-off" aria-hidden="true"></i>
+                            </a>
+                            <a type="button"
+                              matTooltipPosition="above"
+                              matTooltip="Inactivar"
+                              style="cursor: pointer; color: blue;" *ngIf="item.statusID === 1" (click)="statusSubject(item, 0)"><i class="fa fa-toggle-on" aria-hidden="true"></i>
+                            </a>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="col-md-12" *ngIf="addingSubjects">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Asignaturas</mat-label>
+                      <mat-select formControlName="courseID" multiple>
+                        <mat-option *ngFor="let item of courses" [value]="item.courseID">{{item.courseName}}</mat-option>
+                      </mat-select>
+                      <mat-error>Seleccione al menos una asignatura</mat-error>
+                    </mat-form-field>
+                  </div>
+                </div><br>
+                <div class="row">
+                  <div class="col-md-3">
+                    <button type="submit" mat-raised-button class="styleButton_sml" style="width: 100px;">
+                      Guardar
+                    </button>
+                  </div>
+                  <div class="col-md-3">
+                    <button type="button" mat-raised-button class="styleButton_gray" style="width: 100px;"
+                      #subjectsModalClose data-dismiss="modal" (click)="currentTeacher= null; currentTeacherSubjects= [];">
+                      Cerrar
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

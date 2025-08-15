@@ -1,0 +1,25 @@
+
+.botoncont{
+    display: flex;
+    border-radius: 10px;
+    width: 95%;
+    background-color: #014798a6;
+    padding: 10px;
+    align-items: center;
+    gap: 20px;
+    cursor: pointer;
+}
+.botoncont:hover{
+    -webkit-box-shadow: 2px 11px 30px -2px rgba(7,60,117,1);
+    -moz-box-shadow: 2px 11px 30px -2px rgba(7,60,117,1);
+    box-shadow: 2px 11px 30px -2px rgba(7, 60, 117, 0.555);
+}
+i{
+    font-size: 3rem;
+    color: white;
+}
+span{
+    font-size: 1.5rem;
+    color: white;
+}
+

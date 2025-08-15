@@ -1,0 +1,92 @@
+<div class="animated fadeIn fast">
+  <div class="form-row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="form-row">
+            <div class="col-2">
+              <button class="btn btn-sm btn-danger" (click)="back()">
+                <i class="fa fa-chevron-left mr-1"></i>Volver
+              </button>
+            </div>
+            <div class="col-8 my-3" >
+              <div class="form-row">
+                <!-- <div class="col-12">
+                  <div class="form-row">
+                    <div class="col-3">
+                      <button class="btn btn-light text-danger">
+                        <i class="fa fa-chevron-left"></i>
+                      </button>
+                    </div>
+                    <div class="col-6 text-center">
+                      <h3>
+                        {{pagination.currentPage}}/{{pages.length}}
+                      </h3>
+                    </div>
+                    <div class="col-3 text-right">
+                      <button class="btn btn-light text-primary-color">
+                        <i class="fa fa-chevron-right"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div> -->
+                <div class="col-12 text-center">
+                  <h2>
+                    {{surveySelected.title | uppercase}}
+                  </h2>
+                </div>
+                <div class="col-12 mb-3">
+                  <small class="text-justify">
+                    <em>
+                      {{surveySelected.description | uppercase}}
+                    </em>
+                  </small>
+                </div>
+                <div class="col-12" [ngClass]="{'mb-2': !surveySelected.inTable}" *ngFor="let q of questions; let index = index">
+                  <div class="form-row">
+                    <div class="col-12">
+                      <ng-container *ngIf="surveySelected.inTable">
+                        <table class="table table-sm table-bordered m-0">
+                          <tbody>
+                            <tr>
+                              <td class="pt-3" style="width: 85%;">
+                                <span>{{index + 1}}. {{q.question}}</span>
+                              </td>
+                              <td class="text-center hand" *ngFor="let a of q.alternatives" (click)="toggleSelectedAlternative(q, a)">
+                                <small>{{a.notation | uppercase}}</small><br>
+                                <i class="fa fa-2x" [ngClass]="{'fa-circle-o': !a.selected, 'fa-circle text-primary-color': a.selected}"></i>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </ng-container>
+                      <ng-container *ngIf="!surveySelected.inTable">
+                        <div class="text-justify">
+                          <span>{{index + 1}}. {{q.question}}</span>
+                        </div>
+                        <div class="form-row">
+                          <div class="col-12 mb-2" *ngFor="let a of q.alternatives" (click)="toggleSelectedAlternative(q, a)">
+                            <button class="btn btn-sm" [ngClass]="{'bg-primary-color': a.selected, 'btn-light text-primary-color': !a.selected}">
+                              <i class="fa mr-1" [ngClass]="{'fa-check-circle': a.selected, 'fa-circle-o': !a.selected}"></i>{{a.notation | uppercase}}
+                            </button>
+                          </div>
+                        </div>
+                      </ng-container>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 d-flex justify-content-center">
+              <button class="btn bg-primary-color btn-sm"
+                [disabled]="!surveySelected.valid"
+                (click)="saveChanges()">
+                <i class="fa fa-save mr-1"></i>Guardar Resultado
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

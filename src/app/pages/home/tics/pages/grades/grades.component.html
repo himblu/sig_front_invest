@@ -1,0 +1,172 @@
+<div class="row animated fadeIn fast" *ngIf="cargando">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+<div class="row animated fadeIn fast" *ngIf="!cargando">
+  <div class="col-md-12">
+    <h1 style="text-align: center; color: #004899;">CALIFICACIONES</h1>
+    <div class="card" style="border-radius: 15px;">
+      <div class="card-body">
+        <div class="row pl-3 pr-3">
+          <div class="col-4">
+            <section [formGroup]="filtersForm">
+              <mat-form-field appearance="outline">
+                <mat-label>Periodo Académico</mat-label>
+                <mat-select formControlName="periodID" placeholder="Filtrar por Periodo Académico">
+                  <mat-option *ngFor="let period of periods;" [value]="period.periodID" (click)="getGrades()">
+                    {{ period.periodName }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </section>
+          </div>
+          <div class="col-md-8" style="text-align: right;"><button type="button" mat-raised-button class="styleButton_sml" style="width: 172px;" data-toggle="modal" data-target="#gradesModal" (click)="openModal(0)">Nueva calificación</button></div>
+        </div>
+        <div class="table-responsive">
+          <table id="demo-foo-addrow"
+                 class="table m-t-0 table-hover no-wrap contact-list footable-loaded footable"
+                 data-page-size="5">
+            <thead style="background-color: #004899; color: white;">
+            <tr>
+              <th class="footable-sortable">
+                Periodo académico
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Parcial
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Calificación
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Porcentaje
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable" style="text-align: center;">
+                Acciones
+                <span class="footable-sort-indicator"></span>
+              </th>
+            </tr>
+            </thead>
+            <tbody style="color: black;">
+            <tr *ngFor="let item of gradesList" class="footable-even" style="text-transform: uppercase;">
+              <td>{{item.periodName}}</td>
+              <td>{{item.evaluationName}}</td>
+              <td>{{item.subComponentTypeName}}</td>
+              <td *ngIf="item.subComponentID !== aux">{{item.percentage}}</td>
+              <td *ngIf="item.subComponentID === aux">
+                <form [formGroup]="filtersForm">
+                  <mat-form-field style="width: 75px;" appearance="outline">
+                    <input matInput style="width: 50px;" type="text" formControlName="percentage">
+                    <mat-error></mat-error>
+                  </mat-form-field>
+                </form>
+              </td>
+              <td style="text-align: center;">
+                <a type="button"
+                    *ngIf="item.subComponentID !== aux"
+                    matTooltipPosition="above"
+                    matTooltip="Editar"
+                    style="cursor: pointer; color: green;"><i class="fa fa-pencil" aria-hidden="true" (click)="updateInTable(item)"></i>
+                </a>
+                <a type="button"
+                    *ngIf="item.subComponentID === aux"
+                    matTooltipPosition="above"
+                    matTooltip="Guardar"
+                    style="cursor: pointer; color: blue;"><i class="fa fa-floppy-o" aria-hidden="true" (click)="updatePartial(item)"></i>
+                </a>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <mat-paginator
+          #paginator
+          [length]="length"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions"
+          (page)="pageEvent = changePageGrades($event)">
+        </mat-paginator>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="gradesModal" tabindex="-1" aria-labelledby="gradesModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="height: 40px;">
+        <div class="col-md-5">
+          <h3 class="modal-title" id="gradesModalLabel"><br>{{title}}</h3>
+        </div>
+        <div class="col-md-1">
+          <button type="button" id="btn_close" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-body">
+              <form [formGroup]="gradesForm"
+                autocomplete="off"
+                (submit)="onSubmitGrades()">
+                <div class="row">
+                  <div class="col-md-6">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Parciales</mat-label>
+                      <mat-select formControlName="componentID" placeholder="Seleccione el parcial">
+                        <mat-option *ngFor="let item of partialsList" [value]="item.componentID">{{item.evaluationName}}</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Total</mat-label>
+                      <input min="100" max="100" readonly="true" type="number" matInput formControlName="count">
+                      <mat-icon matSuffix>percent</mat-icon>
+                      <mat-error>
+                        Requerido <strong>100%</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="row" formArrayName="subComponents">
+                  <div class="col-md-4" *ngFor="let activity of $any(activitiesList | filterPartials: gradesForm.get('componentID').value); let i=index" [formGroupName]="i">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>{{activity.subComponentTypeName}}</mat-label>
+                      <input type="number" matInput formControlName="percentage" (blur)="calculate()">
+                      <mat-icon matSuffix>percent</mat-icon>
+                      <mat-error>
+                        Campo <strong>requerido</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-3">
+                    <button type="submit" mat-raised-button class="styleButton_sml" style="width: 100px;">
+                      Guardar
+                    </button>
+                  </div>
+                  <div class="col-md-3">
+                    <button type="button" mat-raised-button class="styleButton_gray" style="width: 100px;" data-dismiss="modal" #modalClose>Cerrar</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,414 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+<div *ngIf="!charging">
+  <div class="card">
+    <div class="card-body">
+      <ng-container [formGroup]="filtersForm">
+        <div class="row pl-2 pr-2">
+          <div class="col-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Periodo académico</mat-label>
+              <mat-select formControlName="periodID" (selectionChange)="getEvaluationInstruments();">
+                <mat-option *ngFor="let item of periods" [value]="item.periodID">{{item.periodName}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Seguimiento / Evaluación</mat-label>
+              <mat-select formControlName="evaluationOrFollowup" (selectionChange)="getEvaluationInstrumentsReport();">
+                <mat-option [value]="0">SEGUIMIENTO DOCENTE</mat-option>
+                <mat-option [value]="1">EVALUACIÓN DOCENTE</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Instrumentos</mat-label>
+              <mat-select formControlName="typeEvaluationInstrumentID"  (selectionChange)="getSchools();">
+                <mat-option *ngFor="let item of evaluationInstrumentsReport" [value]="item.typeEvaluationInstrumentID">{{item.typeEvaluationDesc}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-3" *ngIf="filtersForm.get('evaluationOrFollowup')?.value === 1">
+            <button
+              [disabled]="isDisabledReports"
+              class="download-button"
+              mat-raised-button
+              matTooltipPosition="above"
+              matTooltip="Reportes"
+              [matMenuTriggerFor]="menu">
+              Reportes
+              <mat-icon class="red-icon">description</mat-icon>
+            </button>
+          </div>
+          <mat-menu #menu="matMenu">
+            <button
+              mat-menu-item
+              matTooltipPosition="above"
+              matTooltip="Descargar Excel"
+              [disabled]="isDisabledReports"
+              (click)="getGeneralReportSumary('evaluation-instruments-report/comprehensive-teacher-evaluation');">
+              <i style="color: green; cursor: pointer;" class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp;
+              <span>Reporte Evaluación Integral</span>
+            </button>
+          
+            <!-- Submenú Docencia -->
+            <mat-menu #docenciaMenu="matMenu">
+              <button mat-menu-item
+                matTooltipPosition="above"
+                matTooltip="Descargar Excel"
+                [disabled]="isDisabledReports"
+                (click)="getGeneralReportSumary('evaluation-instruments-report/report-general-sumary',1,1);">
+                <i style="color: green; cursor: pointer;" class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp;
+                <span>Reporte Docencia-Heteroevaluación</span>
+              </button>
+              <button mat-menu-item
+                matTooltipPosition="above"
+                matTooltip="Descargar Excel"
+                [disabled]="isDisabledReports"
+                (click)="getGeneralReportSumary('evaluation-instruments-report/report-general-sumary',3,1);">
+                <i style="color: green; cursor: pointer;" class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp;
+                <span>Reporte Docencia-Autoevaluación</span>
+              </button>
+              <button mat-menu-item
+                matTooltipPosition="above"
+                matTooltip="Descargar Excel"
+                [disabled]="isDisabledReports"
+                (click)="getGeneralReportSumary('evaluation-instruments-report/report-general-sumary',7,1);">
+                <i style="color: green; cursor: pointer;" class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp;
+                <span>Reporte Docencia-Coevaluación-Pares-Docentes</span>
+              </button>
+              <button mat-menu-item
+                matTooltipPosition="above"
+                matTooltip="Descargar Excel"
+                [disabled]="isDisabledReports"
+                (click)="getGeneralReportSumary('evaluation-instruments-report/report-general-sumary',8,1);">
+                <i style="color: green; cursor: pointer;" class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp;
+                <span>Reporte Docencia-Coevaluación-Pares-Directivos</span>
+              </button>
+            </mat-menu>
+          
+            <!-- Submenú Investigación -->
+            <mat-menu #investigacionMenu="matMenu">
+              <button
+                mat-menu-item
+                matTooltipPosition="above"
+                matTooltip="Descargar Excel"
+                [disabled]="isDisabledReports"
+                (click)="getGeneralReportSumary('evaluation-instruments-report/report-general-sumary',23,4);">
+                <i style="color: green; cursor: pointer;" class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp;
+                <span>Reporte Investigación-Heteroevaluación-Proyecto-Ejecución</span>
+              </button>
+              <button
+                mat-menu-item
+                matTooltipPosition="above"
+                matTooltip="Descargar Excel"
+                [disabled]="isDisabledReports"
+                (click)="getGeneralReportSumary('evaluation-instruments-report/report-general-sumary',24,4);">
+                <i style="color: green; cursor: pointer;" class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp;
+                <span>Reporte  Investigación-Heteroevaluación-Proyecto-Terminado</span>
+              </button>
+              <button
+                mat-menu-item
+                matTooltipPosition="above"
+                matTooltip="Descargar Excel"
+                [disabled]="isDisabledReports"
+                (click)="getGeneralReportSumary('evaluation-instruments-report/report-general-sumary',26,4);">
+                <i style="color: green; cursor: pointer;" class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp;
+                <span>Reporte  Investigación-Heteroevaluación-Proyecto-Divulgación</span>
+              </button>
+              <button
+                mat-menu-item
+                matTooltipPosition="above"
+                matTooltip="Descargar Excel"
+                [disabled]="isDisabledReports"
+                (click)="getGeneralReportSumary('evaluation-instruments-report/report-general-sumary',21,4);">
+                <i style="color: green; cursor: pointer;" class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp;
+                <span>Reporte Investigación-Autoevaluación</span>
+              </button>
+              <button
+                mat-menu-item
+                matTooltipPosition="above"
+                matTooltip="Descargar Excel"
+                [disabled]="isDisabledReports"
+                (click)="getGeneralReportSumary('evaluation-instruments-report/report-general-sumary',22,4);">
+                <i style="color: green; cursor: pointer;" class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp;
+                <span>Reporte Investigación-Coevaluación-Pares-Investigadores</span>
+              </button>
+              <button
+                mat-menu-item
+                matTooltipPosition="above"
+                matTooltip="Descargar Excel"
+                [disabled]="isDisabledReports"
+                (click)="getGeneralReportSumary('evaluation-instruments-report/report-general-sumary',25,4);">
+                <i style="color: green; cursor: pointer;" class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp;
+                <span>Reporte Investigación-Coevaluación-Pares-Directivos</span>
+              </button>
+            </mat-menu>
+
+            <!-- Submenú Vinculación -->
+            <mat-menu #vinculacionMenu="matMenu">
+              <button
+                mat-menu-item
+                matTooltipPosition="above"
+                matTooltip="Descargar Excel"
+                [disabled]="isDisabledReports"
+                (click)="getGeneralReportSumary('evaluation-instruments-report/report-general-sumary',2,5);">
+                <i style="color: green; cursor: pointer;" class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp;
+                <span>Reporte Vinculación-Heteroevaluación</span>
+              </button>
+              <button
+                mat-menu-item
+                matTooltipPosition="above"
+                matTooltip="Descargar Excel"
+                [disabled]="isDisabledReports"
+                (click)="getGeneralReportSumary('evaluation-instruments-report/report-general-sumary',6,5);">
+                <i style="color: green; cursor: pointer;" class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp;
+                <span>Reporte Vinculación-Autoevaluación</span>
+              </button>
+              <button
+                mat-menu-item
+                matTooltipPosition="above"
+                matTooltip="Descargar Excel"
+                [disabled]="isDisabledReports"
+                (click)="getGeneralReportSumary('evaluation-instruments-report/report-general-sumary',20,5);">
+                <i style="color: green; cursor: pointer;" class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp;
+                <span>Reporte Vinculación-Coevaluación-Pares-Docentes</span>
+              </button>
+              <button
+                mat-menu-item
+                matTooltipPosition="above"
+                matTooltip="Descargar Excel"
+                [disabled]="isDisabledReports"
+                (click)="getGeneralReportSumary('evaluation-instruments-report/report-general-sumary',11,5);">
+                <i style="color: green; cursor: pointer;" class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp;
+                <span>Reporte Vinculación-Coevaluación-Pares-Directivos</span>
+              </button>
+            </mat-menu>
+
+            <!-- Submenú Gestión Académica -->
+            <mat-menu #gestionMenu="matMenu">
+              <button
+                mat-menu-item
+                matTooltipPosition="above"
+                matTooltip="Descargar Excel"
+                [disabled]="isDisabledReports"
+                (click)="getGeneralReportSumary('evaluation-instruments-report/report-general-sumary',9,3);">
+                <i style="color: green; cursor: pointer;" class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp;
+                <span>Reporte Gestión-Académica-Heteroevaluación</span>
+              </button>
+              <button
+                mat-menu-item
+                matTooltipPosition="above"
+                matTooltip="Descargar Excel"
+                [disabled]="isDisabledReports"
+                (click)="getGeneralReportSumary('evaluation-instruments-report/report-general-sumary',4,3);">
+                <i style="color: green; cursor: pointer;" class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp;
+                <span>Reporte Gestión-Académica-Autoevaluación</span>
+              </button>
+              <button
+                mat-menu-item
+                matTooltipPosition="above"
+                matTooltip="Descargar Excel"
+                [disabled]="isDisabledReports"
+                (click)="getGeneralReportSumary('evaluation-instruments-report/report-general-sumary',19,3);">
+                <i style="color: green; cursor: pointer;" class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp;
+                <span>Reporte Gestión-Académica-Coevaluación-Pares-Docentes</span>
+              </button>
+              <button
+                mat-menu-item
+                matTooltipPosition="above"
+                matTooltip="Descargar Excel"
+                [disabled]="isDisabledReports"
+                (click)="getGeneralReportSumary('evaluation-instruments-report/report-general-sumary',10,3);">
+                <i style="color: green; cursor: pointer;" class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp;
+                <span>Reporte Gestión-Académica-Coevaluación-Pares-Directivos</span>
+              </button>
+            </mat-menu>
+          
+            <!-- Menú principal con submenús -->
+            <button mat-menu-item [matMenuTriggerFor]="docenciaMenu">
+              Docencia <mat-icon style="color: #004899; font-size: larger;">chrome_reader_mode</mat-icon>
+            </button>
+            <button mat-menu-item [matMenuTriggerFor]="investigacionMenu">
+              Investigación <mat-icon style="color: #004899; font-size: larger;">chrome_reader_mode</mat-icon>
+            </button>
+            <button mat-menu-item [matMenuTriggerFor]="vinculacionMenu">
+              Vinculación <mat-icon style="color: #004899; font-size: larger;">chrome_reader_mode</mat-icon>
+            </button>
+            <button mat-menu-item [matMenuTriggerFor]="gestionMenu">
+              Gestión Académica <mat-icon style="color: #004899; font-size: larger;">chrome_reader_mode</mat-icon>
+            </button>
+          </mat-menu>
+          
+        </div>
+        <div class="row pl-2 pr-2">
+          <div class="col-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Escuela</mat-label>
+              <mat-select formControlName="schoolID" (selectionChange)="getCareers();">
+                <mat-option *ngFor="let item of schools" [value]="item.schoolID">{{item.schoolName}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Carrera</mat-label>
+              <mat-select formControlName="careerID" (selectionChange)="getStudyPlan($event.value); getModalities($event.value);">
+                <mat-option *ngFor="let item of careers" [value]="item.careerID">{{item.careerName}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Malla curricular</mat-label>
+              <mat-select formControlName="studyPlanID" (selectionChange)="getCycles($event.value);">
+                <mat-option *ngFor="let item of study_plan" [value]="item.studyPlanID">{{item.studyPlanDesc}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Modalidad</mat-label>
+              <mat-select formControlName="modalityID">
+                <mat-option *ngFor="let item of modalities" [value]="item.modalityID">{{item.modalityName}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Nivel</mat-label>
+              <mat-select formControlName="cycleID" (selectionChange)="getReport()">
+                <mat-option *ngFor="let item of cycles" [value]="item.cycleID">{{item.cycleName}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-6">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Buscar por docente, asignatura, paralelo</mat-label>
+              <input type="text" matInput formControlName="filter" (input)="getFollowList();">
+              <mat-icon matSuffix>search</mat-icon>
+            </mat-form-field>
+          </div>
+          <div class="col-1">
+            <button mat-raised-button color="primary" (click)="getEvaluationInstrumentsTeacherFollowup();">Buscar</button>
+          </div>
+          <div class="col-2" *ngIf="filtersForm.get('evaluationOrFollowup')?.value === 1">
+            <button
+              mat-raised-button
+              matTooltipPosition="above"
+              matTooltip="Descargar PDF"
+              [disabled]="isDisabledReport"
+              (click)="getGeneralReport('evaluation-instruments-report/report-general-evaluation');">
+              Reporte General
+              <mat-icon class="red-icon">picture_as_pdf</mat-icon>
+            </button>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div><br>
+  <div class="card">
+    <div class="card-body">
+      <div class="row pl-2 pr-2">
+        <div class="col-12">
+          <div class="table-responsive">
+            <table class="table">
+              <thead style="background-color: #004899; color: white;">
+                <tr>
+                  <th>DOCENTE</th>
+                  <th>ASIGNATURA</th>
+                  <th>PARALELO</th>
+                  <th style="text-align: center;">ACCIONES</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of teachersList">
+                  <td>{{item.teacher}}</td>
+                  <td>{{item.courseName}}</td>
+                  <td>{{item.parallelCode}}</td>
+                  <td style="text-align: center;">
+                    <a type="button" style="color: #004899; cursor: pointer;" [matMenuTriggerFor]="menu">
+                      <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                    </a>
+                    <mat-menu #menu="matMenu">
+                      <!-- <button type="button"
+                        mat-menu-item
+                        *ngIf="filtersForm.get('evaluationOrFollowup').value === 1"
+                        matTooltipPosition="above"
+                        matTooltip="Descargar PDF"
+                        (click)="getGeneralReport('evaluation-instruments-report/report-teacher-evaluation', item);">
+                        <i style="color: red; cursor: pointer;" class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                        &nbsp;<span>Reporte General</span>
+                      </button> -->
+                      <button type="button"
+                        mat-menu-item
+                        *ngIf="filtersForm.get('evaluationOrFollowup').value === 1"
+                        matTooltipPosition="above"
+                        matTooltip="Descargar PDF"
+                        (click)="getGeneralReport('evaluation-instruments-report/report-evaluation-partial-teacher', item);">
+                        <i style="color: red; cursor: pointer;" class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                        &nbsp;<span>Reporte Informe Parcial</span>
+                      </button>
+                      <button type="button"
+                        mat-menu-item
+                        *ngIf="filtersForm.get('evaluationOrFollowup').value === 1"
+                        matTooltipPosition="above"
+                        matTooltip="Descargar PDF"
+                        (click)="getGeneralReport('evaluation-instruments-report/report-evaluation-general-teacher', item);">
+                        <i style="color: red; cursor: pointer;" class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                        &nbsp;<span>Reporte Informe General</span>
+                      </button>
+                      <button type="button"
+                        mat-menu-item
+                        *ngIf="filtersForm.get('evaluationOrFollowup').value === 1"
+                        matTooltipPosition="above"
+                        matTooltip="Descargar PDF"
+                        (click)="getReportPendingStudents(item);">
+                        <i style="color: red; cursor: pointer;" class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                        &nbsp;<span>Estudiantes Pendientes</span>
+                      </button>
+                      <button type="button"
+                        mat-menu-item
+                        *ngIf="filtersForm.get('evaluationOrFollowup').value === 0"
+                        matTooltipPosition="above"
+                        matTooltip="Descargar PDF"
+                        (click)="getGeneralReport('evaluation-instruments-report/report-evaluation-instrument', item);">
+                        <i style="color: red; cursor: pointer;" class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                        &nbsp;<span>Reporte General</span>
+                      </button>
+<!--                      <button type="button"-->
+<!--                        mat-menu-item-->
+<!--                        *ngIf="filtersForm.get('evaluationOrFollowup').value === 0"-->
+<!--                        matTooltipPosition="above"-->
+<!--                        matTooltip="Descargar Excel"-->
+<!--                        (click)="getGeneralReport('evaluation-instruments-report/summary-evaluation-instrument', item);">-->
+<!--                        <i style="color: green; cursor: pointer;" class="fa fa-file-excel-o" aria-hidden="true"></i>-->
+<!--                        &nbsp;<span>Reporte General</span>-->
+<!--                      </button>-->
+                    </mat-menu>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <mat-paginator
+            #paginator
+            [length]="length"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="pageSizeOptions"
+            (page)="pageEvent = changePage($event)">
+          </mat-paginator>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

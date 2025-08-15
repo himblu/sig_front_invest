@@ -1,0 +1,95 @@
+/* Contenedor del buscador */
+.search-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	margin-bottom: 20px;
+	width: 100%;
+}
+
+/* Estilos del input group */
+.input-group {
+	width: 40%;
+	max-width: 800px;
+	border-radius: 50px;
+	overflow: hidden;
+	align-items: center;
+}
+
+/* Icono dentro del input */
+.input-group-text {
+	background: #014898;
+	color: white;
+	border-radius: 50px 0 0 50px;
+	border: none;
+	padding: 10px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 40px; /* Ajusta la altura al input */
+}
+
+/* Icono Material */
+mat-icon {
+	font-size: 20px;
+	color: white;
+}
+
+/* Estilo del campo de búsqueda */
+.search-input {
+	border-radius: 0 50px 50px 0;
+	border: none;
+	padding: 10px;
+	font-size: 16px;
+	height: 40px; /* Asegura la misma altura que el contenedor del icono */
+	display: flex;
+	align-items: center;
+}
+
+.search-input:focus {
+	outline: none;
+	box-shadow: 0px 0px 5px rgba(0, 114, 255, 0.5);
+}
+
+/* Contenedor de las tarjetas superiores (instrumentos) */
+.card-container {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 20px;
+	justify-content: center;
+}
+
+/* Tarjetas de los instrumentos */
+.instrument-card {
+	width: 280px;
+	text-align: center;
+	border-radius: 12px;
+	overflow: hidden;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
+	background: white;
+}
+
+/* Efecto hover en la tarjeta */
+.instrument-card:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Imagen dentro de la tarjeta */
+mat-card img {
+	height: 180px;
+	object-fit: cover;
+}
+
+/* Estilos del título */
+h3 {
+	font-size: 20px;
+	margin-top: 10px;
+	color: #333;
+}
+
+
+
+

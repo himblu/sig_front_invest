@@ -1,0 +1,45 @@
+td, th {
+	width:400px;
+  white-space: pre-wrap;      /* CSS3 */
+  white-space: -moz-pre-wrap; /* Firefox */
+  white-space: -pre-wrap;     /* Opera <7 */
+  white-space: -o-pre-wrap;   /* Opera 7 */
+  word-wrap: break-word;      /* IE */
+}
+
+.red-icon {
+	color: #cf2a27 !important;
+}
+
+.green-icon {
+	color: #009e0f !important;
+}
+
+.download-button {
+	font-size: 14px;
+	background: transparent;
+	letter-spacing: 0;
+	color: #00000099 !important;
+	font-weight: 400;
+}
+
+.example-list {
+  width: 200px;
+  border: solid 1px #ccc;
+  border-radius: 5px;
+  background: #fff;
+  text-align: center;
+  padding: 5px;
+  margin: 0;
+}
+
+.example-list > li {
+  list-style-type: none;
+  border-bottom: solid 1px #8b8b8b;
+  padding: 5px 0;
+}
+
+.example-list > li:last-child {
+  border-bottom: none;
+}
+

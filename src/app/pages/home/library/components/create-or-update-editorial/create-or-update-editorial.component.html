@@ -1,0 +1,115 @@
+
+<div style="display: flex; justify-content: end; align-items: center; background: transparent;" class="p-2">
+  <mat-icon style="cursor: pointer; color: red;" [matDialogClose]="false" class="red-icon" matRipple>close</mat-icon>
+</div>
+
+<mat-dialog-content>
+  <div *ngIf="isLoadingEditorialInfo; else editorialForm">
+    <spinner-loader></spinner-loader>
+  </div>
+
+  <ng-template #editorialForm>
+    <div [formGroup]="form">
+      <h3 class="text-center mb-4" style="font-weight: 500; color: #014898;">EDITORIAL</h3>
+      <div class="row">
+        <div class="col-6">
+          <mat-form-field>
+            <mat-label>Nombre de la Editorial</mat-label>
+            <input matInput type="text" formControlName="name">
+            <mat-error *ngIf="form.hasError('required', 'name')">
+              Este campo es requerido
+            </mat-error>
+            <mat-error *ngIf="form.hasError('minlength', 'name')">
+              Este campo requiere un mínimo de 2 caracteres
+            </mat-error>
+            <mat-error *ngIf="form.hasError('maxlength', 'name')">
+              Este campo excede el límite de caracteres permitidos
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+<!--        <div class="col-6">-->
+<!--          <mat-form-field appearance="outline">-->
+<!--            <mat-label>País</mat-label>-->
+<!--            <mat-select formControlName="country">-->
+<!--              <mat-option *ngFor="let country of countries;" [value]="country.countryID">-->
+<!--                {{ country.countryName }}-->
+<!--              </mat-option>-->
+<!--              <mat-error *ngIf="form.hasError('required', 'country')">-->
+<!--                Este campo es requerido-->
+<!--              </mat-error>-->
+<!--            </mat-select>-->
+<!--          </mat-form-field>-->
+<!--        </div>-->
+
+        <div class="col-6">
+          <mat-form-field>
+            <mat-label>Ciudad/País</mat-label>
+            <input matInput type="text" formControlName="cityCountry">
+            <mat-error *ngIf="form.hasError('required', 'cityCountry')">
+              Este campo es requerido
+            </mat-error>
+            <mat-error *ngIf="form.hasError('minlength', 'cityCountry')">
+              Este campo requiere un mínimo de 2 caracteres
+            </mat-error>
+            <mat-error *ngIf="form.hasError('maxlength', 'cityCountry')">
+              Este campo excede el límite de caracteres permitidos
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="col-6">
+          <mat-form-field>
+            <mat-label>Sitio web</mat-label>
+            <input matInput type="text" formControlName="website">
+            <mat-error *ngIf="form.hasError('pattern', 'website')">
+              Utiliza una URL válida
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="col-6">
+          <mat-form-field>
+            <mat-label>Año de Fundación</mat-label>
+            <input
+              matInput
+              type="text" [mask]="'9*'" [allowNegativeNumbers]="false" formControlName="foundationYear" autocomplete="off"/>
+          </mat-form-field>
+        </div>
+
+        <div class="col-6">
+          <mat-form-field>
+            <mat-label>Descripción</mat-label>
+            <textarea matInput type="text" cols="30" rows="5" formControlName="description"></textarea>
+            <mat-error *ngIf="form.hasError('minlength', 'description')">
+              Este campo requiere un mínimo de 2 caracteres
+            </mat-error>
+            <mat-error *ngIf="form.hasError('maxlength', 'description')">
+              Este campo excede el límite de caracteres permitidos
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <div class="d-flex no-block w-100 justify-content-between">
+    <div class="pl-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;" color="warn" [mat-dialog-close]="false">
+        Cerrar
+      </button>
+    </div>
+    <div class="pr-3">
+      <button
+        mat-raised-button
+        (click)="sendForm();"
+        style="letter-spacing: 0;" color="primary">
+        Guardar
+      </button>
+    </div>
+  </div>
+</mat-dialog-actions>

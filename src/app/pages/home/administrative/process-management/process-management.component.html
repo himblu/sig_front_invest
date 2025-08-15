@@ -1,0 +1,152 @@
+<style>
+  .list-group-item  {
+    border: 1px solid #ccc !important;
+  }
+</style>
+<div class="animated fadeIn fast">
+  <div class="form-row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <div class="form-row">
+            <div class="col-8 pt-1">
+              <i class="fa fa-cog mr-1"></i>Administración de Procesos
+            </div>
+            <div class="col-4 text-right">
+              <button class="btn btn-sm btn-primary" (click)="toggleProcessModal()">
+                <i class="fa fa-plus mr-1"></i>Nuevo
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body text-center" *ngIf="!processes.length">
+          <i class="fa fa-times fa-2x"></i><br>
+          No se encontraron registros
+        </div>
+        <ul class="list-group list-group-flush" *ngIf="processes.length">
+          <li class="list-group-item" *ngFor="let p of processes">
+            <div class="form-row">
+              <div class="col-5 pt-1">
+                {{p.otherProcessName | uppercase}}
+              </div>
+              <div class="col-4">
+                <button class="btn btn-sm btn-light text-primary" (click)="toggleFileModal(p)">
+                  <i class="fa fa-cog mr-1"></i>{{p.quantityFiles}}&nbsp;Archivos
+                </button>
+              </div>
+              <div class="col-3 text-right">
+                <button class="btn btn-sm rounded-circle btn-light text-primary mr-2" (click)="toggleProcessModal(p)">
+                  <i class="fa fa-edit"></i>
+                </button>
+                <button class="btn btn-sm rounded-circle btn-danger" (click)="deleteProcess(p)">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div bsModal #processModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name2">
+  <div class="modal-dialog modal-nm">
+    <div class="modal-content" *ngIf="newProcess">
+      <div class="modal-header">
+        <h4 id="dialog-sizes-name2" class="modal-title pull-left">
+          {{newProcess.editing ? 'Editando Proceso' : 'Creando Proceso'}}
+        </h4>
+        <button type="button" class="btn btn-sm btn-light text-danger pull-right" aria-label="Close" (click)="toggleProcessModal()">
+          <span aria-hidden="true"><i class="fa fa-times"></i></span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="processForm">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Nombre del Proceso</mat-label>
+            <input type="text" formControlName="otherProcessName" matInput>
+          </mat-form-field>
+          <mat-form-field class="width pt-2" appearance="outline">
+            <mat-label>Descripción del Proceso</mat-label>
+            <textarea formControlName="otherProcessDescription" style="resize: none;" rows="3" matInput></textarea>
+          </mat-form-field>
+          <div class="row">
+            <div class="col-md-12 text-center">
+              <button class="btn btn-sm" [ngClass]="{'btn-primary': !newProcess.editing, 'btn-success': newProcess.editing}" (click)="saveProcess()">
+                <i class="fa fa-save mr-1"></i>Guardar Configuración
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div bsModal #fileModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name2">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" *ngIf="newFile">
+      <div class="modal-header">
+        <h4 id="dialog-sizes-name2" class="modal-title pull-left">
+          Configuración de Archivos
+        </h4>
+        <button type="button" class="btn btn-sm btn-light text-danger pull-right" aria-label="Close" (click)="toggleFileModal()">
+          <span aria-hidden="true"><i class="fa fa-times"></i></span>
+        </button>
+      </div>
+      <div class="modal-body" style="max-height: 550px; overflow: auto;">
+        <div class="form-row">
+          <div [ngClass]="{'col-12': !config.company, 'col-9': config.company}">
+            <label for="company">Nombre de Instituto</label>
+            <select name="company" [(ngModel)]="config.company" (change)="selectCompany()" class="form-control">
+              <option [ngValue]="undefined">--SELECCIONE--</option>
+              <option *ngFor="let c of companies" [ngValue]="c">{{c.companyName | uppercase}}</option>
+            </select>
+          </div>
+          <div class="col-3" [ngClass]="{'mt-4': !isCreatingFile, 'mt-2': isCreatingFile}" *ngIf="config.company">
+            <input #input [hidden]="!isCreatingFile" class="mb-1" type="text" style="width: 100%;" placeholder="Nombre">
+            <button class="btn btn-sm btn-block bg-primary-color" (click)="toggleNewFile(input.value)">
+              <i class="fa fa-plus mr-1"></i>
+              {{!isCreatingFile ? 'Agregar' : 'Guardar'}}
+            </button>
+          </div>
+          <div class="col-12" *ngIf="config.company && config.fileTypes.length">
+            <ul class="list-group">
+              <caption>ARCHIVOS DEL PROCESO DE {{newFile.otherProcessName | uppercase}} en {{config.company.companyName | uppercase}}</caption>
+              <li class="list-group-item hand" *ngFor="let c of config.fileTypes">
+                <div class="form-row">
+                  <div class="col-8 pt-1">
+                    <small>
+                      {{c.fileTypeName | uppercase}}
+                    </small>
+                  </div>
+                  <div class="col-3">
+                    <select name="file-{{c.fileTypeID}}" [(ngModel)]="c.executableTypeID" class="form-select form-select-sm">
+                      <option [ngValue]="undefined">--SELECCIONE--</option>
+                      <option *ngFor="let e of executableTypes" [ngValue]="e.executableTypeID">{{e.executableTypeName}}</option>
+                    </select>
+                  </div>
+                  <div class="col-1 text-right">
+                    <button class="btn btn-sm btn-light rounded-circle btn-rounded-circle" *ngIf="c.executableTypeID" (click)="toggleSelectFile(c)">
+                      <i class="fa" [ngClass]="{'fa-circle-o text-secondary': !c.selected, 'fa-circle text-success': c.selected}"></i>
+                    </button>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <!-- <div class="modal-footer">
+        <div class="form-row">
+          <div class="col-12 text">
+            <button class="btn btn-sm btn-primary" (click)="saveFileProcessConfig()">
+              <i class="fa fa-save mr-1"></i>Guardar Cambios
+            </button>
+          </div>
+        </div>
+      </div> -->
+    </div>
+  </div>
+</div>

@@ -1,0 +1,318 @@
+<div class="animated fadeIn fast">
+  <div class="form-row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <!-- Encabezado con Barra de Búsqueda -->
+          <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand">
+              {{tabSelected ? tabSelected.title : 'Oferta Horaria'}}
+              <span *ngIf="isResponsible && entitySelected && !entitySelected.isASolePropietor">
+                &nbsp;|&nbsp;ENTIDAD:&nbsp;<span class="badge bg-primary-color">{{entitySelected.businessName | uppercase}}</span>
+              </span>
+            </a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <form class="form-inline my-2 my-lg-0 ml-auto">
+                    <input class="form-control mr-sm-2 text-uppercase" name="text" [(ngModel)]="body.filter.text" type="search" placeholder="BUSCAR CURSOS" aria-label="Search">
+                    <!-- <button class="btn bg-primary-color my-2 my-sm-0" type="button">
+                      Buscar
+                    </button> -->
+                </form>
+            </div>
+          </nav>
+        </div>
+      </div><br>
+    </div>
+    <div class="col-12">
+      <div class="card">
+        <!-- <div class="card-header">
+          Oferta Académica
+        </div> -->
+        <div class="card-body">
+          <!-- <div class="form-row">
+            <div class="col-12">
+
+            </div>
+          </div> -->
+
+          <div class="container-fluid">
+            <div class="row mt-4">
+
+                <!-- Sección Principal con Tarjetas de Cursos -->
+                  <div class="col-md-12 mb-3">
+                  <button class="btn mr-2 btn-pill" *ngFor="let t of tabs" (click)="selectTab(t)" [ngClass]="{'bg-primary-color': tabSelected && tabSelected.id === t.id, 'btn-outline-primary-color': tabSelected && tabSelected.id !== t.id}">
+                    <i class="{{t.icon}} mr-1"></i>{{t.name}}
+                  </button>
+                  </div>
+                <div class="col-md-12">
+                  <div class="row" *ngIf="!result.length">
+                    <div class="col-md-12 text-center text-secondary">
+                        <i class="fa fa-times fa-3x"></i> <br>
+                        <h2>
+                          <span *ngIf="tabSelected && tabSelected.id === 2">No tienes cursos en tu Historial Académico</span>
+                          <span *ngIf="tabSelected && tabSelected.id === 1">No se tienen cursos programados para inscripciones</span>
+                        </h2>
+                    </div>
+                  </div>
+                    <div class="row" *ngIf="result.length">
+                        <!-- Card de un Curso -->
+                        <div class="col-md-4 mb-4" *ngFor="let c of result | filter:body.filter.text">
+                            <div class="card" style="max-height: 550px; min-height: 500px;">
+                                <img src="{{c.urlImage || 'https://via.placeholder.com/150'}}" height="180" width="50" class="card-img-top" alt="Imagen del Curso">
+                                <div class="card-body">
+                                    <p class="single-line"
+                                    matTooltipPosition="above"
+                                    matTooltip="{{c.courseName | uppercase}}">
+                                      <strong class="text-primary-color text-uppercase">{{c.courseName | uppercase}}</strong>
+                                    </p>
+                                    <p class="card-text single-line"
+                                    matTooltipPosition="above"
+                                    matTooltip="{{c.courseDesc | uppercase}}">
+                                      {{c.courseDesc | uppercase}}
+                                    </p>
+                                    <p class="card-text single-line"
+                                      matTooltipPosition="above"
+                                      [matTooltip]="getTeacherNames(c)">
+                                      INSTRUCTOR (ES): {{getTeacherNames(c)}}
+                                    </p>
+                                    <hr>
+                                    <p class="text-right">
+                                      <a class="btn btn-sm btn-light text-primary-color" href="{{c.urlContent}}" target="_blank" *ngIf="c.urlContent">
+                                        <i class="fa fa-download mr-1"></i>Descarga Temario
+                                      </a>
+                                      <br *ngIf="!c.urlContent">
+                                    </p>
+                                    <p class="card-text">
+                                      <!-- <span *ngIf="tabSelected && tabSelected.id === 2">
+                                        <strong>Instructor:</strong> {{c.teacherNames.teacherName | uppercase}} <br>
+                                      </span> -->
+                                      <strong>Fecha de Inicio:</strong> {{c.startDate}} <br>
+                                      <ng-container *ngIf="c.typeCategory === 1">
+                                        <strong>Fecha Fin:</strong> {{c.endDate}} <br>
+                                      </ng-container>
+                                      <strong>Precio:</strong> ${{c.cost}} <br>
+                                      <strong>Estado:</strong> Activo</p>
+                                    <!-- <p class="card-text" *ngIf="tabSelected && tabSelected.id === 1">{{c.weekdayDesc}} - {{c.startTime}} a {{c.endTime}}</p> -->
+                                    <br *ngIf="tabSelected && tabSelected.id === 1">
+                                    <button class="pull-left btn btn-sm" style="background-color: rgb(181, 208, 243); color: black;" *ngIf="(tabSelected && tabSelected.id === 1)"
+                                    matTooltipPosition="above"
+                                    matTooltip="Cuenta a pagar"
+                                    (click)="showPayment();">
+                                      Cuenta
+                                    </button>
+                                    <button class="pull-right btn btn-sm bg-primary-color text-white" [ngClass]="{'bg-primary-color': !c.inShoppingCart, 'btn-danger': c.inShoppingCart}"
+                                      *ngIf="(tabSelected && tabSelected.id === 1)" (click)="toggleToShoppingCart(c)">
+                                      <i class="fa mr-1" [ngClass]="{'fa-plus': !c.inShoppingCart, 'fa-trash': c.inShoppingCart}"></i>{{!c.inShoppingCart ? 'Agregar al carrito' : 'Quitar del Carrito'}}
+                                    </button>
+                                    <!-- <button class="pull-right btn btn-sm bg-primary-color text-white" *ngIf="(tabSelected && tabSelected.id === 1)" (click)="enroll(c)">
+                                      <i class="fa fa-plus mr-1"></i>Inscribirse
+                                    </button> -->
+                                    <span *ngIf="(tabSelected && tabSelected.id === 2 && c.statusFileID !== 3) && c.observation">
+                                      <strong>Motivo de Rechazo:</strong> <br>
+                                      {{c.observation | uppercase}} <br><br>
+                                    </span>
+                                    <div class="mt-3" *ngIf="(tabSelected && tabSelected.id === 2) && !c.observation">
+                                      <br>
+                                      <br>
+                                      <br>
+                                    </div>
+                                    <span *ngIf="(tabSelected && tabSelected.id === 2) && c.observation"><br></span>
+                                    <div class="form-row">
+                                      <div class="col-12">
+                                        <button type="button" class="btn bg-primary-color btn-block btn-sm" *ngIf="(tabSelected && tabSelected.id === 2) && c.statusFileID !== 3" (click)="togglePayment()">
+                                          <i class="fa fa-shopping-cart mr-1"></i>Ir al carrito de Compras
+                                        </button>
+                                        <!-- <button class="pull-right btn btn-sm btn-light text-primary-color text-white" *ngIf="(tabSelected && tabSelected.id === 2) && (!c.isPayed)">
+                                          <i class="fa fa-money mr-1"></i>PAGO CON TARJETA
+                                        </button>
+                                      </div>
+                                      <div class="col-12 mt-1 text-right">
+                                        <button class="btn btn-sm btn-success text-white" *ngIf="(tabSelected && tabSelected.id === 2) && (!c.isPayed)" (click)="togglePayment(c)">
+                                          <i class="fa fa-money mr-1"></i>PAGO DEPOSITO/TRANSFERENCIA
+                                        </button> -->
+
+                                      </div>
+                                    </div>
+                                    <ng-container *ngIf="c.isPayed">
+                                      <!-- <span class="pull-right badge bg-success font-xs" *ngIf="(tabSelected && tabSelected.id === 2) && c.isValidated"> -->
+                                      <span class="pull-right badge font-nm pt-1" [ngClass]="{'bg-primary-color': c.statusFileID === 3, 'bg-light text-danger': c.statusFileID !== 3}" *ngIf="(tabSelected && tabSelected.id === 2)">
+                                        <i class="fa fa-check mr-1"></i>{{c.statusFileDesc | uppercase}}
+                                      </span>
+                                      <!-- <span class="pull-right badge bg-primary-color font-xs" *ngIf="(tabSelected && tabSelected.id === 2) && !c.isValidated">
+                                        <i class="fa fa-check mr-1"></i>Pendiente a validación de Pago
+                                      </span> -->
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Fin de Card de un Curso -->
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" bsModal #paymentModal="bs-modal" [config]="{backdrop: 'static'}" tabindex="-1" role="dialog" aria-labelledby="dialog-static-name">
+	<div class="modal-dialog modal-nm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="btn-close close pull-right" aria-label="Close" (click)="togglePayment()">
+					<span aria-hidden="true" class="visually-hidden">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+        <form #paymentForm="ngForm">
+          <div class="form-row">
+            <div class="col-12">
+              <label for="voucherFile">Suba el Comprobante de Pago (Formato PNG, JPG)</label>
+              <input type="file" name="newFile" accept=".png,.jpg,.jpeg" [(ngModel)]="newPayment.newFile" id="new-file" required class="form-control">
+            </div>
+            <div class="col-12">
+              <label for="payDay">Fecha que consta en el Comprobante de Pago</label>
+              <input type="date" name="payDay" [max]="currentDate" min="1" [(ngModel)]="newPayment.payDay" required class="form-control">
+            </div>
+            <div class="col-12">
+              <label for="financialEntityID">Entidad Financiera</label>
+              <select name="financialEntityID" [(ngModel)]="newPayment.financialEntityID" required class="form-control">
+                <option [ngValue]="undefined">--SELECCIONE--</option>
+                <option *ngFor="let f of financialEntities" [ngValue]="f.financialEntityID">{{f.financialEntityDesc | uppercase}}</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label for="transactionTypeID">Tipo de Transacción</label>
+              <select name="transactionTypeID" [(ngModel)]="newPayment.transactionTypeID" required class="form-control">
+                <option [ngValue]="undefined">--SELECCIONE--</option>
+                <option *ngFor="let f of transactionTypes" [ngValue]="f.transactionTypeID">{{f.transactionTypeDesc | uppercase}}</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label for="voucherNumber">Número de Comprobante de Pago</label>
+              <input type="text" name="voucherNumber" min="1" [(ngModel)]="newPayment.voucherNumber" required class="form-control">
+            </div>
+            <!-- <div class="col-12">
+              <label for="amount">Monto</label>
+              <input type="number" name="amount" min="1" [(ngModel)]="newPayment.amount" required class="form-control">
+            </div> -->
+            <div class="col-12 mt-3">
+              <div class="form-row">
+                <div class="col-6">
+                  <button class="btn btn-sm btn-light text-danger" (click)="togglePayment()">
+                    <i class="fa fa-times mr-1"></i>Cancelar
+                  </button>
+                </div>
+                <div class="col-6 text-right">
+                  <button class="btn btn-sm bg-primary-color" [disabled]="paymentForm.invalid" (click)="saveChanges()">
+                    <i class="fa fa-check mr-1"></i>Guardar Cambios
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" bsModal #selectEntityModal="bs-modal" [config]="{backdrop: 'static'}" tabindex="-1" role="dialog" aria-labelledby="dialog-static-name">
+	<div class="modal-dialog modal-nm">
+		<div class="modal-content">
+			<div class="modal-body p-5">
+        <form #enrollInBulkForm="ngForm">
+          <div class="form-row">
+            <div class="col-12 text-center">
+              <strong class="text-primary-color font-lg">Seleccione la Entidad con la que trabajara:</strong>
+            </div>
+            <div class="col-12 mt-5">
+              <div class="form-row">
+                <div class="" [ngClass]="{'col': entities.length<=2, 'col-4': entities.length>3}" *ngFor="let e of entities" (click)="toggleSelectEntity(e)">
+                  <div class="card hand" [ngClass]="{'bg-primary-color': e.isSelected, 'text-primary-color': !e.isSelected}">
+                    <div class="card-body pt-5 pb-5 text-center">
+                      <i class="fa fa-building fa-4x"></i><br>
+                      <p class="mt-3 text-center">
+                        <strong class="font-xl">{{e.businessName | uppercase}}</strong><br>
+                        <span>{{e.businessAddress | uppercase}}</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 mt-5 text-right" *ngIf="entitySelected">
+              <button class="btn bg-primary-color"  (click)="toggleEntityModal()">
+                <i class="fa fa-check mr-1"></i>Continuar
+              </button>
+            </div>
+          </div>
+        </form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" bsModal #enrollInBulkModal="bs-modal" [config]="{backdrop: 'static'}" tabindex="-1" role="dialog" aria-labelledby="dialog-static-name">
+	<div class="modal-dialog modal-nm">
+		<div class="modal-content">
+			<div class="modal-body">
+        <form #enrollInBulkForm="ngForm">
+          <div class="form-row">
+            <div class="col-9 pt-1">
+              <i class="fa fa-list-alt mr-1"></i>Elija que colaboradores inscribirá al Curso:
+            </div>
+            <div class="col-3 text-right">
+              <button class="btn btn-sm btn-light text-danger" (click)="toggleEnrollInBulkModal()">
+                <i class="fa fa-times mr-1"></i>Cerrar
+              </button>
+            </div>
+            <div class="col-12">
+              <hr>
+              <strong>Lista de Colaboradores</strong>
+              <ul class="list-group">
+                <li class="list-group-item p-2">
+                  <div class="form-row">
+                    <div class="col-10">
+                      <strong class="text-primary-color">Detalle de Colaborador</strong>
+                    </div>
+                    <div class="col-2 text-right hand" (click)="toggleSelectedAllCollaborators()">
+                      Todos&nbsp;<i class="fa" [ngClass]="{'fa-circle-o': !selectedAllCollaborators, 'fa-circle text-primary-color': selectedAllCollaborators}"></i>
+                    </div>
+                  </div>
+                </li>
+                <li class="list-group-item p-2 hand" *ngFor="let c of collaborators" (click)="toggleSelected(c)">
+                  <div class="form-row">
+                    <div class="col-10">
+                      <i class="fa fa-user mr-1"></i>{{c.personFullName | uppercase}}
+                    </div>
+                    <div class="col-2 text-right">
+                      <i class="fa" [ngClass]="{'fa-circle-o': !c.isSelected, 'fa-circle text-primary-color': c.isSelected}"></i>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <div class="col-12 mt-3">
+              <div class="form-row">
+                <div class="col-6">
+                  <button class="btn btn-light text-danger" (click)="toggleEnrollInBulkModal()">
+                    <i class="fa fa-times mr-1"></i>Cancelar
+                  </button>
+                </div>
+                <div class="col-6 text-right">
+                  <button class="btn bg-primary-color" [disabled]="enrollCollaborators.quantitySelecteds === 0" (click)="enrollInBulk()">
+                    <i class="fa fa-check mr-1"></i>Guardar Cambios
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+			</div>
+		</div>
+	</div>
+</div>

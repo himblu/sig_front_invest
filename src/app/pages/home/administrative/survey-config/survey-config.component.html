@@ -1,0 +1,28 @@
+<div class="animated fadeIn">
+  <div class="card">
+    <div class="card-header">
+      <div class="form-row">
+        <div class="col-8 pt-1">
+          <i class="fa fa-cog mr 1"></i>Configuración de Encuestas
+        </div>
+        <div class="col-4 text-right">
+          <button class="btn btn-sm btn-primary">
+            <i class="fa fa-plus mr-1"></i>Nuevo
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="card-body text-center" *ngIf="searched && !configs.length">
+      <i class="fa fa-times fa-3x"></i><br>
+      No se encontraron resultados
+    </div>
+    <ul class="list-group list-group-flush" *ngIf="searched && configs.length">
+      <li class="list-group-item p-1">
+        
+      </li>
+      <li class="list-group-item p-1" *ngFor="let c of configs">
+        .form-row>.col-
+      </li>
+    </ul>
+  </div>
+</div>

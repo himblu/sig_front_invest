@@ -1,0 +1,343 @@
+<div class="container-fluid">
+  <h2 class="text-center">CALENDARIO</h2>
+
+  <div class="d-flex">
+    <div class="col-3 pb-3">
+      <div class="d-flex align-items-center">
+        <button
+          (click)="createOrUpdateEvent();"
+          mat-stroked-button
+          style="height: 48px !important; border-radius: 48px; background: white">
+          <mat-icon class="blue">add</mat-icon>
+          Crear Evento
+        </button>
+        <button
+          (click)="reportsForm();"
+          mat-stroked-button
+          style="height: 48px !important; border-radius: 48px; background: white">
+          <mat-icon class="green">download</mat-icon>
+          Descargar Evento
+        </button>
+      </div>
+
+      <div class="mt-4">
+        <mat-card>
+          <mat-calendar #calendar [(selected)]="viewDate" (selectedChange)="getEventsFromDate($event);">
+          </mat-calendar>
+        </mat-card>
+      </div>
+
+<!--      <div class="mt-4">-->
+<!--        <mat-accordion>-->
+<!--          <mat-expansion-panel [expanded]="false">-->
+<!--            <mat-expansion-panel-header>-->
+<!--              <mat-panel-title>-->
+<!--                Calendarios-->
+<!--              </mat-panel-title>-->
+<!--              <mat-panel-description>-->
+<!--              </mat-panel-description>-->
+<!--            </mat-expansion-panel-header>-->
+
+<!--            <ul>-->
+<!--              <li matRipple-->
+<!--                  matTooltip="Agregar Calendario"-->
+<!--                  matTooltipPosition="after"-->
+<!--                  (click)="createOrUpdateCustomEvent();">-->
+<!--                <div class="d-flex justify-content-between"-->
+<!--                     style="cursor: pointer; padding: 10px 24px 10px 24px; background: #27a8db; color: white;">-->
+<!--                  <div class="align-self-center">-->
+<!--                    <span class="mr-3">Agregar</span>-->
+<!--                  </div>-->
+<!--                  <div class="d-flex align-self-center">-->
+<!--                    <mat-icon>add</mat-icon>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--              </li>-->
+<!--              <li matRipple-->
+<!--                  [matTooltip]="event.eventName"-->
+<!--                  matTooltipPosition="after"-->
+<!--                  *ngFor="let event of customEvents; trackBy: trackByCustomEventId;"-->
+<!--                  style="cursor: default; padding: 10px 5px 10px 15px;">-->
+<!--                <div class="event-container d-flex align-items-center justify-content-between" style="height: 1.4rem;">-->
+<!--                  <div>-->
+<!--                    <label class="check-container mb-0">{{ event.eventName }}-->
+<!--                      <input [(ngModel)]="event.isChecked" (ngModelChange)="getFilteredEvents(event);" type="checkbox">-->
+<!--                      <span class="checkmark" [style.border]="'2px solid ' + event.background"-->
+<!--                            [style.background-color]="event.isChecked ? event.background : 'white'"></span>-->
+<!--                    </label>-->
+<!--                  </div>-->
+<!--                  <div class="align-items-center event-options hide">-->
+<!--                    <mat-icon-->
+<!--                      (click)="removeCustomEvent(event);"-->
+<!--                      matTooltip="Eliminar"-->
+<!--                      matTooltipPosition="above"-->
+<!--                      style="cursor: pointer;"-->
+<!--                      color="warn" class="mr-2">close-->
+<!--                    </mat-icon>-->
+
+<!--                    <mat-icon-->
+<!--                      [matMenuTriggerFor]="eventOptions"-->
+<!--                      matTooltip="Opciones"-->
+<!--                      matTooltipPosition="above"-->
+<!--                      style="cursor: pointer;">more_vert-->
+<!--                    </mat-icon>-->
+
+<!--                    <mat-menu #eventOptions="matMenu" yPosition="above">-->
+<!--                      <ng-template matMenuContent>-->
+<!--                        <button mat-menu-item (click)="showOnlyThisEvent(event)">Mostrar Sólo Este Calendario</button>-->
+<!--                        <button mat-menu-item (click)="createOrUpdateCustomEvent(event)">Editar Calendario</button>-->
+<!--                      </ng-template>-->
+<!--                    </mat-menu>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--              </li>-->
+<!--            </ul>-->
+<!--          </mat-expansion-panel>-->
+<!--        </mat-accordion>-->
+
+<!--        <br>-->
+<!--        <mat-accordion>-->
+<!--          <mat-expansion-panel [expanded]="false">-->
+<!--            <mat-expansion-panel-header>-->
+<!--              <mat-panel-title>-->
+<!--                Mis Calendarios-->
+<!--              </mat-panel-title>-->
+<!--              <mat-panel-description>-->
+<!--              </mat-panel-description>-->
+<!--            </mat-expansion-panel-header>-->
+
+<!--            <ul>-->
+<!--              <li matRipple-->
+<!--                  matTooltip="Agregar Calendario"-->
+<!--                  matTooltipPosition="after"-->
+<!--                  (click)="createCustomEventSetting();">-->
+<!--                <div class="d-flex justify-content-between"-->
+<!--                     style="cursor: pointer; padding: 10px 24px 10px 24px; background: #27a8db; color: white;">-->
+<!--                  <div class="align-self-center">-->
+<!--                    <span class="mr-3">Agregar</span>-->
+<!--                  </div>-->
+<!--                  <div class="d-flex align-self-center">-->
+<!--                    <mat-icon>add</mat-icon>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--              </li>-->
+<!--              <li matRipple-->
+<!--                  [matTooltip]="event.eventName + ' | ' + event.modalityName + ' | ' + event.hoursClass + ' Horas'"-->
+<!--                  matTooltipPosition="after"-->
+<!--                  *ngFor="let event of customEventSettings; trackBy: trackByCustomEventSettingId;"-->
+<!--                  style="cursor: default; padding: 10px 5px 10px 15px;">-->
+<!--                <div class="event-container d-flex align-items-center justify-content-between" style="height: 1.4rem;">-->
+<!--                  <div>-->
+<!--                    <span class="mb-0">{{ event.eventName + ' | ' + event.modalityName }}</span>-->
+<!--                  </div>-->
+<!--                  <div class="align-items-center event-options hide">-->
+<!--                    <mat-icon-->
+<!--                      (click)="removeCustomEventSetting(event);"-->
+<!--                      matTooltip="Eliminar"-->
+<!--                      matTooltipPosition="above"-->
+<!--                      style="cursor: pointer;"-->
+<!--                      color="warn" class="mr-2">close-->
+<!--                    </mat-icon>-->
+
+<!--                    <mat-icon-->
+<!--                      (click)="createCustomEventSetting(event);"-->
+<!--                      matTooltip="Editar"-->
+<!--                      matTooltipPosition="above"-->
+<!--                      style="cursor: pointer;"-->
+<!--                      color="primary" class="mr-2">edit-->
+<!--                    </mat-icon>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--              </li>-->
+<!--            </ul>-->
+<!--          </mat-expansion-panel>-->
+<!--        </mat-accordion>-->
+
+
+<!--      </div>-->
+    </div>
+    <div class="col-9">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div style="display: flex; align-items: center;">
+          <button
+            style="background: white"
+            mat-stroked-button
+            matTooltip="Eventos de hoy"
+            matTooltipClass="blue-tooltip"
+            class="mr-3"
+            (click)="selectToday()">
+            Eventos Hoy
+          </button>
+
+          <button mat-icon-button mwlCalendarPreviousView [view]="view" [(viewDate)]="viewDate"
+                  (viewDateChange)="getEventsFromDate($event);">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <button mat-icon-button mwlCalendarNextView [view]="view" [(viewDate)]="viewDate"
+                  (viewDateChange)="getEventsFromDate($event);">
+            <mat-icon>navigate_next</mat-icon>
+          </button>
+          <span class="ml-3"
+                style="font-size: larger; color: black;">{{ viewDate | calendarDate:(view + 'ViewTitle'):'es' }}</span>
+        </div>
+
+        <div>
+
+          <mat-form-field appearance="outline" style="width: 100%;">
+            <mat-select [formControl]="calendarTypeFormControl" style="background: white;" (selectionChange)="getEventsFromDate(viewDate);">
+              <mat-option *ngFor="let calendar of calendarTypes;" [value]="calendar.calendarTypeID" style="text-align: center;">
+                {{ calendar.calendarTypeDesc }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div>
+          <button
+            mat-icon-button
+            [ngClass]="view === 'month' ? 'blue' : 'black'"
+            matTooltip="Vista mensual"
+            matTooltipClass="blue-tooltip"
+            (click)="setView(calendarView.Month)">
+            <mat-icon>view_comfy</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            [ngClass]="view === 'week' ? 'blue' : 'black'"
+            matTooltip="Vista semanal"
+            matTooltipClass="blue-tooltip"
+            (click)="setView(calendarView.Week)"
+            [class.active]="view === 'week'">
+            <mat-icon>view_week</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            [ngClass]="view === 'day' ? 'blue' : 'black'"
+            matTooltip="Vista diaria"
+            matTooltipClass="blue-tooltip"
+            (click)="setView(calendarView.Day)"
+            [class.active]="view === 'day'">
+            <mat-icon>view_day</mat-icon>
+          </button>
+        </div>
+      </div>
+      <div [ngSwitch]="view">
+        <mwl-calendar-month-view
+          (dayClicked)="createOrEditEventMonthView($event.day, $event.sourceEvent)"
+          *ngSwitchCase="calendarView.Month"
+          [viewDate]="viewDate"
+          [cellTemplate]="customCellTemplate"
+          [events]="events">
+        </mwl-calendar-month-view>
+        <mwl-calendar-week-view
+          *ngSwitchCase="calendarView.Week"
+          [viewDate]="viewDate"
+          (eventClicked)="openContextMenu($event)"
+          (hourSegmentClicked)="createEventWeekOrDay($event)"
+          [hourSegments]="1"
+          [eventTemplate]="customWeekViewEventTemplate"
+          [events]="events">
+        </mwl-calendar-week-view>
+        <mwl-calendar-day-view
+          *ngSwitchCase="calendarView.Day"
+          (eventClicked)="openContextMenu($event)"
+          (hourSegmentClicked)="createEventWeekOrDay($event)"
+          [viewDate]="viewDate"
+          [hourSegments]="1"
+          [eventTemplate]="customWeekViewEventTemplate"
+          [events]="events">
+        </mwl-calendar-day-view>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--Check out the docs to override the templates-->
+<!--https://github.com/mattlewis92/angular-calendar/blob/main/projects/angular-calendar/src/modules/month/calendar-month-view/calendar-month-cell/calendar-month-cell.component.ts-->
+<ng-template
+  #customCellTemplate
+  let-day="day"
+  let-locale="locale"
+  let-highlightDay="highlightDay"
+  let-unhighlightDay="unhighlightDay"
+  let-eventClicked="eventClicked"
+  let-trackByEventId="trackByEventId">
+  <div class="cal-cell-top" [matMenuTriggerFor]="day.badgeTotal > 0 ? eventMenu : null" [attr.aria-label]="{ day: day, locale: locale } | calendarA11y : 'monthCell'">
+    <mat-menu #eventMenu="matMenu" yPosition="above" xPosition="after">
+      <ul>
+        <ng-container *ngFor="let event of day.events; trackBy: trackByEventId">
+          <li class="p-2" style="cursor: pointer; border-bottom: 2px solid #27a8db;" *ngIf="day.badgeTotal > 0 && day.day != 0" (click)="updateDates(event);">
+            <div>
+              <div class="d-flex" style="font-size: 12px; color: black; letter-spacing: 0; font-weight: 500;">
+                <div class="mr-2" style="height: 15px; width: 15px; display: flex; align-self: center;" [ngStyle]="{ backgroundColor: event.background }"></div>
+                <span>{{ event.title }}</span>
+              </div>
+              <div style="font-size: 11px; color: black; letter-spacing: 0;">
+                <ng-container *ngIf="event.classModuleDesc; else modalityName;">{{ event.modalityName }} - {{ event.classModuleDesc }}</ng-container>
+                <ng-template #modalityName>{{ event.modalityName }}</ng-template>
+              </div>
+              <div style="font-size: 11px; color: black; letter-spacing: 0;">
+                Del {{ event.start | date: 'longDate' }} al {{ event.end | date: 'longDate' }}
+              </div>
+            </div>
+  <!--          <p style="font-size: 12px; color: black; letter-spacing: 0; font-weight: 500;" class="m-0">-->
+  <!--            <span class="mr-3" style="height: 10px; width: 10px; background: #1e90ff; display: flex; align-self: center;"></span>{{ event.title }}-->
+  <!--          </p>-->
+  <!--          <p style="font-size: 11px; color: black; letter-spacing: 0;" class="m-0"> Del {{ event.start | date: 'longDate' }} al {{ event.end | date: 'longDate' }}</p>-->
+          </li>
+        </ng-container>
+      </ul>
+    </mat-menu>
+    <span class="cal-day-number">{{ day.date | calendarDate:'monthViewDayNumber':locale }}</span>
+    <span
+      class="cal-day-badge badge-shadow blue"
+        *ngIf="day.badgeTotal > 0 && day.day != 0"
+        [matBadge]="day.badgeTotal"
+        matBadgePosition="before"
+        matBadgeOverlap="false">
+		</span>
+  </div>
+  <div class="cal-events" *ngIf="day.events.length > 0 && day.day != 0">
+    <ng-container *ngFor="let event of day.events; trackBy: trackByCalendarEvent;">
+      <div
+        class="cal-event"
+        [ngStyle]="{ backgroundColor: event.background }"
+        [ngClass]="{'disable': !event.statusID}"
+        (mouseenter)="highlightDay.emit({ event: event })"
+        (mouseleave)="unhighlightDay.emit({ event: event })"
+        mwlDraggable
+        [matTooltip]="event.modalityName ? event.title+ ' - ' +event.modalityName : (event.modalityName? null : event.title)"
+        matTooltipPosition="above"
+        [class.cal-draggable]="event.draggable"
+        dragActiveClass="cal-drag-active"
+        [dropData]="{ event: event, draggedFrom: day }"
+        [dragAxis]="{ x: event.draggable, y: event.draggable }"
+        [touchStartLongPress]="{ delay: 300, delta: 30 }"
+        (mwlClick)="eventClicked.emit({ event: event, sourceEvent: $event })"
+        [attr.aria-hidden]="{} | calendarA11y : 'hideMonthCellEvents'">
+      </div>
+    </ng-container>
+  </div>
+
+</ng-template>
+
+<ng-template #customWeekViewEventTemplate let-weekEvent="weekEvent" let-locale="locale" let-eventClicked="eventClicked"
+             let-tooltipPlacement="tooltipPlacement" let-tooltipTemplate="tooltipTemplate"
+             let-tooltipAppendToBody="tooltipAppendToBody" let-tooltipDisabled="tooltipDisabled">
+  <div *ngIf="view === 'week'"
+       class="cal-event"
+       (mwlClick)="eventClicked.emit({ event: weekEvent.event })"
+       matTooltipPosition="above"
+       [matTooltip]="weekEvent.event.title + lineBreak + 'De ' + (weekEvent.event.start | date: 'hh:mm a') + ' a ' + (weekEvent.event.end | date: 'hh:mm a')">
+    {{ weekEvent.event.start | date: 'hh:mm a' }} - {{ weekEvent.event.end | date: 'hh:mm a' }}
+  </div>
+
+  <div *ngIf="view === 'day'"
+       class="cal-event"
+       (mwlClick)="eventClicked.emit({ event: weekEvent.event })"
+       matTooltipPosition="above"
+       [matTooltip]="weekEvent.event.title + lineBreak + 'De ' + (weekEvent.event.start | date: 'hh:mm a') + ' a ' + (weekEvent.event.end | date: 'hh:mm a')">
+    {{ weekEvent.event.title }} ({{ weekEvent.event.start | date: 'hh:mm a' }}
+    - {{ weekEvent.event.end | date: 'hh:mm a' }})
+  </div>
+</ng-template>

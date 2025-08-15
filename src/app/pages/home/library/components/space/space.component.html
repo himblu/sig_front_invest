@@ -1,0 +1,32 @@
+<mat-dialog-content>
+  <div *ngIf="isLoading; else form">
+    <spinner-loader></spinner-loader>
+  </div>
+
+  <ng-template #form>
+      <div class="card">
+        <div class="card-body">
+          <div class="col-12" style="text-align: center;">
+            <h2>Bienvenido al espacio de Biblioteca</h2>
+          </div>
+          <div class="col-12" style="text-align: center;">
+            <h3>{{librarySpace?.librarySpaceName}}</h3>
+          </div>
+          <div class="col-12"><hr></div>
+          <div class="col-12" style="text-align: center;">
+            <h4 style="color: #014898;">{{selectedStudentCareer.names}}</h4>
+          </div>
+          <div class="col-12" style="text-align: center;" *ngIf="selectedStudentCareer?.careerName">
+            <h4>Carrera:
+              <p style="color: #014898;">{{selectedStudentCareer.careerName}}</p>
+            </h4>
+          </div>
+          <div class="col-12" style="text-align: center;">
+            <h4>Número de documento:
+              <p style="color: #014898;">{{selectedStudentCareer.documentNumber}}</p>
+            </h4>
+          </div>
+        </div>
+      </div>
+  </ng-template>
+</mat-dialog-content>

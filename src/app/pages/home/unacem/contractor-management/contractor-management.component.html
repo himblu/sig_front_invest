@@ -1,0 +1,81 @@
+<div class="animated fadeIn fast container-fluid">
+    <div class="form-row">
+        <div class="col-12 m-3">
+            <div class="card">
+                <div class="card-header p-2">
+                    <div class="form-row">
+                        <div class="col-3 pt-1">
+                            <i class="fa fa-building mr-1"></i>Administración de Contratistas
+                        </div>
+                        <div class="col-3">
+                            <input type="text" name="byText" placeholder="FILTRAR POR TEXTO" [(ngModel)]="byText" class="form-control form-control-sm text-center">
+                        </div>
+                        <div class="col-3">
+                            <div class="form-row">
+                                <div class="col-6">
+                                    <input type="date" name="startDate" [(ngModel)]="filter.startDate" class="form-control form-control-sm">
+                                </div>
+                                <div class="col-6">
+                                    <input type="date" [min]="filter.startDate" [disabled]="!filter.startDate" name="endDate" [(ngModel)]="filter.endDate" class="form-control form-control-sm">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-right">
+                            <button type="button" class="btn bg-primary-color btn-sm mr-2" *ngIf="contractors.length" (click)="report()">
+                                Reporte .xlsx
+                            </button>
+                            <button type="button" class="btn bg-primary-color btn-sm" (click)="toggleContractor()">
+                                Agregar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-2">
+                    <div class="form-row">
+                      <div class="col-12 text-center text-secondary" *ngIf="!contractors.length">
+                        <i class="fa fa-times fa-3x"></i><br>
+                        No se encontraron registros
+                      </div>
+                        <div class="col-12" *ngIf="contractors.length">
+                            <!-- Tabla de Empresas Contratistas -->
+                            <table class="table table-bordered table-sm">
+                                <thead class="thead-light bg-primary-color">
+                                    <tr>
+                                        <th class="">Nombre de la Empresa</th>
+                                        <th class="">Dirección</th>
+                                        <th class="">Teléfono</th>
+                                        <th class="">Estado</th>
+                                        <th class="text-right">Creado</th>
+                                        <th class="text-right">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let c of contractors | filter:byText">
+                                        <td class="" style="vertical-align: middle;">{{c.businessName | uppercase}}</td>
+                                        <td class="" style="vertical-align: middle;">{{c.businessAddress | uppercase}}</td>
+                                        <td class="" style="vertical-align: middle;">{{c.businessPhone}}</td>
+                                        <td class="" style="vertical-align: middle;">
+                                            <i class="fa fa-circle mr-1" [ngClass]="{'text-success': c.statusID === 1, 'text-danger': c.statusID === 0}"></i>
+                                            {{c.statusID === 1 ? 'Activo' : 'Inactivo'}}
+                                        </td>
+                                        <td class="text-right" style="vertical-align: middle;">{{c.dateCreated | date: 'dd-MM-yyyy HH:mm a'}}</td>
+                                        <td class="" style="vertical-align: middle;" class="text-right">
+                                            <button class="btn btn-light text-primary-color btn-sm rounded-circle" (click)="toggleContractor(c)">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm rounded-circle" [ngClass]="{'btn-danger': c.statusID === 1, 'bg-primary-color': c.statusID === 0}" (click)="deleteContractor(c)">
+                                                <i class="fa" [ngClass]="{'fa-trash': c.statusID === 1, 'fa-arrow-up': c.statusID === 0}"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <!-- Más filas de empresas contratistas según sea necesario -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

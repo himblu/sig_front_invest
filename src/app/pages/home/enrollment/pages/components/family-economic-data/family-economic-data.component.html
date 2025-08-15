@@ -1,0 +1,214 @@
+<div class="animated fadeIn fast">
+    <div class="row">
+        <div class="col-md-4">
+            <form [formGroup]="averageIncomeForm"
+                    autocomplete="off">
+                <mat-card class="result" style="margin-top: 2px;">
+                    <h2 class="text-info text-center"> INGRESOS PROMEDIOS </h2>
+                    <mat-card-content>
+                        <mat-form-field class="width " appearance="outline">
+                            <mat-label>Aporte Padre</mat-label>
+                            <span matPrefix><mat-icon matSuffix>monetization_on</mat-icon> &nbsp;</span>
+                            <input formControlName="fatherIncome" type="text" matInput>
+                            <mat-error *ngIf="isValidField('fatherIncome')">{{getFielError('fatherIncome')}}</mat-error>
+                        </mat-form-field>
+                        <mat-form-field class="width " appearance="outline">
+                            <mat-label>Aporte Madre</mat-label>
+                            <span matPrefix><mat-icon matSuffix>monetization_on</mat-icon> &nbsp;</span>
+                            <input formControlName="motherIncome" type="text" matInput>
+                            <mat-error *ngIf="isValidField('motherIncome')">{{getFielError('motherIncome')}}</mat-error>
+                        </mat-form-field>
+                        <mat-form-field class="width " appearance="outline">
+                            <mat-label>Aportes Familiares</mat-label>
+                            <span matPrefix><mat-icon matSuffix>monetization_on</mat-icon> &nbsp;</span>
+                            <input formControlName="familyIncome" type="text" matInput>
+                            <mat-error *ngIf="isValidField('familyIncome')">{{getFielError('familyIncome')}}</mat-error>
+                        </mat-form-field>
+                        <mat-form-field class="width " appearance="outline">
+                            <mat-label>Aporte Estudiante</mat-label>
+                            <span matPrefix><mat-icon matSuffix>monetization_on</mat-icon> &nbsp;</span>
+                            <input formControlName="studentIncome" type="text" matInput>
+                            <mat-error *ngIf="isValidField('studentIncome')">{{getFielError('studentIncome')}}</mat-error>
+                        </mat-form-field>
+                        <mat-form-field class="width " appearance="outline">
+                            <mat-label>Aporte Pareja</mat-label>
+                            <span matPrefix><mat-icon matSuffix>monetization_on</mat-icon> &nbsp;</span>
+                            <input formControlName="partnerContribution" type="text" matInput>
+                            <mat-error *ngIf="isValidField('partnerContribution')">{{getFielError('partnerContribution')}}</mat-error>
+                        </mat-form-field>
+                        <mat-form-field class="width " appearance="outline">
+                            <mat-label>Otro Ingresos</mat-label>
+                            <span matPrefix><mat-icon matSuffix>monetization_on</mat-icon> &nbsp;</span>
+                            <input formControlName="otherIncome" type="text" matInput>
+                            <mat-error *ngIf="isValidField('otherIncome')">{{getFielError('otherIncome')}}</mat-error>
+                        </mat-form-field>
+                        <div style="display: flex; margin-top: 110px; margin-bottom: 25px;">
+                            
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+            </form>
+        </div>
+        <div class="col-md-8">
+            <form [formGroup]="averageExpensesForm"
+                    autocomplete="off">
+                <mat-card class="result">
+                    <h2 class="text-info text-center"> EGRESOS PROMEDIOS </h2>
+                    <mat-card-content>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-label>Vivienda</mat-label>
+                                    <span matPrefix><mat-icon matSuffix>monetization_on</mat-icon> &nbsp;</span>
+                                    <input formControlName="livingPlace" type="text" matInput>
+                                    <mat-error *ngIf="isValidField2('livingPlace')">{{getFielError2('livingPlace')}}</mat-error>
+                                </mat-form-field>
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-label>Alimentación</mat-label>
+                                    <span matPrefix><mat-icon matSuffix>monetization_on</mat-icon> &nbsp;</span>
+                                    <input formControlName="feeding" type="text" matInput>
+                                    <mat-error *ngIf="isValidField2('feeding')">{{getFielError2('feeding')}}</mat-error>
+                                </mat-form-field>
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-label>Salud</mat-label>
+                                    <span matPrefix><mat-icon matSuffix>monetization_on</mat-icon> &nbsp;</span>
+                                    <input formControlName="health" type="text" matInput>
+                                    <mat-error *ngIf="isValidField2('health')">{{getFielError2('health')}}</mat-error>
+                                </mat-form-field>
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-label>Vestimenta</mat-label>
+                                    <span matPrefix><mat-icon matSuffix>monetization_on</mat-icon> &nbsp;</span>
+                                    <input formControlName="lockerRoom" type="text" matInput>
+                                    <mat-error *ngIf="isValidField2('lockerRoom')">{{getFielError2('lockerRoom')}}</mat-error>
+                                </mat-form-field>
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-label>Educación</mat-label>
+                                    <span matPrefix><mat-icon matSuffix>monetization_on</mat-icon> &nbsp;</span>
+                                    <input formControlName="education" type="text" matInput>
+                                    <mat-error *ngIf="isValidField2('education')">{{getFielError2('education')}}</mat-error>
+                                </mat-form-field>
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-label>Transporte</mat-label>
+                                    <span matPrefix><mat-icon matSuffix>monetization_on</mat-icon> &nbsp;</span>
+                                    <input formControlName="transportation" type="text" matInput>
+                                    <mat-error *ngIf="isValidField2('transportation')">{{getFielError2('transportation')}}</mat-error>
+                                </mat-form-field>
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-label>Recreación</mat-label>
+                                    <span matPrefix><mat-icon matSuffix>monetization_on</mat-icon> &nbsp;</span>
+                                    <input formControlName="recreation" type="text" matInput>
+                                    <mat-error *ngIf="isValidField2('recreation')">{{getFielError2('recreation')}}</mat-error>
+                                </mat-form-field>
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-label>Créditos</mat-label>
+                                    <span matPrefix><mat-icon matSuffix>monetization_on</mat-icon> &nbsp;</span>
+                                    <input formControlName="credits" type="text" matInput>
+                                    <mat-error *ngIf="isValidField2('credits')">{{getFielError2('credits')}}</mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-md-6">
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-label>Agua</mat-label>
+                                    <span matPrefix><mat-icon matSuffix>monetization_on</mat-icon> &nbsp;</span>
+                                    <input formControlName="water" type="text" matInput>
+                                    <mat-error *ngIf="isValidField2('water')">{{getFielError2('water')}}</mat-error>
+                                </mat-form-field>
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-label>Luz</mat-label>
+                                    <span matPrefix><mat-icon matSuffix>monetization_on</mat-icon> &nbsp;</span>
+                                    <input formControlName="light" type="text" matInput>
+                                    <mat-error *ngIf="isValidField2('light')">{{getFielError2('light')}}</mat-error>
+                                </mat-form-field>
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-label>Teléfono Convencional</mat-label>
+                                    <span matPrefix><mat-icon matSuffix>monetization_on</mat-icon> &nbsp;</span>
+                                    <input formControlName="housePhone" type="text" matInput>
+                                    <mat-error *ngIf="isValidField2('housePhone')">{{getFielError2('housePhone')}}</mat-error>
+                                </mat-form-field>
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-label>Teléfono Celular</mat-label>
+                                    <span matPrefix><mat-icon matSuffix>monetization_on</mat-icon> &nbsp;</span>
+                                    <input formControlName="celularPhone" type="text" matInput>
+                                    <mat-error *ngIf="isValidField2('celularPhone')">{{getFielError2('celularPhone')}}</mat-error>
+                                </mat-form-field>
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-label>Internet</mat-label>
+                                    <span matPrefix><mat-icon matSuffix>monetization_on</mat-icon> &nbsp;</span>
+                                    <input formControlName="internet" type="text" matInput>
+                                    <mat-error *ngIf="isValidField2('internet')">{{getFielError2('internet')}}</mat-error>
+                                </mat-form-field>
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-label>Tv Cable</mat-label>
+                                    <span matPrefix><mat-icon matSuffix>monetization_on</mat-icon> &nbsp;</span>
+                                    <input formControlName="tvCable" type="text" matInput>
+                                    <mat-error *ngIf="isValidField2('tvCable')">{{getFielError2('tvCable')}}</mat-error>
+                                </mat-form-field>
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-label>Otro Egreso</mat-label>
+                                    <span matPrefix><mat-icon matSuffix>monetization_on</mat-icon> &nbsp;</span>
+                                    <input formControlName="otherExpenses" type="text" matInput>
+                                    <mat-error *ngIf="isValidField2('otherExpenses')">{{getFielError2('otherExpenses')}}</mat-error>
+                                </mat-form-field>
+                                
+                            </div>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+            </form>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <form [formGroup]="averageIncomeForm"
+                    autocomplete="off">
+                <mat-card class="result" style="border: 1px solid rgb(80, 96, 248);">
+                    <h2 class="text-info text-center mt-3"> PROMEDIO MENSUAL DISPONIBLE </h2>
+                    <mat-card-content>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h2 class="text-info"> INGRESOS PROMEDIOS</h2>
+                            </div>
+                            <div class="col-md-6 text-center">
+                                <h1 class="text-info">{{averageIncomeForm.get('totalIncome').value | currency}}</h1>
+                                <!-- <h1 class="text-info">{{global | currency}}</h1> -->
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h2 class="text-info"> EGRESOS PROMEDIOS</h2>
+                            </div>
+                            <div class="col-md-6 text-center">
+                                <h1 class="text-info">{{averageExpensesForm.get('totalExpenses').value | currency}}</h1>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h2 class="text-info">MENSUAL DISPONIBLE</h2>
+                            </div>
+                            <div class="col-md-6 text-center">
+                                <h1 class="text-info">{{global | currency}}</h1>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h1 class="text-info text-center">Nivel Económico: B</h1>
+                            </div>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+            </form>
+        </div>
+        <div class="col-md-6" style="margin-top: 120px;">
+            <div class="row">
+                <div class="col-md-6"></div>
+                <div class="col-md-6">
+                    <button mat-button class="styleButton">
+                        <i class="fa fa-save"></i>
+                        &nbsp;
+                        Guardar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

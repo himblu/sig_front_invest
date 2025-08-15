@@ -1,0 +1,55 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+<br>
+<div *ngIf="!charging">
+  <form [formGroup]="studentForm" autocomplete="off" *ngIf="studentsList">
+    <div class="table-responsive" formArrayName="data">
+      <table id="demo-foo-addrow"
+             class="table m-t-0 table-hover no-wrap contact-list footable-loaded footable"
+             data-page-size="5">
+        <thead style="background-color: #004899; color: white;">
+          <tr>
+            <th class="footable-sortable">
+              Estudiante
+              <span class="footable-sort-indicator"></span>
+            </th>
+            <th class="footable-sortable">
+              Fecha/Hora
+              <span class="footable-sort-indicator"></span>
+            </th>
+            <th class="footable-sortable" style="text-align: center;">
+              Asistencia
+              <span class="footable-sort-indicator"></span>
+            </th>
+            <th class="footable-sortable" style="text-align: center;">
+              <a type="submit" style="cursor: pointer; color: white; font-size: 20px;"
+                *ngIf="attendanceList && attendanceList.flag_date_active && attendanceList.flag_active"
+                (click)="postAttendance()"
+                matTooltipPosition="right"
+                matTooltip="Guardar Asistencia">
+                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+              </a>
+            </th>
+          </tr>
+        </thead>
+        <tbody style="color: black;">
+          <tr *ngFor="let student of studentsList; let i=index" [formGroupName]="i">
+            <td class="wrap">{{student.student}}</td>
+            <td class="wrap"><label>{{actualDate}}</label>&nbsp;<label *ngIf="attendanceList">/ {{attendanceList.startTime}}-{{attendanceList.endTime}}</label></td>
+            <td style="text-align: center;" *ngIf="attendanceList" colspan="2">
+              <mat-checkbox *ngIf="attendanceList.flag_date_active && attendanceList.flag_active" color="primary" formControlName="attendanceStatusID"></mat-checkbox>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <components-button-arrow [actual]="actualStudents" [totalPage]="totalPageStudents" [count]="countStudents" (result)="changePageStudents($event)"></components-button-arrow>
+  </form>
+</div>

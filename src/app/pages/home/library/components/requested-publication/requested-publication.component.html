@@ -1,0 +1,133 @@
+<section>
+  <div style="position: relative;">
+    <spinner-loader [absolute]="true" *ngIf="isLoadingRequestedPublications"></spinner-loader>
+    <mat-table
+      [dataSource]="dataSource" matSort (matSortChange)="getRequestedPublications($event);">
+      <!-- deweyCodeInternal -->
+      <ng-container matColumnDef="deweyCodeInternal">
+        <mat-header-cell *matHeaderCellDef class="dewey-code-column">Código</mat-header-cell>
+        <mat-cell *matCellDef="let row; let i = index;" class="dewey-code-column"> {{ row.deweyCodeInternal }} </mat-cell>
+      </ng-container>
+      <!-- title -->
+      <ng-container matColumnDef="title">
+        <mat-header-cell *matHeaderCellDef class="title-column" mat-sort-header>
+          Título
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <div class="cell-content" [matTooltip]="row.title" matTooltipPosition="above">
+            {{ row.title }}
+          </div>
+        </mat-cell>
+      </ng-container>
+
+      <!-- edition -->
+      <ng-container matColumnDef="edition">
+        <mat-header-cell *matHeaderCellDef class="edition-column">Edición</mat-header-cell>
+        <mat-cell *matCellDef="let row;" class="edition-column"> {{ row.edition }} </mat-cell>
+      </ng-container>
+
+      <!-- codeISBN -->
+      <ng-container matColumnDef="codeISBN">
+        <mat-header-cell *matHeaderCellDef class="isbn-column">ISBN/ISSN</mat-header-cell>
+        <mat-cell *matCellDef="let row" class="isbn-column">{{ row.codeISBN || 'N/A' }}</mat-cell>
+      </ng-container>
+
+      <!-- publicationYear -->
+      <ng-container matColumnDef="publicationYear">
+        <mat-header-cell *matHeaderCellDef mat-sort-header  class="year-column">Año Publicación</mat-header-cell>
+        <mat-cell *matCellDef="let row " class="year-column">{{ row.publicationYear || 'N/D' }}</mat-cell>
+      </ng-container>
+
+      <!-- dateRequest -->
+      <ng-container matColumnDef="dateRequest">
+        <mat-header-cell *matHeaderCellDef mat-sort-header class="date-request-column">Fecha Solicitud</mat-header-cell>
+        <mat-cell *matCellDef="let row" class="date-request-column">{{ row.dateRequest ? (row.dateRequest | date: 'dd-MM-yyyy HH:mm': 'UTC-5') : 'N/D' }}</mat-cell>
+      </ng-container>
+
+      <!-- dateDelivery -->
+      <ng-container matColumnDef="dateDelivery">
+        <mat-header-cell *matHeaderCellDef mat-sort-header class="date-delivery-column" >Fecha Entrega</mat-header-cell>
+        <mat-cell *matCellDef="let row" class="date-delivery-column" >{{ row.dateDelivery ? (row.dateDelivery | date: 'dd-MM-yyyy HH:mm': 'UTC-5') : 'N/D' }}</mat-cell>
+      </ng-container>
+
+      <!-- statusDesc -->
+      <ng-container matColumnDef="statusDesc">
+        <mat-header-cell *matHeaderCellDef mat-sort-header class="status-column"   >Estado</mat-header-cell>
+        <mat-cell
+          cdkOverlayOrigin
+          #trigger="cdkOverlayOrigin"
+          style="cursor: pointer;"
+          (mouseenter)="row.openOverlay = true;"
+          (mouseleave)="row.openOverlay = false;"
+          *matCellDef="let row" class="status-column" >
+          <span
+            class="badge"
+            [style.color]="row.fontColor"
+            [style.background-color]="row.backgroundColor">
+            {{ row.requestStatusName }}
+          </span>
+
+          <ng-template
+            cdkConnectedOverlay
+            [cdkConnectedOverlayOrigin]="trigger"
+            [cdkConnectedOverlayOpen]="row.openOverlay">
+            <div style="min-width: 400px; width: 400px; max-width: 400px; min-height: 60px; background: white;">
+              <p class="p-2" style="letter-spacing: 0; font-size: 14px;">{{ row.observation || 'No existe una observación de esta solicitud' }}</p>
+            </div>
+          </ng-template>
+        </mat-cell>
+      </ng-container>
+
+      <!-- actions -->
+      <ng-container matColumnDef="actions">
+        <mat-header-cell *matHeaderCellDef class="actions-column">
+          <span>Acciones</span>
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row" class="actions-column">
+          <button
+            class="blue-icon"
+            mat-icon-button
+            (click)="$event.stopPropagation();"
+            [matMenuTriggerFor]="menu"
+            #menuTrigger="matMenuTrigger">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu [xPosition]="'before'" #menu="matMenu">
+            <button
+              mat-menu-item
+              (click)="cancelPublication(row);"
+              [disabled]="row.requestStatusID !== REQUESTED_PUBLICATION_STATUS.PENDING">
+              <mat-icon class="red-icon">delete</mat-icon>
+              <span class="item">Cancelar Solicitud</span>
+            </button>
+
+            <!--            <button mat-menu-item (click)="addToSelectedPublications(row);">-->
+            <!--              <mat-icon class="blue-icon">add</mat-icon>-->
+            <!--              <span class="item">Agregar a Préstamo</span>-->
+            <!--            </button>-->
+          </mat-menu>
+        </mat-cell>
+        <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+      </ng-container>
+
+      <!-- noData -->
+      <ng-container matColumnDef="noData">
+        <mat-footer-cell *matFooterCellDef>
+          <p *ngIf="!requestedPublications.length" style="font-size: 90%;">No hay resultados que coincidan con los términos de búsqueda o no tienes un historial de solicitudes de publicaciones</p>
+        </mat-footer-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row matRipple *matRowDef="let row; columns: displayedColumns;" class="mat-row"></mat-row>
+      <mat-footer-row *matFooterRowDef="['noData']" [ngClass]="{'hide': requestedPublications.length }"></mat-footer-row>
+    </mat-table>
+
+    <mat-paginator
+      #paginator
+      [length]="length"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="pageSizeOptions"
+      (page)="pageEvent = getPublicationsPaginator($event)">
+    </mat-paginator>
+  </div>
+</section>

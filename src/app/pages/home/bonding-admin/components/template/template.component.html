@@ -1,0 +1,109 @@
+
+<div style="display: flex; justify-content: end; align-items: center; background: transparent;" class="p-2">
+  <mat-icon style="cursor: pointer; color: red;" [matDialogClose]="false" class="red-icon" matRipple>close</mat-icon>
+</div>
+
+<mat-dialog-content>
+  <div *ngIf="isLoading; else form">
+    <spinner-loader></spinner-loader>
+  </div>
+
+  <ng-template #form>
+      <div class="card">
+        <div class="card-body">
+          <div class="row" [formGroup]="filesForm" *ngIf="!isPostingType">
+            <div class="col-6">
+              <mat-form-field appearance="outline">
+                <mat-label>Periodo académico</mat-label>
+                <mat-select formControlName='periodID'>
+                  <mat-option [value]="0">TODOS</mat-option>
+                  <mat-option *ngFor="let item of data.periods" [value]="item.periodID">{{item.periodName}}</mat-option>
+                </mat-select>
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-6">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Tipo de archivo</mat-label>
+                <mat-select formControlName="fileTypeID">
+                  <mat-option (click)="isPostingType= true;">NUEVO</mat-option>
+                  <mat-option *ngFor="let item of fileTypes | FilterTypes" [value]="item.fileTypeID">{{item.fileTypeName}}</mat-option>
+                </mat-select>
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-6">
+              <input type="file"
+                #input
+                style="cursor: pointer; max-width: 250px;"
+                autocomplete="off"
+                (change)="onChangeInput(input);"
+                accept=".xlsx, .xls, image/*, .doc, .docx, .ppt, .pptx, .txt, .pdf">
+            </div>
+            <div class="col-6">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Nro secuencia</mat-label>
+                <input type="number" formControlName="orderNumber" matInput [min]="1">
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-6" style="text-align: left;" *ngIf="isUpdating">
+              <mat-label>Estado</mat-label>
+              <mat-checkbox class="example-margin" color="primary" formControlName="statusID"></mat-checkbox>
+            </div>
+          </div>
+          <div class="row" [formGroup]="typeForm" *ngIf="isPostingType">
+            <div class="col-8">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Nombre</mat-label>
+                <input type="text" matInput formControlName="fileTypeName">
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-2">
+              <button
+                mat-raised-button
+                style="letter-spacing: 0;"
+                color="primary"
+                (click)="postType();">
+                <small>Guardar</small>
+              </button>
+            </div>
+            <div class="col-2">
+              <button
+                mat-raised-button
+                style="letter-spacing: 0;"
+                color="warn"
+                (click)="isPostingType= false; initTypesForm(); initFilesForm();">
+                <small>Cancelar</small>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+  </ng-template>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <div class="d-flex no-block w-100 justify-content-between">
+    <div class="pl-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="warn"
+        [mat-dialog-close]="false">
+        Cerrar
+      </button>
+    </div>
+    <div class="pr-3">
+      <button *ngIf="!isPostingType"
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="primary"
+        (click)="onSubmit();">
+        <ng-container *ngIf="!isUpdating; else updating;">Guardar</ng-container>
+        <ng-template #updating>Actualizar</ng-template>
+      </button>
+    </div>
+  </div>
+</mat-dialog-actions>

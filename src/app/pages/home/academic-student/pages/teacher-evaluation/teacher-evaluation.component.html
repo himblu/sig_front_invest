@@ -1,0 +1,99 @@
+<div class="row animated fadeIn fast" *ngIf="cargando">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+<div>
+  <div class="card">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-4">
+          <section [formGroup]="filtersForm">
+            <mat-form-field appearance="outline">
+              <mat-label>Asignatura</mat-label>
+              <mat-select formControlName="subject" placeholder="Filtrar por Asignatura">
+                <mat-option value="1">Lengua</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </section>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-2"></div>
+        <div class="row col-md-3">
+          <div class="col-12">
+            Docente
+          </div>
+        </div>
+        <div class="row col-md-3">
+          <div class="col-12">
+            Indicaciones
+          </div>
+      </div>
+      <div class="row col-md-3">
+        <div class="col-12">
+          Escala de valoración:
+          <small>
+            5: Cumple, <br>
+            4: Casi siempre,
+            3: Cumple parcialmente, <br>
+            2: Pocas veces,
+            1: No cumple
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<br>
+<div class="card">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table id="demo-foo-addrow"
+             class="table m-t-0 table-hover no-wrap contact-list footable-loaded footable"
+             data-page-size="5">
+        <thead style="background-color: #004899; color: white;">
+          <tr>
+            <th class="footable-sortable">
+              No.
+              <span class="footable-sort-indicator"></span>
+            </th>
+            <th class="footable-sortable">
+              Pregunta
+              <span class="footable-sort-indicator"></span>
+            </th>
+            <th class="footable-sortable" style="text-align: center;">
+              Escala de valoración
+              <span class="footable-sort-indicator"></span>
+            </th>
+          </tr>
+          <tr style="background-color: #cfcfcf; color: black;">
+            <td></td>
+            <td>CRITERIO: INICIO DE LA CLASE - PRESENTACIÓN Y ENFOQUE</td>
+            <td></td>
+          </tr>
+        </thead>
+        <tbody style="color: black;">
+        <tr class="footable-even" style="text-transform: uppercase;">
+          <td>1</td>
+          <td>¿Está de acuerdo?</td>
+          <td>
+            <mat-radio-group aria-label="Select an option">
+              <mat-radio-button value="5">5</mat-radio-button>
+              <mat-radio-button value="4">4</mat-radio-button>
+              <mat-radio-button value="3">3</mat-radio-button>
+              <mat-radio-button value="2">2</mat-radio-button>
+              <mat-radio-button value="1">1</mat-radio-button>
+          </mat-radio-group>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

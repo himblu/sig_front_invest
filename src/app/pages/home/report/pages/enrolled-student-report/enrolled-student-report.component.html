@@ -1,0 +1,721 @@
+<div class="animated fadeIn fast">
+  <div class="container-fluid">
+    <section [formGroup]="filtersForm">
+      <div class="row pl-2 pr-2">
+        <div class="col-3">
+          <mat-form-field appearance="outline">
+            <mat-label>Periodo Académico</mat-label>
+            <mat-select (selectionChange)="getStudentsDetail(); getCareerByID();" formControlName="period" placeholder="Filtrar por Periodo Académico">
+              <mat-option value="">Todos</mat-option>
+              <mat-option *ngFor="let period of periods; trackBy: trackByPeriodId;" [value]="period.periodID">
+                {{ period.periodName }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col-3">
+          <mat-form-field appearance="outline">
+            <mat-label>Carrera</mat-label>
+            <mat-select (selectionChange)="getStudentsDetail();" formControlName="career" placeholder="Filtrar por Carrera">
+              <mat-option value="">Todos</mat-option>
+              <mat-option *ngFor="let career of careers;" [value]="career.careerID">
+                {{ career.careerName }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col-4">
+          <mat-form-field appearance="outline">
+            <mat-label>Buscar por Estudiante, Documento...</mat-label>
+            <input matInput formControlName="search" autocomplete="off">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <div class="col-2">
+          <mat-form-field appearance="outline">
+            <mat-label>Estado</mat-label>
+            <mat-select (selectionChange)="getStudentsDetail();" formControlName="status" placeholder="Filtrar por Estado">
+              <mat-option value="">Todos</mat-option>
+              <mat-option *ngFor="let status of fileStatuses; trackBy: trackByFileStatusId" [value]="status.statusFileID">
+                {{ status.statusFileDesc }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col-2">
+          <button
+            [disabled]="!filtersForm.get('period')?.value"
+            class="download-button"
+            mat-raised-button
+            matTooltipPosition="above"
+            matTooltip="Reportes"
+            [matMenuTriggerFor]="menu">
+            Reportes
+            <mat-icon class="red-icon">description</mat-icon>
+          </button>
+        </div>
+
+        <mat-menu #menu="matMenu">
+          <ng-container *ngIf="user.rolName !== ROL.ADMIN; else admin">
+            <button [disabled]="!filtersForm.get('period')?.value"
+              mat-menu-item
+              (click)="buildReport('enroll/reports/total');"
+              matTooltipPosition="above"
+              matTooltip="Descargar PDF">
+              Matriculados
+              <mat-icon class="red-icon">picture_as_pdf</mat-icon>
+            </button>
+            <button
+              mat-menu-item
+              [disabled]="!filtersForm.get('period')?.value"
+              data-toggle="modal"
+              data-target="#reportsModal"
+              matTooltipPosition="above"
+              matTooltip="Listado de Matrícula"
+              (click)="isGettingNotes= false; initReportsForm();">
+                Listado de Matrícula
+              <mat-icon class="blue-icon">assignment</mat-icon>
+            </button>
+            <button
+              mat-menu-item
+              [disabled]="!filtersForm.get('period')?.value || user.rolName === ROL.RECTOR"
+              (click)="buildReport('enroll/reports/by-status', filtersFormValue.status);"
+              matTooltipPosition="above"
+              matTooltip="Descargar PDF">
+                Reporte de Estado
+              <mat-icon class="red-icon">picture_as_pdf</mat-icon>
+            </button>
+            <button
+              mat-menu-item
+              [disabled]="!filtersForm.get('period')?.value || user.rolName === ROL.RECTOR"
+              (click)="excelStudentReport();"
+              matTooltipPosition="above"
+              matTooltip="Descargar Excel">
+                Reporte de Estudiantes
+              <mat-icon class="green-icon">assignment</mat-icon>
+            </button>
+            <button mat-menu-item
+              [disabled]="!filtersForm.get('period')?.value"
+              (click)="buildReport('enroll/reports/failed');"
+              matTooltipPosition="above"
+              matTooltip="Descargar Excel">
+                Reporte de Arrastres
+              <mat-icon class="green-icon">assignment</mat-icon>
+            </button>
+            <button
+              mat-menu-item
+              [disabled]="!filtersForm.get('period')?.value"
+              data-toggle="modal"
+              data-target="#reportsModal"
+              matTooltipPosition="above"
+              matTooltip="Listado de Notas"
+              (click)="isGettingNotes= true; initReportsForm(null);">
+                Listado de Notas
+              <mat-icon class="blue-icon">assignment</mat-icon>
+            </button>
+            <button
+              mat-menu-item
+              [disabled]="!filtersForm.get('period')?.value"
+              matTooltipPosition="above"
+              matTooltip="Reporte de departamentos"
+              (click)="buildReport('enroll/report-departament/students-enroll');">
+                Reporte de departamentos
+              <mat-icon class="green-icon">assignment</mat-icon>
+            </button>
+            <ng-container *ngIf="currentPeriod?.periodID">
+              <button *ngIf="+filtersForm.get('period')?.value != +currentPeriod.periodID"
+                mat-menu-item
+                [disabled]="!filtersForm.get('period')?.value"
+                matTooltipPosition="above"
+                matTooltip="Promedios finales"
+                (click)="buildReport('enroll/reports/average-grade');">
+                  Promedios finales
+                <mat-icon class="green-icon">assignment</mat-icon>
+              </button>
+            </ng-container>
+          </ng-container>
+          <ng-template #admin>
+            <button
+              mat-menu-item
+              [disabled]="!filtersForm.get('period')?.value"
+              (click)="buildReport('enroll/reports/credentials-legalized', filtersFormValue.status);"
+              matTooltipPosition="above"
+              matTooltip="Descargar Excel">
+                Credenciales
+              <mat-icon class="green-icon">assignment</mat-icon>
+            </button>
+            <button
+              mat-menu-item
+              [disabled]="!filtersForm.get('period')?.value"
+              (click)="getReportDragCredentials('enroll/reports/student-credentials-enrolled-drag-courses','Reporte Arrastre Credenciales', filtersFormValue.status);"
+              matTooltipPosition="above"
+              matTooltip="Descargar Excel">
+                Arrastres Credenciales
+              <mat-icon class="green-icon">assignment</mat-icon>
+            </button>
+            <button mat-menu-item
+              [disabled]="!filtersForm.get('period')?.value"
+              (click)="excelStudentReport();"
+              matTooltipPosition="above"
+              matTooltip="Descargar Excel">
+                Reporte de Estudiantes
+              <mat-icon class="green-icon">assignment</mat-icon>
+            </button>
+            <button mat-menu-item
+              [disabled]="!filtersForm.get('period')?.value"
+              data-toggle="modal"
+              data-target="#reportsModal"
+              matTooltipPosition="above"
+              matTooltip="Listado de Notas"
+              (click)="isGettingNotes= true; initReportsForm(null);">
+                Listado de Notas
+              <mat-icon class="blue-icon">assignment</mat-icon>
+            </button>
+            <button mat-menu-item
+              [disabled]="!filtersForm.get('period')?.value"
+              matTooltipPosition="above"
+              matTooltip="Reporte de departamentos"
+              (click)="buildReport('enroll/report-departament/students-enroll');">
+                Reporte de departamentos
+              <mat-icon class="green-icon">assignment</mat-icon>
+            </button>
+            <ng-container *ngIf="currentPeriod?.periodID">
+              <button *ngIf="+filtersForm.get('period')?.value != +currentPeriod.periodID"
+                mat-menu-item
+                [disabled]="!filtersForm.get('period')?.value"
+                matTooltipPosition="above"
+                matTooltip="Promedios finales"
+                (click)="buildReport('enroll/reports/average-grade');">
+                  Promedios finales
+                <mat-icon class="green-icon">assignment</mat-icon>
+              </button>
+            </ng-container>
+          </ng-template>
+        </mat-menu>
+
+        <div class="col-8">
+          <!-- <div class="d-flex no-block" *ngIf="user.rolName === ROL.ADMIN">
+            <div class="pl-2 d-flex">
+              <button
+                [disabled]="!filtersForm.get('period')?.value"
+                (click)="buildReport('enroll/reports/credentials-legalized', filtersFormValue.status);"
+                class="download-button"
+                mat-raised-button
+                matTooltipPosition="above"
+                matTooltip="Descargar Excel">
+                Descargar Excel
+                <mat-icon class="green-icon">description</mat-icon>
+              </button>
+            </div>
+            <div class="pl-2 d-flex">
+              <button
+                [disabled]="!filtersForm.get('period')?.value"
+                (click)="excelStudentReport();"
+                class="download-button"
+                mat-raised-button
+                matTooltipPosition="above"
+                matTooltip="Descargar Excel">
+                  Reporte de Estudiantes
+                <mat-icon class="green-icon">assignment</mat-icon>
+              </button>
+            </div>
+            <div class="pl-2 d-flex">
+              <button
+                [disabled]="!filtersForm.get('period')?.value"
+                class="download-button"
+                mat-raised-button
+                data-toggle="modal"
+                data-target="#reportsModal"
+                matTooltipPosition="above"
+                matTooltip="Listado de Notas"
+                (click)="isGettingNotes= true; initReportsForm(null);">
+                  Listado de Notas
+                <mat-icon class="blue-icon">assignment</mat-icon>
+              </button>
+            </div>
+            <div class="pl-2 d-flex">
+              <button
+                [disabled]="!filtersForm.get('period')?.value"
+                class="download-button"
+                mat-raised-button
+                matTooltipPosition="above"
+                matTooltip="Reporte de departamentos"
+                (click)="buildReport('enroll/report-departament/students-enroll');">
+                  Reporte de departamentos
+                <mat-icon class="green-icon">assignment</mat-icon>
+              </button>
+            </div>
+            <ng-container *ngIf="currentPeriod?.periodID">
+              <div class="pl-2 d-flex" *ngIf="+filtersForm.get('period')?.value != +currentPeriod.periodID">
+                <button
+                  [disabled]="!filtersForm.get('period')?.value"
+                  class="download-button"
+                  mat-raised-button
+                  matTooltipPosition="above"
+                  matTooltip="Promedios finales"
+                  (click)="buildReport('/api/enroll/reports/average-grade');">
+                    Promedios finales
+                  <mat-icon class="red-icon">assignment</mat-icon>
+                </button>
+              </div>
+            </ng-container>
+          </div> -->
+
+          <!-- <div class="d-flex no-block" *ngIf="user.rolName !== ROL.ADMIN">
+            <div class="pl-2 d-flex">
+              <button [disabled]="!filtersForm.get('period')?.value"
+                class="download-button"
+                mat-raised-button
+                (click)="buildReport('enroll/reports/total');"
+                matTooltipPosition="above"
+                matTooltip="Descargar PDF">
+                Matriculados
+                <mat-icon class="red-icon">picture_as_pdf</mat-icon>
+              </button>
+            </div>
+
+            <div class="pl-2 d-flex">
+              <button
+                [disabled]="!filtersForm.get('period')?.value"
+                data-toggle="modal"
+                data-target="#reportsModal"
+                class="download-button"
+                mat-raised-button
+                matTooltipPosition="above"
+                matTooltip="Listado de Matrícula"
+                (click)="isGettingNotes= false; initReportsForm();">
+                  Listado de Matrícula
+                <mat-icon class="blue-icon">assignment</mat-icon>
+              </button>
+            </div>
+
+            <div class="pl-2 d-flex">
+              <button
+                [disabled]="!filtersForm.get('period')?.value || user.rolName === ROL.RECTOR"
+                (click)="buildReport('enroll/reports/by-status', filtersFormValue.status);"
+                class="download-button"
+                mat-raised-button
+                matTooltipPosition="above"
+                matTooltip="Descargar PDF">
+                  Reporte de Estado
+                <mat-icon class="red-icon">picture_as_pdf</mat-icon>
+              </button>
+            </div>
+
+            <div class="pl-2 d-flex">
+              <button
+                [disabled]="!filtersForm.get('period')?.value || user.rolName === ROL.RECTOR"
+                (click)="excelStudentReport();"
+                class="download-button"
+                mat-raised-button
+                matTooltipPosition="above"
+                matTooltip="Descargar Excel">
+                  Reporte de Estudiantes
+                <mat-icon class="green-icon">assignment</mat-icon>
+              </button>
+            </div>
+
+            <div class="pl-2 d-flex">
+              <button
+                [disabled]="!filtersForm.get('period')?.value"
+                class="download-button"
+                mat-raised-button
+                data-toggle="modal"
+                data-target="#reportsModal"
+                matTooltipPosition="above"
+                matTooltip="Listado de Notas"
+                (click)="isGettingNotes= true; initReportsForm(null);">
+                  Listado de Notas
+                <mat-icon class="blue-icon">assignment</mat-icon>
+              </button>
+            </div>
+
+            <div class="pl-2 d-flex">
+              <button
+                [disabled]="!filtersForm.get('period')?.value"
+                class="download-button"
+                mat-raised-button
+                matTooltipPosition="above"
+                matTooltip="Reporte de departamentos"
+                (click)="buildReport('enroll/report-departament/students-enroll');">
+                  Reporte de departamentos
+                <mat-icon class="green-icon">assignment</mat-icon>
+              </button>
+            </div>
+
+            <ng-container *ngIf="currentPeriod?.periodID">
+              <div class="pl-2 d-flex" *ngIf="+filtersForm.get('period')?.value != +currentPeriod.periodID">
+                <button
+                  [disabled]="!filtersForm.get('period')?.value"
+                  class="download-button"
+                  mat-raised-button
+                  matTooltipPosition="above"
+                  matTooltip="Promedios finales"
+                  (click)="buildReport('/api/enroll/reports/average-grade');">
+                    Promedios finales
+                  <mat-icon class="red-icon">assignment</mat-icon>
+                </button>
+              </div>
+            </ng-container>
+          </div> -->
+
+        </div>
+
+        <div class="col-2" style="text-align: right;">
+          <a
+            style="background-color: rgb(84, 158, 77);
+            color: white;"
+            mat-raised-button
+            matTooltipPosition="above"
+            matTooltip="Descargar"
+            href="https://tecnologicoitcaeduec-my.sharepoint.com/personal/encuba_itca_edu_ec/_layouts/15/onedrive.aspx?ga=1&id=%2Fpersonal%2Fencuba%5Fitca%5Fedu%5Fec%2FDocuments%2FCONTRATO%20SISTEMA%20INFORM%C3%81TICO%20DE%20GESTI%C3%93N%20%28SIG%29%20%2D%20ENCUBA%2FMANUALES%20DE%20USUARIO%20%28SIG%29%2FSECRETAR%C3%8DA%20GENERAL%2FMU%5FPROCESO%5FMATR%C3%8DCULAS%20EN%20L%C3%8DNEA%5FROL%20SECRETAR%C3%8DA%2Epdf&parent=%2Fpersonal%2Fencuba%5Fitca%5Fedu%5Fec%2FDocuments%2FCONTRATO%20SISTEMA%20INFORM%C3%81TICO%20DE%20GESTI%C3%93N%20%28SIG%29%20%2D%20ENCUBA%2FMANUALES%20DE%20USUARIO%20%28SIG%29%2FSECRETAR%C3%8DA%20GENERAL"
+            target="_blank">
+            <small>Manual Usuario</small>
+          </a>
+        </div>
+      </div>
+    </section>
+    <br>
+    <div style="position: relative;">
+      <spinner-loader [absolute]="true" *ngIf="loadingStudentsDetail"></spinner-loader>
+      <mat-table
+        [dataSource]="dataSource" matSort (matSortChange)="getStudentsDetail($event);">
+
+        <!-- document -->
+        <ng-container matColumnDef="documentNumber">
+          <mat-header-cell *matHeaderCellDef mat-sort-header>Documento</mat-header-cell>
+          <mat-cell *matCellDef="let row; let i = index;"> <small>{{ row.documentNumber }}</small> </mat-cell>
+        </ng-container>
+
+        <!-- studentNames -->
+        <ng-container matColumnDef="student">
+          <mat-header-cell *matHeaderCellDef mat-sort-header>Estudiante</mat-header-cell>
+          <mat-cell *matCellDef="let row;"> <small>{{ row.student }}</small> </mat-cell>
+        </ng-container>
+
+        <!-- Career -->
+        <ng-container matColumnDef="career">
+          <mat-header-cell *matHeaderCellDef mat-sort-header>Carrera</mat-header-cell>
+          <mat-cell *matCellDef="let row"> <small>{{ row.career }}</small> </mat-cell>
+        </ng-container>
+
+        <!-- Modality -->
+        <ng-container matColumnDef="modality">
+          <mat-header-cell *matHeaderCellDef style="max-width: 100px;">Modalidad</mat-header-cell>
+          <mat-cell *matCellDef="let row" style="max-width: 100px;"> <small>{{ row.modality }}</small> </mat-cell>
+        </ng-container>
+
+        <!-- Level -->
+        <ng-container matColumnDef="levelID">
+          <mat-header-cell *matHeaderCellDef mat-sort-header>Nivel</mat-header-cell>
+          <mat-cell *matCellDef="let row" style="text-transform: uppercase;"> <small>{{ row.levelDesc }}</small> </mat-cell>
+        </ng-container>
+
+        <!-- Parallel -->
+        <ng-container matColumnDef="parallel">
+          <mat-header-cell *matHeaderCellDef style="max-width: 100px;">Paralelo</mat-header-cell>
+          <mat-cell *matCellDef="let row" style="max-width: 100px;"> <small>{{ row.parallel }}</small> </mat-cell>
+        </ng-container>
+
+        <!-- Scholarship -->
+        <ng-container matColumnDef="scholarship">
+          <mat-header-cell *matHeaderCellDef style="max-width: 100px;">Beca</mat-header-cell>
+          <mat-cell *matCellDef="let row" style="max-width: 100px;"> <small>{{ row.Beca || 'NO APLICA' }}</small> </mat-cell>
+        </ng-container>
+
+        <!-- enrollmentDate -->
+        <ng-container matColumnDef="enrollDate">
+          <mat-header-cell *matHeaderCellDef mat-sort-header style="max-width: 100px;">Fecha Matrícula</mat-header-cell>
+          <mat-cell *matCellDef="let row" style="max-width: 100px;"> <small>{{ row.enrollDate | date: 'dd/MM/yy' }}</small> </mat-cell>
+        </ng-container>
+
+        <!-- status -->
+        <ng-container matColumnDef="status">
+          <mat-header-cell *matHeaderCellDef>Estado</mat-header-cell>
+          <mat-cell
+            *matCellDef="let row"
+            cdkOverlayOrigin
+            #trigger="cdkOverlayOrigin"
+            (mouseenter)="getStatesByDepartment(row);"
+            (mouseleave)="row.openOverlay = false; loadingStatesByDepartment = true; clearTimeout(); fileStatesByDepartment = [];"
+            style="cursor: pointer;">
+
+            <span
+              class="badge"
+              [style.color]="row.fontColor"
+              [style.background-color]="row.backgroundColor">
+                {{ row.statusFileDesc }}
+            </span>
+
+            <ng-template
+              cdkConnectedOverlay
+              [cdkConnectedOverlayOrigin]="trigger"
+              [cdkConnectedOverlayOpen]="row.openOverlay">
+              <div
+                class="mat-elevation-z4"
+                style="min-width: 400px; width: 400px; max-width: 400px; min-height: 60px; position: relative; background: white;">
+                <spinner-loader [absolute]="true" *ngIf="loadingStatesByDepartment; else table;"></spinner-loader>
+                <ng-template #table>
+                  <table class="w-100">
+                    <tbody>
+                    <tr>
+                      <th style="width: 140px;">DEPARTAMENTO</th>
+                      <th style="width: 60px;">ESTADO</th>
+                    </tr>
+
+                    <tr *ngFor="let file of fileStatesByDepartment">
+                      <td>{{ file.areaName }}</td>
+                      <td>
+                        <span
+                          class="badge"
+                          [style.background-color]="file.backgroundColor"
+                          [style.color]="file.fontColor">
+                          {{ file.statusFileDesc }}
+                        </span>
+                      </td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </ng-template>
+              </div>
+            </ng-template>
+          </mat-cell>
+        </ng-container>
+
+        <!-- actions -->
+        <ng-container matColumnDef="actions">
+          <mat-header-cell *matHeaderCellDef><span>Acciones</span></mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <button
+              class="blue-icon"
+              [disabled]="user.rolName === ROL.RECTOR"
+              mat-icon-button
+              (click)="$event.stopPropagation();" [matMenuTriggerFor]="menu" #menuTrigger="matMenuTrigger">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu [xPosition]="'before'" #menu="matMenu">
+              <mat-menu #report="matMenu">
+                <button
+                  mat-menu-item
+                  (click)="generateRecordReport(row.studentID);">
+                  <mat-icon class="red-icon">picture_as_pdf</mat-icon>
+                  <span class="item">Record Académico</span>
+                </button>
+                <button
+                  mat-menu-item (click)="openFile(row);"
+                  [disabled]="!filtersForm.get('period')?.value || row.statusFileID !== FILE_STATE.LEGALIZED">
+                  <mat-icon class="blue-icon">topic</mat-icon>
+                  <span class="item">Asignaturas</span>
+                </button>
+                <button
+                  mat-menu-item
+                  [disabled]="!filtersForm.get('period')?.value || row.statusFileID !== FILE_STATE.LEGALIZED"
+                  (click)="buildReport('enroll/pass-report', row.studentID, true);">
+                  <mat-icon class="red-icon">picture_as_pdf</mat-icon>
+                  <span class="item">Pase de Nivel</span>
+                </button>
+                <button
+                  mat-menu-item
+                  [disabled]="!filtersForm.get('period')?.value || row.statusFileID !== FILE_STATE.LEGALIZED"
+                  (click)="buildReport('enroll/certificado/matricula', row.personID+ '/' + row.studentID, true);">
+                  <mat-icon class="red-icon">picture_as_pdf</mat-icon>
+                  <span class="item">Certificado</span>
+                </button>
+                <button
+                  [disabled]="!filtersForm.get('period')?.value || row.statusFileID !== FILE_STATE.LEGALIZED"
+                  mat-menu-item (click)="buildReport('enroll/reports/enrollment', row.personID+ '/' + row.studentID, true);">
+                  <mat-icon class="red-icon">picture_as_pdf</mat-icon>
+                  <span class="item">Ficha Estudiante</span>
+                </button>
+              </mat-menu>
+
+              <button mat-menu-item [matMenuTriggerFor]="report">
+                <mat-icon class="red-icon">picture_as_pdf</mat-icon>
+                <span class="item">Reportes</span>
+              </button>
+
+              <button *ngIf="user.rolName !== ROL.ADMIN" mat-menu-item (click)="validateDocument(row);">
+                <mat-icon class="blue-icon">topic</mat-icon>
+                <span class="item">Validar Documentos</span>
+              </button>
+
+              <button *ngIf="user.rolName !==ROL.ADMIN" mat-menu-item (click)="editInformation(row);">
+                <mat-icon class="blue-icon">edit</mat-icon>
+                <span class="item">Editar Información</span>
+              </button>
+
+              <button
+                mat-menu-item (click)="parallelChange(row)">
+                <mat-icon class="blue-icon">assignment_return</mat-icon>
+                <span class="item">Cambio de paralelo</span>
+              </button>
+
+            </mat-menu>
+
+          </mat-cell>
+          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+        </ng-container>
+
+        <!-- noData -->
+        <ng-container matColumnDef="noData">
+          <mat-footer-cell *matFooterCellDef>
+            <p *ngIf="!studentsDetail.length">No hay resultados que coincidan con los términos de búsqueda</p>
+          </mat-footer-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row matRipple *matRowDef="let row; columns: displayedColumns;" class="mat-row"></mat-row>
+        <mat-footer-row *matFooterRowDef="['noData']" [ngClass]="{'hide': studentsDetail.length }"></mat-footer-row>
+      </mat-table>
+
+      <mat-paginator
+        #paginator
+        [length]="length"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="pageEvent = getStudentsDetailFromPaginator($event)">
+      </mat-paginator>
+    </div>
+  </div>
+</div>
+
+<!-- reportsModal -->
+<div class="modal fade" id="reportsModal" tabindex="-1" aria-labelledby="reportsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="height: 40px;">
+        <div class="col-md-8">
+          <h3 class="modal-title" id="reportsModalLabel"><br>
+          <ng-container *ngIf="isGettingNotes; else enrollments">Listado de Notas</ng-container>
+          <ng-template #enrollments>Listado de Matrículas</ng-template>
+          </h3>
+        </div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" #reportsModalClose>
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-12">
+                  <form [formGroup]="reportsForm"
+                    autocomplete="off">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <mat-form-field class="width" appearance="outline">
+                          <mat-label>Carrera</mat-label>
+                          <mat-select formControlName="careerID" (click)="studyPlans = []; reportsForm.get('studyPlanID').patchValue('')"
+                            (selectionChange)="getStudyPlans($event.value)">
+                            <mat-option *ngFor="let item of careers" [value]="item.careerID">{{item.careerName}}</mat-option>
+                          </mat-select>
+                          <mat-error>Campo requerido!</mat-error>
+                        </mat-form-field>
+                      </div>
+                      <div class="col-md-6">
+                        <mat-form-field class="width" appearance="outline">
+                          <mat-label>Malla Curricular</mat-label>
+                          <mat-select formControlName="studyPlanID">
+                            <mat-option *ngFor="let item of studyPlans" [value]="item.studyPlanID">{{item.studyPlanDesc}}</mat-option>
+                          </mat-select>
+                          <mat-error>Campo requerido!</mat-error>
+                        </mat-form-field>
+                      </div>
+                      <div class="col-md-6">
+                        <mat-form-field class="width" appearance="outline">
+                          <mat-label>Nivel</mat-label>
+                          <mat-select formControlName="cycleID" (selectionChange)="getParallelsByCycle();">
+                            <mat-option *ngIf="!isGettingNotes" [value]="0" (click)="reportsForm.get('parallelCode')?.patchValue('-'); parallelsByCycle = [];">Todos</mat-option>
+                            <mat-option *ngFor="let item of cycles" [value]="item.cycleID">{{item.cycleDesc}}</mat-option>
+                          </mat-select>
+                          <mat-error>Campo requerido!</mat-error>
+                        </mat-form-field>
+                      </div>
+                      <div class="col-md-6">
+                        <mat-form-field class="width" appearance="outline">
+                          <mat-label>Paralelo</mat-label>
+                          <mat-select formControlName="parallelCode">
+                            <mat-option value="-">Todos</mat-option>
+                            <mat-option *ngFor="let item of parallelsByCycle" [value]="item.parallelCode">{{item.parallelCode}}</mat-option>
+                          </mat-select>
+                          <mat-error>Campo requerido!</mat-error>
+                        </mat-form-field>
+                      </div>
+                      <!-- NOTAS -->
+                      <ng-container *ngIf="isGettingNotes; else enrollmentsBody;">
+                        <div class="col-6">
+                          <button
+                            [disabled]="!reportsForm.get('cycleID').value"
+                            (click)="generateNotesReport();"
+                            class="download-button"
+                            mat-raised-button
+                            matTooltipPosition="above"
+                            matTooltip="Descargar PDF">
+                            Descargar Reporte
+                            <mat-icon class="red-icon">picture_as_pdf</mat-icon>
+                          </button>
+                        </div>
+                        <div class="col-6">
+                          <button
+                            [disabled]="!reportsForm.get('studyPlanID').value"
+                            (click)="generateEnrollExcel();"
+                            class="download-button"
+                            mat-raised-button
+                            matTooltipPosition="above"
+                            matTooltip="Descargar Excel">
+                            Descargar Excel
+                            <mat-icon class="green-icon">assignment</mat-icon>
+                          </button>
+                        </div>
+                      </ng-container>
+                      <!-- MATRICULAS -->
+                      <ng-template #enrollmentsBody>
+                        <!-- <div class="col-md-6">
+                          <mat-form-field class="width" appearance="outline">
+                            <mat-label>Nivel</mat-label>
+                            <mat-select formControlName="cycleID">
+                              <mat-option [value]="0" (click)="reportsForm.get('parallelCode')?.patchValue(0); parallels = [];">Todos</mat-option>
+                              <mat-option *ngFor="let item of cycles" [value]="item.cycleID">{{item.cycleDesc}}</mat-option>
+                            </mat-select>
+                            <mat-error>Campo requerido!</mat-error>
+                          </mat-form-field>
+                        </div>
+                        <div class="col-md-6">
+                          <mat-form-field class="width" appearance="outline">
+                            <mat-label>Paralelo</mat-label>
+                            <mat-select formControlName="parallelCode">
+                              <mat-option value="-">Todos</mat-option>
+                              <mat-option *ngFor="let item of parallels" [value]="item.parallelCode">{{item.parallelCode}}</mat-option>
+                            </mat-select>
+                            <mat-error>Campo requerido!</mat-error>
+                          </mat-form-field>
+                        </div> -->
+                        <div class="col-6">
+                          <button
+                            [disabled]="!reportsForm.get('studyPlanID').value"
+                            (click)="generateEnrollReport();"
+                            class="download-button"
+                            mat-raised-button
+                            matTooltipPosition="above"
+                            matTooltip="Descargar PDF">
+                            Descargar Reporte
+                            <mat-icon class="red-icon">picture_as_pdf</mat-icon>
+                          </button>
+                        </div>
+                      </ng-template>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,214 @@
+
+<div style="display: flex; justify-content: end; align-items: center; background: transparent;" class="p-2">
+  <mat-icon style="cursor: pointer; color: red;" [matDialogClose]="false" class="red-icon" matRipple>close</mat-icon>
+</div>
+
+<mat-dialog-content>
+  <div *ngIf="isLoading; else form">
+    <spinner-loader></spinner-loader>
+  </div>
+
+  <ng-template #form>
+    <div class="row animated fadeIn fast">
+      <div class="col-md-12">
+        <p>Empresa</p>
+        <div class="card">
+          <div class="card-body">
+            <ng-container [formGroup]="agreementForm">
+              <div class="row">
+                <div class="col-4">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Tipo de empresa</mat-label>
+                    <mat-select formControlName="p_typeBusiness">
+                      <mat-option *ngFor="let item of approvalBusinessType" [value]="item.typeBusinessDesc">{{item.typeBusinessDesc}}</mat-option>
+                    </mat-select>
+                    <mat-error>Campo requerido</mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-4">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Razón Social</mat-label>
+                    <input matInput autocomplete="off" formControlName="p_bussinesName">
+                    <mat-error>Campo requerido</mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-4">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Número de RUC</mat-label>
+                    <input type="text" matInput autocomplete="off" formControlName="p_ruc" [minLength]="10" [maxLength]="13" onKeypress="if (event.keyCode < 47 || event.keyCode > 57) event.returnValue = false;">
+                    <mat-error>Campo requerido</mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-4">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Representante Legal</mat-label>
+                    <input matInput autocomplete="off" formControlName="p_legalRepresentative">
+                    <mat-error>Campo requerido</mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-4">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Cargo</mat-label>
+                    <input matInput autocomplete="off" formControlName="p_position">
+                    <mat-error>Campo requerido</mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-4">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Nombre Comercial</mat-label>
+                    <input matInput autocomplete="off" formControlName="p_tradename">
+                    <mat-error>Campo requerido</mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-4">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Número Celular de la empresa</mat-label>
+                    <input type="text" matInput autocomplete="off" formControlName="p_businessPhone" [minLength]="9" [maxlength]="10" onKeypress="if (event.keyCode < 47 || event.keyCode > 57) event.returnValue = false;">
+                    <mat-error>Campo requerido</mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-4">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Correo Electrónico de la empresa</mat-label>
+                    <input matInput autocomplete="off" formControlName="p_bussinessEmail" #p_bussinessEmail (input)="validateMail(p_bussinessEmail);">
+                    <mat-error>Campo requerido</mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-4">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Ubicación de la empresa</mat-label>
+                    <input matInput autocomplete="off" formControlName="p_location">
+                    <mat-error>Campo requerido</mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-4">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Referencia de la empresa</mat-label>
+                    <input matInput autocomplete="off" formControlName="p_referenceBusiness">
+                    <mat-error>Campo requerido</mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-4">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Nº Años fiscal de la empresa</mat-label>
+                    <input type="number" matInput autocomplete="off" formControlName="p_fiscalYears" [min]="1">
+                    <mat-error>Campo requerido</mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-4">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Sector Económico</mat-label>
+                    <input matInput autocomplete="off" formControlName="p_economicSector">
+                    <mat-error>Campo requerido</mat-error>
+                  </mat-form-field>
+                </div>
+                <hr>
+                <div class="col-4">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Nombre del Responsable</mat-label>
+                    <input matInput autocomplete="off" formControlName="p_responsibleName">
+                    <mat-error>Campo requerido</mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-4">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Cargo de Responsable</mat-label>
+                    <input matInput autocomplete="off" formControlName="p_responsiblePosition">
+                    <mat-error>Campo requerido</mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-4">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Número Celular</mat-label>
+                    <input type="text" matInput autocomplete="off" formControlName="p_responsiblePhone" [minLength]="9" [maxlength]="10"
+                    onKeypress="if (event.keyCode < 47 || event.keyCode > 57) event.returnValue = false;">
+                    <mat-error>Campo requerido</mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-8">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Correo Electrónico</mat-label>
+                    <input matInput autocomplete="off" formControlName="p_responsibleEmail">
+                    <mat-error>Campo requerido</mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-4">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Tipo</mat-label>
+                    <mat-select formControlName="p_agreementsID">
+                        <mat-option *ngFor="let item of agreementType" [value]="item.agreementsID">{{item.agreementsDesc}}</mat-option>
+                    </mat-select>
+                    <mat-error>Campo requerido</mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+            </ng-container>
+            <!--<hr>
+            <ng-container [formGroup]="businessCareerForm">
+              <div class="row">
+                <div class="col-6">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Carrera afin</mat-label>
+                    <mat-select formControlName="p_careerID">
+                      <mat-option *ngFor="let item of careers" [value]="item.careerID">{{item.careerName}}</mat-option>
+                    </mat-select>
+                    <mat-error>Campo requerido</mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-6">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Periodo académico</mat-label>
+                    <mat-select formControlName="p_periodID">
+                      <mat-option *ngFor="let item of periods" [value]="item.periodID">{{item.periodName}}</mat-option>
+                    </mat-select>
+                    <mat-error>Campo requerido</mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-6">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Fecha inicio - Fecha fin de la práctica</mat-label>
+                    <mat-date-range-input [rangePicker]="picker">
+                      <input matStartDate readonly="true" placeholder="Fecha Inicio" formControlName="p_initdatePractice">
+                      <input matEndDate readonly="true" placeholder="Fecha Fin" formControlName="p_enddatePractice">
+                    </mat-date-range-input>
+                    <mat-hint>DD/MM/AAAA – DD/MM/AAAA</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-date-range-picker #picker></mat-date-range-picker>
+                    <mat-error>Campo requerido</mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-6">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Fecha inicio - Fecha fin del acuerdo</mat-label>
+                    <mat-date-range-input [rangePicker]="picker1">
+                      <input matStartDate readonly="true" placeholder="Fecha Inicio" formControlName="p_initdateAgreement">
+                      <input matEndDate readonly="true" placeholder="Fecha Fin" formControlName="p_enddateAgreement">
+                    </mat-date-range-input>
+                    <mat-hint>DD/MM/AAAA – DD/MM/AAAA</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix [for]="picker1"></mat-datepicker-toggle>
+                    <mat-date-range-picker #picker1></mat-date-range-picker>
+                    <mat-error>Campo requerido</mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+            </ng-container>-->
+            <div class="row">
+              <div class="col-8"></div>
+                <div class="col-2">
+                  <button *ngIf="!isUpdating" type="submit" mat-raised-button class="styleButton_sml" style="width: 100px;" (click)="onSubmit()">
+                    Guardar
+                  </button>
+                  <button *ngIf="isUpdating" type="submit" mat-raised-button class="styleButton_sml" style="width: 100px;" (click)="updateAgreement()">
+                    Actualizar
+                  </button>
+                </div>
+                <div class="col-2">
+                  <button type="button" mat-raised-button class="styleButton_gray" style="width: 100px;" [matDialogClose]="false" matRipple>Cerrar</button>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</mat-dialog-content>

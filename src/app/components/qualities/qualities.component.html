@@ -1,0 +1,354 @@
+<div class="row animated fadeIn fast">
+  <div class="col-12">
+      <div class="card">
+          <div class="card-body">
+              <h1 class="text-info text-center">Tipo de contratación</h1>
+              <form [formGroup]="formTypeCollaborator">
+                <div class="row" *ngIf="colaborator">
+                  <div class="col-md-12">
+                    <p class="text-info">NOMBRE: <label style="color: black;">{{colaborator.PersonFirstName}} {{colaborator.PersonMiddleName}} {{colaborator.PersonLastName}}</label></p>
+                  </div>
+                  <div class="col-md-12">
+                    <p class="text-info">NRO IDENTIFICACIÓN: <label style="color: black;">{{colaborator.PersonDocumentNumber}}</label></p>
+                  </div>
+                </div><br>
+                  <div class="row">
+                      <div class="col-md-4">
+                          <mat-form-field class="width" appearance="outline">
+                              <mat-label>Tipo de Personal</mat-label>
+                              <mat-select formControlName="typeStaffID" (selectionChange)="changePersonalType($event); getCharge($event.value)" placeholder="Seleccione una opción">
+                                  <!--<mat-option [value]=null>Seleccione una opción</mat-option>-->
+                                  <mat-option *ngFor="let item of staff" [value]="item.typeStaffID">{{item.typeStaffName}}</mat-option>
+                              </mat-select>
+                          </mat-form-field>
+                      </div>
+                  </div>
+              </form>
+              <form [formGroup]="qualitiesForm" *ngIf="formTypeCollaborator.get('typeStaffID').value === 2">
+                  <div class="row">
+                      <div class="col-md-4">
+                          <mat-form-field class="width" appearance="outline">
+                              <mat-label>Sede</mat-label>
+                              <mat-select formControlName="branchID" placeholder="Seleccione una opción">
+                                  <!--<mat-option value="">Seleccione una opción</mat-option>-->
+                                  <mat-option *ngFor="let item of campus" [value]="item.campusID">{{item.campusName}}</mat-option>
+                              </mat-select>
+                          </mat-form-field>
+                      </div>
+                      <div class="col-md-4">
+                        <mat-form-field class="width" appearance="outline">
+                            <mat-label>Disposición Administrativa</mat-label>
+                            <mat-select formControlName="positionID" placeholder="Seleccione una opción">
+                                <!--<mat-option value="">Seleccione una opción</mat-option>-->
+                                <mat-option [value]="type.positionID" *ngFor="let type of charges"> {{
+                                    type.positionName }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="col-md-4">
+                        <mat-form-field class="width" appearance="outline">
+                            <mat-label>Area</mat-label>
+                            <mat-select formControlName="areaID" placeholder="Seleccione una opción">
+                                <!--<mat-option value="">Seleccione una opción</mat-option>-->
+                                <mat-option [value]="type.areaID" *ngFor="let type of area">
+                                {{ type.areaName }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                      </div>
+                      <div class="col-md-4">
+                          <mat-form-field class="width" appearance="outline">
+                              <mat-label>Tipo Contrato</mat-label>
+                              <mat-select formControlName="employeeContrTypeID" placeholder="Seleccione una opción" (selectionChange)="getEmployeeType($event.value)">
+                                  <!--<mat-option value="">Seleccione una opción</mat-option>-->
+                                  <mat-option [value]="contract.employeeContractTypeID"
+                                  *ngFor="let contract of contractTypes"> {{ contract.employeeContractTypeDesc}}</mat-option>
+                              </mat-select>
+                          </mat-form-field>
+                      </div>
+                      <div class="col-md-4">
+                        <mat-form-field class="width" appearance="outline">
+                            <mat-label>Nro de Contrato</mat-label>
+                            <input matInput type="text" formControlName="nroContract">
+                        </mat-form-field>
+                      </div>
+                      <div class="col-md-4" *ngIf="qualitiesForm.get('employeeContrTypeID').value===1">
+                          <mat-form-field class="width" appearance="outline">
+                              <mat-label><small>Fecha Inicio</small></mat-label>
+                              <input type="date" formControlName="initDate" #initDate matInput (click)="initDate.showPicker()">
+                              <mat-icon style="cursor: pointer;" matSuffix (click)="initDate.showPicker()">calendar_month</mat-icon>
+                              <mat-hint>dd/mm/aaaa</mat-hint>
+                              <mat-error></mat-error>
+                          </mat-form-field>
+                      </div>
+                      <div class="col-md-4">
+                          <mat-form-field class="width" appearance="outline">
+                              <mat-label>Tipo Personal Académico</mat-label>
+                              <mat-select formControlName="employeeTypeID"
+                                  (selectionChange)="changeTypeContract($event.value)" placeholder="Seleccione una opción">
+                                  <!--<mat-option value="">Seleccione una opción</mat-option>-->
+
+                                  <mat-option [value]="type.employeeTypeID" *ngFor="let type of employeeTypes"> {{
+                                      type.employeeTypeDesc }}</mat-option>
+                              </mat-select>
+                          </mat-form-field>
+                      </div>
+                      <div class="col-md-4" *ngIf="categories.length>0">
+                          <mat-form-field class="width" appearance="outline">
+                              <mat-label>Categoria</mat-label>
+                              <mat-select formControlName="salaryCategoryID" (selectionChange)="changeCategory($event.value)" placeholder="Seleccione una opción">
+                                  <!--<mat-option value="">Seleccione una opción</mat-option>-->
+                                  <mat-option [value]="category.salaryCategoryID" *ngFor="let category of categories">
+                                      {{
+                                      category.salaryCategoryDesc }}</mat-option>
+                              </mat-select>
+                          </mat-form-field>
+                      </div>
+                      <div class="col-md-4"
+                          *ngIf="salaryScales.length>0 && qualitiesForm.get('employeeTypeID').value === 1">
+                          <mat-form-field class="width" appearance="outline">
+                              <mat-label>Escala</mat-label>
+                              <mat-select formControlName="salaryScaleID" placeholder="Seleccione una opción">
+                                  <!--<mat-option value="">Seleccione una opción</mat-option>-->
+                                  <mat-option [value]="scale.salaryScaleID" *ngFor="let scale of salaryScales" (onSelectionChange)="changeScale(scale, $event);">
+                                    {{ scale.salaryScaleDesc }}</mat-option>
+                              </mat-select>
+                          </mat-form-field>
+                      </div>
+                      <div class="col-md-4">
+                          <mat-form-field class="width" appearance="outline">
+                              <mat-label>Dedicación (Docencia)</mat-label>
+                              <mat-select formControlName="dedicationsID" placeholder="Seleccione una opción">
+                                  <!--<mat-option value="">Seleccione una opción</mat-option>-->
+                                  <mat-option [value]="dedication.dedicationsID" *ngFor="let dedication of dedications" (onSelectionChange)="dedicationChange(dedication, $event)">
+                                    {{ dedication.dedicationsDesc }}
+                                  </mat-option>
+                              </mat-select>
+                          </mat-form-field>
+                      </div>
+                      <div class="col-md-4">
+                          <mat-form-field class="width" appearance="outline">
+                              <mat-label><small>Tiempo Total del trabajador</small></mat-label>
+                              <input formControlName="totalHours" matInput type="number" matInput maxlength="3">
+                          </mat-form-field>
+                      </div>
+                      <div class="col-md-4">
+                          <mat-form-field class="width" appearance="outline">
+                              <mat-label><small>Horas de dedicación</small></mat-label>
+                              <input formControlName="hoursDedications" matInput type="number" [max]="min_working_hours">
+                          </mat-form-field>
+                      </div>
+                      <div class="col-md-4"
+                          *ngIf="qualitiesForm.get('employeeContrTypeID').value != 2 || qualitiesForm.get('employeeTypeID').value != 1">
+                          <mat-form-field class="width" appearance="outline">
+                              <mat-label><small>Costo por hora</small></mat-label>
+                              <input matInput type="number" formControlName="costHour" maxlength="3" (blur)="blurCostPerHour($event)">
+                          </mat-form-field>
+                      </div>
+                      <div class="col-md-4">
+                          <mat-form-field class="width" appearance="outline">
+                              <mat-label><small>Remuneración</small></mat-label>
+                              <input formControlName="salary" matInput type="number" maxlength="5">
+                          </mat-form-field>
+                      </div>
+                      <div class="col-md-4">
+                          <mat-form-field class="width" appearance="outline">
+                              <mat-label>Lista de Asignaturas</mat-label>
+                              <mat-select formControlName="listAsignatures" multiple placeholder="Seleccione una opción">
+                                  <!--<mat-option value="">Seleccione una opción</mat-option>-->
+                                  <mat-option [value]="course.courseID" *ngFor="let course of courses">{{
+                                      course.courseName }} </mat-option>
+                              </mat-select>
+                          </mat-form-field>
+                      </div>
+                      <div class="w-100 col-4"
+                        *ngIf="employeeContract?.urlDocument; else fileInput"
+                        (click)="openFile(employeeContract?.urlDocument);"
+                        style="cursor: pointer;">
+                        <img style="width: 20px;" src="assets/images/file.png" alt="Payment File">
+                        <span style="color: #5090f5;">Ver Archivo</span>
+                      </div>
+                      <ng-template #fileInput>
+                        <div class="col-md-4" style="display: inline-flex;">
+                          <mat-label>Contrato</mat-label>&nbsp;
+                          <input type="file"
+                          #input
+                          style="cursor: pointer;"
+                          autocomplete="off"
+                          (change)="onChangeInput(input.files, input);"
+                          accept="application/pdf">
+                        </div>
+                      </ng-template>
+                  </div>
+              </form>
+
+              <form [formGroup]="qualitiesForm" *ngIf="formTypeCollaborator.get('typeStaffID').value === 1">
+                <div class="row">
+                  <div class="col-md-4">
+                      <mat-form-field class="width" appearance="outline">
+                          <mat-label>Sede</mat-label>
+                          <mat-select formControlName="branchID" placeholder="Seleccione una opción">
+                              <!--<mat-option value="">Seleccione una opción</mat-option>-->
+                              <mat-option *ngFor="let item of campus" [value]="item.campusID">{{item.campusName}}</mat-option>
+                          </mat-select>
+                      </mat-form-field>
+                  </div>
+
+                  <div class="col-md-4">
+                    <mat-form-field class="width" appearance="outline">
+                        <mat-label>Disposición Administrativa</mat-label>
+                        <mat-select formControlName="positionID" placeholder="Seleccione una opción">
+                            <!--<mat-option value="">Seleccione una opción</mat-option>-->
+                            <mat-option [value]="type.positionID" *ngFor="let type of charges"> {{
+                                type.positionName }}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                  </div>
+
+                  <div class="col-md-4">
+                    <mat-form-field class="width" appearance="outline">
+                        <mat-label>Area</mat-label>
+                        <mat-select formControlName="areaID" placeholder="Seleccione una opción">
+                            <!--<mat-option value="">Seleccione una opción</mat-option>-->
+                            <mat-option [value]="type.areaID" *ngFor="let type of area">
+                            {{ type.areaName }}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                  </div>
+
+                  <div class="col-md-4">
+                      <mat-form-field class="width" appearance="outline">
+                          <mat-label>Tipo Contrato</mat-label>
+                          <mat-select formControlName="employeeContrTypeID" placeholder="Seleccione una opción">
+                              <!--<mat-option value="">Seleccione una opción</mat-option>-->
+                              <mat-option [value]="contract.employeeContractTypeID"
+                                  *ngFor="let contract of contractTypes"> {{ contract.employeeContractTypeDesc
+                                  }}</mat-option>
+                          </mat-select>
+                      </mat-form-field>
+                  </div>
+                  <div class="col-md-4">
+                    <mat-form-field class="width" appearance="outline">
+                        <mat-label>Nro de Contrato</mat-label>
+                        <input matInput type="text" formControlName="nroContract">
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-4">
+                      <mat-form-field class="width" appearance="outline">
+                          <mat-label><small>Fecha Inicio</small></mat-label>
+                          <input type="date" formControlName="initDate" #initDate matInput (click)="initDate.showPicker()">
+                          <mat-icon style="cursor: pointer;" matSuffix (click)="initDate.showPicker()">calendar_month</mat-icon>
+                          <mat-hint>dd/mm/aaaa</mat-hint>
+                          <mat-error></mat-error>
+                      </mat-form-field>
+                  </div>
+
+                  <div class="col-md-4">
+                      <mat-form-field class="width" appearance="outline">
+                          <mat-label><small>Remuneración</small></mat-label>
+                          <input formControlName="salary" matInput type="number" maxlength="5">
+                      </mat-form-field>
+                  </div>
+                  <div class="col-md-4">
+                      <mat-checkbox class="example-margin" color="primary" formControlName="inactive">Fecha Fin</mat-checkbox>
+                  </div>
+                  <div class="col-md-4" *ngIf="qualitiesForm.get('inactive').value">
+                      <mat-form-field class="width" appearance="outline">
+                          <mat-label><small>Fecha Fin</small></mat-label>
+                          <input type="date" formControlName="endDate" #endDate matInput (click)="endDate.showPicker()">
+                          <mat-icon style="cursor: pointer;" matSuffix (click)="endDate.showPicker()">calendar_month</mat-icon>
+                          <mat-hint>dd/mm/aaaa</mat-hint>
+                          <mat-error></mat-error>
+                      </mat-form-field>
+                  </div>
+                  <div class="w-100 col-4"
+                    *ngIf="employeeContract?.urlDocument; else fileInput"
+                    (click)="openFile(employeeContract?.urlDocument);"
+                    style="cursor: pointer;">
+                    <img style="width: 20px;" src="assets/images/file.png" alt="Payment File">
+                    <span style="color: #5090f5;">Ver Archivo</span>
+                  </div>
+                  <ng-template #fileInput>
+                    <div class="col-md-4" style="display: inline-flex;">
+                      <mat-label>Contrato</mat-label>&nbsp;
+                      <input type="file"
+                      #input
+                      style="cursor: pointer;"
+                      autocomplete="off"
+                      (change)="onChangeInput(input.files, input);"
+                      accept="application/pdf">
+                    </div>
+                  </ng-template>
+                </div>
+              </form>
+
+              <!-- <form [formGroup]="formSustantiveFn">
+                  <div class="row" *ngIf="formTypeCollaborator.get('personalType').value === 1">
+
+                      <div class="col-md-4">
+                          <mat-form-field class="width" appearance="outline">
+                              <mat-label>Funciones Sustantivas</mat-label>
+                              <mat-select formControlName="scheduleTypeID">
+                                  <mat-option value="">Seleccione una opción</mat-option>
+                                  <mat-option [value]="fn.scheduleTypeID" *ngFor="let fn of sustantiveFunctionsMain">
+                                      {{fn.scheduleTypeName}}
+                                  </mat-option>
+                              </mat-select>
+                          </mat-form-field>
+                      </div>
+                      <div class="col-md-4">
+                          <mat-form-field class="width" appearance="outline">
+                              <mat-label><small>Horas de las Funciones Sustantivas</small></mat-label>
+                              <input matInput type="number" formControlName="amount" maxlength="3">
+                          </mat-form-field>
+                      </div>
+                      <div class="col-md-4">
+                          <button mat-raised-button color="primary" (click)="addSustantiveFn()">Agregar</button>
+                      </div>
+                  </div>
+              </form> -->
+              <form [formGroup]="recordForm">
+                  <!-- <div class="row"> -->
+
+                      <div class="row" *ngIf="formTypeCollaborator.get('typeStaffID').value === 2">
+                          <div class="col">
+                              <h1 class="text-info text-center">Funciones sustantivas</h1>
+                          </div>
+                      </div>
+                      <div *ngFor="let item of dynamicsArr.controls; let i = index">
+                          <div formArrayName="dynamics">
+                              <div class="row" [formGroupName]="i">
+                                  <div class="col-md-4">
+                                      <mat-form-field class="width" appearance="outline">
+                                          <mat-label>Funcion Sustantiva</mat-label>
+                                          <mat-select formControlName="scheduleTypeID" [disabled]="true" readonly placeholder="Seleccione una opción">
+                                              <!--<mat-option value="">Seleccione una opción</mat-option>-->
+                                              <mat-option [value]="fn.scheduleTypeID"
+                                                  *ngFor="let fn of sustantiveFunctions"> {{fn.scheduleTypeName}}
+                                              </mat-option>
+                                          </mat-select>
+                                      </mat-form-field>
+                                  </div>
+                                  <div class="col-md-4">
+                                      <mat-form-field class="width" appearance="outline">
+                                          <mat-label><small>Horas de las Funciones Sustantivas</small></mat-label>
+                                          <input matInput type="number" formControlName="amount" maxlength="3" (blur)="blurAmount(i)">
+                                      </mat-form-field>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  <!-- </div> -->
+              </form>
+          </div>
+         <div class="row m-4">
+            <div class="col-md-9"></div>
+            <div class="col-md-3">
+                <button mat-raised-button color="primary" (click)="saveQualities()" type="button" class="styleButton">
+                    Guardar
+                </button>
+            </div>
+        </div>
+      </div>
+  </div>
+</div>

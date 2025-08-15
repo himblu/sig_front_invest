@@ -1,0 +1,135 @@
+<div class="container-fluid">
+  <section>
+      <div >
+        <ng-template matStepLabel>Paso 2</ng-template>
+       <div class="row mb-3 p-4 animated fadeIn fast" *ngIf="showMessageLost">
+          <div class="col">
+            <div class="h4 text-center">
+              Usted ha superado el límite máximo de asignaturas de arrastre.
+            </div>
+          </div>
+
+        </div>
+        <div class="row mb-1">
+          <div class="col-md-12">
+            <h3 class="text-center mt-3 mb-5">HORARIOS</h3>
+          </div>
+        </div>
+        <!-- arrastres -->
+
+        <div class="row ml-4">
+          <div class="col-md-11" *ngIf="scheduleSignatureRepeatSave.length>0 && !showMessageLost">
+
+            <div class="row">
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th colspan="3">Asignaturas de Arrastre Horario</th>
+                    </tr>
+                    <tr>
+                      <th>Horario</th>
+                      <th>Paralelo</th>
+                      <th>Lunes</th>
+                      <th>Martes</th>
+                      <th>Miércoles</th>
+                      <th>Jueves</th>
+                      <th>Viernes</th>
+                      <th>Sábado</th>
+                      <th>Domingo</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of scheduleSignatureRepeatSave; let i = index">
+                      <td>{{item.startTime}} - {{ item.endTime }} </td>
+                      <td>
+                        {{ item.spaceSession}}
+                      </td>
+                      <td>
+                        {{ item.mon }}
+                      </td>
+                      <td>
+                        {{ item.tue }}
+                      </td>
+                      <td>
+                        {{ item.wed }}
+                      </td>
+                      <td>
+                        {{ item.thu }}
+                      </td>
+                      <td>
+                        {{ item.fri }}
+                      </td>
+                      <td>
+                        {{ item.sat }}
+                      </td>
+                      <td>
+                        {{ item.sun }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-1"></div>
+        </div>
+        <!-- horarios modulos -->
+        <ng-container *ngFor="let schedule of schedulesModule">
+          <div class="row mt-2 p-4">
+            <h2> {{ schedule[0].classModuleDesc }} </h2>
+            <table mat-table [dataSource]="schedule" class="mat-elevation-z8">
+
+              <!-- Position Column -->
+              <ng-container matColumnDef="startTime">
+                <th mat-header-cell *matHeaderCellDef [style.width]="'50px'" [style.background-color]="'#014898'"
+                  [style.text-align]="'center'" [style.color]="'white'"> Horario </th>
+                <td mat-cell *matCellDef="let element" class="text-center" style="font-size: 10px;"> {{element.startTime}} - {{element.endTime}} </td>
+              </ng-container>
+
+              <!-- Weight Column -->
+              <ng-container matColumnDef="mon">
+                <th mat-header-cell *matHeaderCellDef [style.width]="'100px'" [style.background-color]="'#014898'"
+                  [style.text-align]="'center'" [style.color]="'white'"> Lunes </th>
+                <td mat-cell *matCellDef="let element" class="text-center" style="font-size: 10px;"> {{element.mon}} </td>
+              </ng-container>
+
+              <!-- Symbol Column -->
+              <ng-container matColumnDef="tue">
+                <th mat-header-cell *matHeaderCellDef [style.width]="'100px'" [style.background-color]="'#014898'"
+                  [style.text-align]="'center'" [style.color]="'white'"> Martes </th>
+                <td mat-cell *matCellDef="let element" class="text-center" style="font-size: 10px;"> {{element.tue}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="wed">
+                <th mat-header-cell *matHeaderCellDef [style.width]="'100px'" [style.background-color]="'#014898'"
+                  [style.text-align]="'center'" [style.color]="'white'"> Miercoles </th>
+                <td mat-cell *matCellDef="let element" class="text-center" style="font-size: 10px;"> {{element.wed}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="thu">
+                <th mat-header-cell *matHeaderCellDef [style.width]="'100px'" [style.background-color]="'#014898'"
+                  [style.text-align]="'center'" [style.color]="'white'"> Jueves </th>
+                <td mat-cell *matCellDef="let element" class="text-center" style="font-size: 10px;"> {{element.thu}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="fri">
+                <th mat-header-cell *matHeaderCellDef [style.width]="'100px'" [style.background-color]="'#014898'"
+                  [style.text-align]="'center'" [style.color]="'white'"> Viernes </th>
+                <td mat-cell *matCellDef="let element" class="text-center" style="font-size: 10px;"> {{element.fri}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="sat">
+                <th mat-header-cell *matHeaderCellDef [style.width]="'100px'" [style.background-color]="'#014898'"
+                  [style.text-align]="'center'" [style.color]="'white'"> Sabado </th>
+                <td mat-cell *matCellDef="let element" class="text-center" style="font-size: 10px;"> {{element.sat}} </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="columnsSchedule"></tr>
+              <tr mat-row *matRowDef="let row; columns: columnsSchedule;"></tr>
+            </table>
+          </div>
+        </ng-container>
+      </div>
+  </section>
+</div>

@@ -1,0 +1,46 @@
+<div style="display: flex; justify-content: end; align-items: center; background: transparent;" class="p-2">
+  <mat-icon style="cursor: pointer; color: red;" [matDialogClose]="false" class="red-icon" matRipple>close</mat-icon>
+</div>
+
+<mat-dialog-content>
+  <div *ngIf="isLoading; else form;">
+    <spinner-loader></spinner-loader>
+  </div>
+
+  <ng-template #form>
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12" style="text-align: center;">
+            <h2 style="color: #014898;">
+              Reporte financiero
+            </h2>
+          </div>
+        </div>
+        <div class="row" [formGroup]="filtersForm">
+          <div class="col-8">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Modalidades</mat-label>
+              <mat-select formControlName="modalityID">
+                <mat-option [value]="0">Todos</mat-option>
+                <mat-option *ngFor="let item of data.modalities" [value]="item.modalityID">{{item.modalityName}}</mat-option>
+              </mat-select>
+              <mat-error>Campo requerido</mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-4">
+            <button
+              class="download-button"
+              mat-raised-button
+              matTooltipPosition="above"
+              matTooltip="Descargar reporte"
+              (click)="openFile();">
+              Reporte de cuotas
+              <mat-icon class="green-icon">assignment</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</mat-dialog-content>

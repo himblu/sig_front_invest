@@ -1,0 +1,251 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+<ng-container *ngIf="!charging">
+  <div class="row">
+    <div class="col 4">
+      <div class="card" style="height: 500px; min-height: auto; max-height: auto; overflow-y: auto;">
+        <div class="card-body">
+          <div class="row" [formGroup]="filtersForm">
+            <div class="col-12">
+              <h2 style="color: #014898;">Bandeja de entrada</h2><hr>
+            </div>
+            <div class="col-12">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Búsqueda</mat-label>
+                <input type="text" formControlName="filter" matInput #filter matTooltipPosition="above" matTooltip="{{filter.value}}" (input)="getManagementInbox(false);">
+                <mat-error></mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-6">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Fecha inicio</mat-label>
+                <input type="date" formControlName="startDate" #startDate matInput (click)="startDate.showPicker()">
+                <mat-error></mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-6">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Fecha fin</mat-label>
+                <input type="date" formControlName="endDate" #endDate matInput (click)="endDate.showPicker()"
+                (change)="getManagementInbox(false);" [min]="startDate.value">
+                <mat-error></mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-12">
+              <mat-accordion multi #accordion>
+                <mat-expansion-panel [expanded]="true" *ngFor="let date of messages; let i=index;">
+                  <mat-expansion-panel-header style="background-color: #014898;">
+                    <mat-panel-title> <h5 style="color: white;">{{date.date}}</h5> </mat-panel-title>
+                  </mat-expansion-panel-header>
+
+                  <div class="row"
+                    style="cursor: pointer;"
+                    *ngFor="let message of date.messages; let index=index;"
+                    [ngClass]="{'target': isClicked === i.toString() + index.toString()}"
+                    (click)="getMessageManagementContent(message.messageID); isClicked= i.toString() + index.toString();
+                    message.toView = 0">
+                    <div class="col 9">
+                      <mat-label><small>{{message.onlyHour}}</small></mat-label>
+                    </div>
+                    <div class="col-1">
+                      <ng-container *ngIf="message.toView">
+                        <i class="fa fa-circle" aria-hidden="true" style="color: greenyellow;"></i>
+                      </ng-container>
+                    </div>
+                    <div class="col-12">
+                      <mat-label><small>{{message.personName}}</small></mat-label>
+                    </div>
+                    <div class="col-12">
+                      <mat-label><small>{{message.subject}}</small></mat-label><hr>
+                    </div>
+                    <!-- <div class="col-12 single-line">
+                      <mat-label><small>{{message.messageDetail}}</small></mat-label><hr>
+                    </div> -->
+                  </div>
+                </mat-expansion-panel>
+              </mat-accordion>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-8">
+      <div class="card" style="height: 500px; min-height: auto; max-height: auto; overflow-y: auto;">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-6">
+              <h2 style="color: #014898;">
+                <ng-container *ngIf="currentMessage; else title">{{currentMessage?.documentManagementSubject}}</ng-container>
+                <ng-template #title>Seleccione un trámite</ng-template>
+              </h2><hr>
+            </div>
+            <div class="col-2">
+              <button *ngIf="currentMessage"
+                (click)="openFile('api/message-management/message-report', currentMessage.messageID);"
+                class="styleButton"
+                mat-raised-button
+                matTooltipPosition="above"
+                matTooltip="Descargar PDF">
+                  <small>Reporte</small>
+              </button>
+            </div>
+            <div class="col-2">
+              <ng-container *ngIf="currentMessage">
+                <button
+                (click)="forward(currentMessage);"
+                mat-raised-button
+                class="styleButton">
+                <small>Reenviar</small>
+              </button>
+              </ng-container>
+            </div>
+            <div class="col-2">
+              <ng-container *ngIf="currentMessage">
+                <button
+                (click)="openDialog(currentMessage);"
+                mat-raised-button
+                class="styleButton">
+                <small>Responder</small>
+              </button>
+              </ng-container>
+            </div>
+          </div>
+          <div class="row pl-4 pr-4" *ngIf="currentMessage">
+            <div class="col-12 card">
+              <div class="row card-body">
+                <div class="col-9">
+                  De: {{currentMessage?.senderName}}
+                </div>
+                <div class="col-3" style="text-align: right;">
+                  {{currentMessage?.dateSend}}
+                </div>
+                <div class="col-9" matTooltip="{{currentMessage?.toChain ? currentMessage?.toChain : currentMessage?.addresseeNameTO}}">
+                  Para: <small>{{currentMessage?.addresseeNameTO}}</small>
+                </div>
+                <div class="col-3" style="text-align: right;">
+                  Archivos
+                  <a style="cursor: pointer; color: #014898" [matMenuTriggerFor]="menu">
+                    <i class="fa fa-paperclip" aria-hidden="true"></i>
+                  </a>
+                  <mat-menu #menu="matMenu">
+                    <ng-container *ngIf="currentMessage.attachments?.length > 0; else message">
+                      <button mat-menu-item *ngFor="let item of currentMessage.attachments; let index=index;" (click)="openFile(item.fileUrl);">
+                        <mat-icon>attachment</mat-icon>
+                        <span>{{index+1}}</span>
+                      </button>
+                    </ng-container>
+                    <ng-template #message>
+                      <button mat-menu-item disabled="true">
+                        <span>Sin archivos</span>
+                      </button>
+                    </ng-template>
+                  </mat-menu>
+                </div>
+                <div class="col-12" matTooltip="{{currentMessage?.ccChain ? currentMessage?.ccChain : currentMessage?.addresseeNameCC}}"
+                *ngIf="currentMessage?.addresseeNameCC">
+                  CC: <small>{{currentMessage?.addresseeNameCC}}</small>
+                </div>
+                <div class="col-12" matTooltip="{{currentMessage?.fwdChain ? currentMessage?.fwdChain : currentMessage?.addresseeNameFWD}}"
+                *ngIf="currentMessage?.addresseeNameFWD">
+                  Reenviado: <small>{{currentMessage?.addresseeNameFWD}}</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-12"><br></div>
+            <div class="col-12 card">
+              <div class="row card-body">
+                <div class="col-12" style="text-align: center;">
+                  <br><h3>{{currentMessage.messageSubject}}</h3>
+                </div>
+                <div class="col-12">
+                  <p [innerHTML]="currentMessage.messageManagementDetail"></p>
+                </div>
+                <div class="col-12">
+                  <p [innerHTML]="currentMessage.documentManagementEsp"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <br>
+          <div class="row pl-4 pr-4" *ngIf="messageReplies && currentMessage">
+            <div class="col-12">
+              <h3>Respuestas:</h3>
+            </div>
+            <div class="col-12">
+              <mat-accordion multi #accordion>
+                <mat-expansion-panel [expanded]="false" *ngFor="let reply of messageReplies; let i=index;">
+                  <mat-expansion-panel-header style="background-color: #014898;">
+                    <mat-panel-title> <h5 style="color: white;">{{reply.dateCreated | date: 'longDate'}}</h5> </mat-panel-title>
+                  </mat-expansion-panel-header>
+                  <div class="row">
+                    <div class="col-11 card">
+                      <div class="row card-body">
+                        <div class="col-12">
+                          <small>{{reply.onlyHour}}</small>
+                        </div>
+                        <div class="col-9">
+                          <small>De: {{reply.personFullName}}</small>
+                        </div>
+                        <div class="col-1" style="text-align: right;">
+                          <a style="cursor: pointer; color: #014898" [matMenuTriggerFor]="menu">
+                            <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                          </a>
+                          <mat-menu #menu="matMenu">
+                            <button mat-menu-item [matMenuTriggerFor]="replies">
+                              <mat-icon>attachment</mat-icon>
+                              <span>Archivos</span>
+                            </button>
+                            <button mat-menu-item (click)="openDialog(null, reply);">
+                              <mat-icon>reply</mat-icon>
+                              <span>Responder</span>
+                            </button>
+                          </mat-menu>
+                          <mat-menu #replies="matMenu">
+                            <ng-container *ngIf="reply.attachments.length > 0; else template;">
+                              <button mat-menu-item *ngFor="let file of reply.attachments; let index=index;" (click)="openFile(file.fileUrl);">
+                                <span>Archivo: {{index+1}}</span>
+                              </button>
+                            </ng-container>
+                            <ng-template #template>
+                              <button mat-menu-item disabled="true">
+                                <span>Sin archivos</span>
+                              </button>
+                            </ng-template>
+                          </mat-menu>
+                        </div>
+                        <div class="col-12"><br></div>
+                        <div class="col-12">
+                          <p [innerHTML]="reply.reply"></p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <ng-container>
+                    <br>
+                    <app-sub-response [messageReply]="reply"></app-sub-response>
+                  </ng-container>
+                </mat-expansion-panel>
+              </mat-accordion>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row pl-2 pr-2">
+    <mat-paginator
+      #paginator
+      [length]="length"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="pageSizeOptions"
+      (page)="pageEvent = changePage($event)">
+    </mat-paginator>
+  </div>
+</ng-container>

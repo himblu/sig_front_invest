@@ -1,0 +1,28 @@
+input.email{
+    text-transform: lowercase !important;
+}
+
+img{
+    width: 80px;
+    height: 100px;
+    border-radius: 25px;
+    cursor: pointer;
+}
+
+.mat-mdc-slide-toggle.mat-accent {
+    --mdc-switch-selected-focus-state-layer-color: #1bd847b1;
+    --mdc-switch-selected-handle-color: #1bd847b1;
+    --mdc-switch-selected-hover-state-layer-color: #1bd847b1;
+    --mdc-switch-selected-pressed-state-layer-color: #1bd847b1;
+    --mdc-switch-selected-focus-handle-color: #1bd847b1;
+    --mdc-switch-selected-hover-handle-color: #1bd847b1;
+    --mdc-switch-selected-pressed-handle-color: #1bd847b1;
+    --mdc-switch-selected-focus-track-color: #1bd847b1;
+    --mdc-switch-selected-hover-track-color: #1bd847b1;
+    --mdc-switch-selected-pressed-track-color: #1bd847b1;
+    --mdc-switch-selected-track-color: #1bd847b1;
+}
+
+.styleButton{
+    padding: 10px;
+}

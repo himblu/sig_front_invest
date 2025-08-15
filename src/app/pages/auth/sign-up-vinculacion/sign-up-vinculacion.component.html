@@ -1,0 +1,137 @@
+<section id="wrapper" class="login-register login-sidebar" style="background-image:url(../../../../assets/images/ITCA_Mesa2.png);">
+  <div class="login-box card" *ngIf="showForms===0" style="background-image:url(../../../../assets/images/Degradado_final2.png); background-size: cover; border-radius: 0% !important;">
+      <div class="card-body">
+        <br><br><br><br><br><br><br><br><br><br><br><br><br>
+          <div class="row animated fadeIn fast" *ngIf="loading">
+              <div class="col-md-12">
+                  <div class="alert alert-info text-center">
+                      <h4 class="alert-heading">Cargando</h4>
+                      <i class="fa fa-spin fa-refresh fa-3x"></i>
+                      <p class="mb-0">Por favor esperar...</p>
+                  </div>
+              </div>
+          </div>
+          <form class="form-horizontal form-material"
+                  autocomplete="off"
+                  [formGroup]="registerForm"
+                  (ngSubmit)="onSubmit()"
+                  *ngIf="!loading">
+              <div class="form-group">
+                <label for="dni" style="color: white; padding-left: 10px;">Área de Participación</label>
+                <div class="input-group input-control">
+                    <mat-select formControlName="p_typeDocId" placeholder="SELECCIONE TIPO DE PARTICIPACIÓN">
+                        <mat-option *ngFor="let item of participationArea" [value]="item.areaParticipationID" (onSelectionChange)="selectedArea(item)">{{item.areaParticipationDesc}}</mat-option>
+                    </mat-select>
+                </div>
+              </div>
+          </form>
+      </div>
+  </div>
+  <!--AREA--2-->
+  <div class="login-box card" *ngIf="showForms===1 || showForms===2" style="background-image:url(../../../../assets/images/sistemas-inv.png); background-size: cover; border-radius: 0% !important;">
+    <div class="card-body">
+      <br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+      <div class="row animated fadeIn fast" *ngIf="loading">
+          <div class="col-md-12">
+              <div class="alert alert-info text-center">
+                  <h4 class="alert-heading">Cargando</h4>
+                  <i class="fa fa-spin fa-refresh fa-3x"></i>
+                  <p class="mb-0">Por favor esperar...</p>
+              </div>
+          </div>
+      </div>
+      <div class="col-12" style="max-height: 450px; overflow-y: auto;">
+        <form class="form-horizontal form-material"
+            autocomplete="off"
+            [formGroup]="registerForm"
+            (ngSubmit)="onSubmit()"
+            *ngIf="!loading">
+            <div class="form-group">
+                <label for="dni" style="color: white; padding-left: 10px;">Tipo de Documento</label>
+                <div class="input-group input-control">
+                    <mat-select formControlName="p_typeDocId" placeholder="SELECCIONE TIPO DOCUMENTO">
+                        <mat-option *ngFor="let item of documentType;" [value]="item.typeDocName" (onSelectionChange)="selectedDocument(item)">
+                          {{item.typeDocName}}
+                        </mat-option>
+                    </mat-select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="dni" style="color: white; padding-left: 10px;">Cédula Ciudadania</label>
+                <div class="input-group">
+                    <input type="text"
+                    #input
+                    class="form-control input-control"
+                    (keypress)="registerForm.get('p_areaParticipationID').value === 1 ? onlyNumbers($event) : alphaNumeric($event)"
+                    formControlName="p_personDocumentNumber"
+                    placeholder="100xxxxxxx"
+                    (input)="getRegistroCivil(input.value);">
+                </div>
+            </div>
+            <ng-container>
+                <div class="form-group">
+                    <label for="p_personFirstName" style="color: white; padding-left: 10px;">Nombres</label>
+                    <div class="input-group">
+                        <input type="text" id="p_personFirstName" [disabled]="recordFounded" class="form-control input-control" (keypress)="onlyLetters($event)" formControlName="p_personFirstName" placeholder="Nombres">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="p_personMiddleName" style="color: white; padding-left: 10px;">Apellido Paterno</label>
+                    <div class="input-group">
+                        <input type="text" id="p_personMiddleName" [disabled]="recordFounded" class="form-control input-control" (keypress)="onlyLetters($event)" formControlName="p_personMiddleName" placeholder="Apellido Paterno">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="p_personLastName" style="color: white; padding-left: 10px;">Apellido Materno</label>
+                    <div class="input-group">
+                        <input type="text" id="p_personLastName" [disabled]="recordFounded" class="form-control input-control" (keypress)="onlyLetters($event)" formControlName="p_personLastName" placeholder="Apellido Materno">
+                    </div>
+                </div>
+            </ng-container>
+            <div class="form-group">
+                <label for="p_emailDesc" style="color: white; padding-left: 10px;">Correo electrónico</label>
+                <div class="input-group">
+                    <input type="email" class="form-control input-control" formControlName="p_emailDesc" id="email" placeholder="Correo electrónico">
+
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="p_numberPhone" style="color: white; padding-left: 10px;">Celular</label>
+                <div class="input-group">
+                    <input type="text" class="form-control input-control" (keypress)="onlyNumbers($event)" maxlength="10" formControlName="p_numberPhone" id="phone" placeholder="Número de celular">
+
+                </div>
+            </div>
+            <div class="form-group">
+              <label for="p_nameInstitucion" style="color: white; padding-left: 10px;">Institución</label>
+              <div class="input-group">
+                  <input type="text" id="p_nameInstitucion" [disabled]="recordFounded" class="form-control input-control" formControlName="p_nameInstitucion" placeholder="Institución">
+              </div>
+          </div>
+            <div class="form-group row">
+                <div class="col-md-12">
+                    <div class="checkbox checkbox-primary pull-left p-t-0">
+                      <mat-checkbox formControlName="accept" color="primary"></mat-checkbox>
+                        <label for="checkbox-signup" class="color" style="color: white;"> Acepta <a style="color: rgba(0, 0, 0, 0.733);" href="assets/Doc/terminos_y_condiciones_ITCA.pdf" target="_blank"><small>(Leer)</small> Terminos y Condiciones </a> </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group text-center m-t-20">
+                <div class="col-xs-12">
+                    <!-- [disabled]="personExists" -->
+                    <button mat-raised-button type="submit" class="width" style="background-color: white; padding: 25px; border-radius: 25px; border: 3px solid #9ac12d;">
+                        CONTINUAR
+                    </button>
+                </div>
+            </div>
+            <div class="form-group m-b-0">
+                <div class="col-sm-12 text-center">
+                    <h3 style="color: white;">¿Ya tiene una cuenta creada? <a routerLink="/autenticacion/login-vinculacion" class="text-info m-l-5"><b style="color: white;">Ingresar</b></a></h3>
+                </div>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+

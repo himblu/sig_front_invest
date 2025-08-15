@@ -1,0 +1,42 @@
+<div class="modal-content">
+  <div class="row mt-4 mb-4">
+    <div class="col text-center">
+      <h2>AGREGAR CUPOS</h2>
+    </div>
+  </div>
+  <div class="row px-5" *ngIf="schedule">
+    <div class="col-6" style="text-align: left;">
+      <label>Carrera: {{ schedule.careerName }}</label>
+    </div>
+    <div class="col-6" style="text-align: left;">
+      <label>Periodo (Nivel): {{ schedule.cycleDesc }}</label>
+    </div>
+    <div class="col-6" style="text-align: left;">
+      <label>Malla Curricular: {{ schedule.studyPlanDesc }}</label>
+    </div>
+    <div class="col-6" style="text-align: left;">
+      <label>Paralelo: {{ schedule.parallelCode }}</label>
+    </div>
+    <div class="col-6" style="text-align: left;">
+      <label>Modalidad: {{ schedule.modalityName }}</label>
+    </div>
+    <div class="col-6" style="text-align: left;">
+      <label>Disponibilidad: {{ schedule.available }}</label>
+    </div>
+  </div>
+  <div class="card px-5">
+    <div class="card-header">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center" style="gap: 8px; flex-wrap: wrap;">
+          <label class="mb-0 fw-bold" style="min-width: 150px;">NÚMERO DE VACANTES:</label>
+          <mat-form-field appearance="outline" style="flex: 0 0 80px; margin-bottom: 0; margin-top: 21px;">
+            <input matInput type="number" [formControl]="vacanciesControl" min="1" style="width: 100%;">
+          </mat-form-field>
+        </div>
+        <button mat-raised-button color="primary" style="background: #014898" (click)="saveVacancies()">
+          GUARDAR
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

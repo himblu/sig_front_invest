@@ -1,0 +1,173 @@
+<div class="animated fadeIn fast">
+  <div class="form-row" *ngIf="courseSelected">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <div class="form-row">
+            <div class="col-8 pt-1">
+              <button class="btn btn-sm btn-light text-danger mr-1" (click)="goBack()">
+                <i class="fa fa-arrow mr-1"></i>Volver
+              </button>
+              <span>
+                <i class="fa fa-cog mr-1"></i>CONFIGURACIÓN DE CURSO: <strong>{{courseSelected.displayname}}</strong>
+              </span>
+            </div>
+            <div class="col-4 text-right">
+              <button class="btn btn-light border-primary-color btn-sm mr-2" *ngIf="nextCourses.length" (click)="nextCourse()">
+                <i class="fa fa-arrow-right mr-1"></i>Siguiente Curso
+              </button>
+              <button class="btn btn-sm bg-primary-color" (click)="togglePostulant()">
+                <i class="fa fa-plus mr-1"></i>Agregar Postulante
+              </button>
+            </div>
+            <div class="col-12">
+              En esta sección puedes visualizar los estudiantes del curso, ademas de agregar nuevos postulantes al mismo.
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="col-12 text-center" *ngIf="!enrolls.length">
+              <i class="fa fa-times fa-3x"></i><br>
+              No se tiene postulantes matriculados en este curso.
+              <button class="btn btn-sm bg-primary-color" (click)="togglePostulant()">
+                <i class="fa fa-plus mr-1"></i>Agregar Postulante
+              </button>
+            </div>
+            <ng-container *ngIf="enrolls.length">
+              <div class="col-4">
+                <button class="btn btn-sm bg-primary-color" *ngIf="courseSelected.edit" [disabled]="gradesOfCourse.invalid" (click)="saveGrades()">
+                  <i class="fa fa-save mr-1"></i>Guardar Cambios
+                </button>
+              </div>
+              <div class="col-4">
+                <input type="text" name="filterByText" placeholder="BUSCAR POR TEXTO EN LA LISTA" [(ngModel)]="courseSelected.filterBytext" class="form-control form-control-sm text-uppercase">
+              </div>
+              <div class="col-4 text-right">
+                <button class="btn btn-sm btn-light" [ngClass]="{'text-primary-color': !courseSelected.edit, 'text-danger': courseSelected.edit}" (click)="toggleEditGrades()">
+                  <i class="fa mr-1" [ngClass]="{'fa-lock': courseSelected.edit, 'fa-unlock': !courseSelected.edit}"></i>{{courseSelected.edit ? 'Deshabilitar' : 'Habilitar'}}&nbsp;edición
+                </button>
+              </div>
+              <div class="col-12 mt-3">
+                <form #gradesOfCourse="ngForm">
+                  <ul class="list-group">
+                    <li class="list-group-item p-1 text-primary-color list-group-item-secondary">
+                      <div class="form-row">
+                        <div class="col-3 pt-1">
+                          <strong>DETALLE DE ESTUDIANTE</strong>
+                        </div>
+                        <div class="col-9">
+                          <div class="form-row">
+                            <div class="col text-center" style="line-height: 90%;" *ngFor="let q of courseSelected.quizzes">
+                              <strong>{{q.name | uppercase}}</strong><br>
+                              <small>Nota para aprobar:&nbsp;{{q.gradetopass}}</small>
+                            </div>
+                            <div class="col-3 text-right pt-1">
+                              <strong>ACCIONES</strong>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                    <li class="list-group-item p-1" *ngFor="let r of enrolls; let i_s = index">
+                      <div class="form-row">
+                        <div class="col-3 pt-1">
+                          <i class="fa fa-user mr-1"></i>{{r.fullName | uppercase}}
+                        </div>
+                        <div class="col-9">
+                          <div class="form-row">
+                            <ng-container>
+                              <div *ngFor="let q of r.quizzes; let i_q = index" class="col text-center" [ngClass]="{'pt-1': !courseSelected.edit}">
+                                <input type="number" *ngIf="courseSelected.edit" min="0" [max]="q.gradetopass" (keypress)="changeGrade(r,q)" name="grade-{{i_s}}-{{i_q}}" (change)="changeGrade(r,q)" [(ngModel)]="q.grade" class="form-control form-control-sm text-center" required>
+                                <span *ngIf="!courseSelected.edit">{{q.grade}}</span>
+                              </div>
+                              <!-- <div class="col-7">
+                                <input type="text" name="commentary-{{i_s}}-{{i_q}}" *ngIf="courseSelected.edit && (q.hasChanged || q.commentary)" [(ngModel)]="q.commentary" placeholder="DETALLE CAMBIO DE NOTA 0 A {{q.grade}}" class="form-control form-control-sm text-uppercase" required>
+                                <small *ngIf="!courseSelected.edit">
+                                  {{(q.commentary || '-') | uppercase}}
+                                </small>
+                              </div> -->
+                            </ng-container>
+                            <div class="col-3 text-right">
+                              <button class="btn btn-sm btn-light text-danger" (click)="deleteOfCourse(r)">
+                                <i class="fa fa-trash mr-1"></i>Expulsar
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </form>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" bsModal #postulantModal="bs-modal" [config]="{backdrop: 'static'}" tabindex="-1" role="dialog" aria-labelledby="dialog-static-name">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="col-9 pt-1">
+            <i class="fa fa-plus mr-1"></i>Agregar Postulantea
+          </div>
+          <div class="col-3 text-right">
+            <button class="btn btn-sm btn-light text-danger" (click)="togglePostulant()">
+              <i class="fa fa-times mr-1"></i>Cerrar
+            </button>
+          </div>
+          <div class="col-12">
+            <hr>
+          </div>
+          <div class="col-12">
+            <div class="form-row">
+              <div class="col-12">
+                <div class="alert alert-info text-justify">
+                  <i class="fa fa-info mr-1"></i>En esta sección se muestran los postulantes <strong>LEGALIZADOS</strong> para la carrera. Si no desea matricular a alguno solo quite la selección.
+                </div>
+              </div>
+              <div class="col-4">
+                <span class="badge badge-light mr-2">
+                  <i class="fa fa-circle mr-1 text-primary-color"></i>Total: {{legalizeds.length}}
+                </span>
+                <span class="badge badge-light">
+                  <i class="fa fa-circle mr-1 text-success"></i>A Matricular: {{filter.enrolleds}}
+                </span>
+              </div>
+              <div class="col-4">
+                <input type="text" placeholder="FILTRAR POR TEXTO" name="filterText" [(ngModel)]="search.text" class="form-control text-uppercase form-control-sm">
+              </div>
+              <div class="col-4 text-right">
+                <button class="btn btn-sm bg-primary-color" [disabled]="filter.enrolleds == 0" (click)="enroll()">
+                  <i class="fa fa-save mr-1"></i>Matricular
+                </button>
+              </div>
+              <div class="col-12 mt-2" style="max-height: 400px; overflow: auto;" *ngIf="legalizeds.length">
+                <ul class="list-group">
+                  <li class="list-group-item p-1" *ngFor="let l of legalizeds | filter:search.text">
+                    <div class="form-row">
+                      <div class="col-9 pt-1">
+                        {{l.fullName! | uppercase}} - {{l.documentNumber!}}
+                      </div>
+                      <div class="col-3 text-right">
+                        <span class="badge badge-success" *ngIf="l.flgCourse"><i class="fa fa-check mr-1"></i>Ya en el Curso</span>
+                        <button class="btn btn-sm" [ngClass]="{'bg-primary-color': l.selected, 'btn-light': !l.selected}" *ngIf="!l.flgCourse" (click)="toggleSelect(l)">
+                          <i class="fa mr-1" [ngClass]="{'fa-circle': l.selected, 'fa-circle-o text-secondary': !l.selected}"></i>{{l.selected ? 'Quitar' : 'Incluir'}}
+                        </button>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

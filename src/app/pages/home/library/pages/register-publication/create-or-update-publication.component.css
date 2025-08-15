@@ -1,0 +1,141 @@
+.mdc-fab--mini {
+    height: 30px;
+    width: 30px;
+}
+
+input[type="file"] {
+    font-size: 85%;
+}
+
+.list-option, .checkbox-label {
+    font-size: 14px;
+}
+
+.list-container {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    min-height: 200px;
+    max-height: 200px;
+	overflow-y: auto;
+}
+
+
+.stock-container {
+    padding: 14px 0 0 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.duplicated-stock {
+    border: 1px solid #f44336;
+}
+
+
+.stock-group {
+    /*border-bottom: 1px solid #ccc;*/
+    /*margin-bottom: 24px;*/
+}
+
+.stock-container > .stock-group:last-child {
+    border-bottom: 0;
+    margin-bottom: 0;
+}
+
+:host ::ng-deep .mdc-list-item.mdc-list-item--with-one-line {
+	height: 30px;
+}
+
+:host ::ng-deep .mdc-tab__text-label {
+	letter-spacing: 0 !important;
+}
+
+:host ::ng-deep label {
+	margin-bottom: 0 !important;
+}
+
+:host ::ng-deep .NgxEditor__MenuBar {
+	background: none;
+    border: 1px solid #ccc;
+    border-radius: 4px 4px 0 0 ;
+}
+
+
+:host ::ng-deep .NgxEditor {
+	background: none;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    border-top: 0;
+    border-bottom: 1px solid #ccc;
+    border-radius: 0 0 4px 4px;
+}
+
+:host ::ng-deep mdc-list-item__primary-text {
+    font-size: 13px;
+    letter-spacing: 0;
+}
+
+::ng-deep .mat-mdc-optgroup-label {
+	background: #014898;
+	color: white;
+	font-size: 12px;
+	line-height: normal;
+}
+
+.file-upload-container {
+	display: flex;
+	flex-direction: column;
+	align-items: start;
+	gap: 10px;
+}
+
+.file-upload-button  {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 150px;
+		height: 150px;
+		background-color: #e8f1ff;
+		color: #004899;
+		border-radius: 12px;
+		cursor: pointer;
+		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+		transition: background-color 0.3s ease;
+		flex-direction: column;
+
+}
+
+.file-upload-button:hover {
+	background-color: #d0e3ff;
+}
+
+.icon-container {
+	font-size: 32px;
+	margin-bottom: 5px;
+}
+
+.file-info {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.file-link {
+	color: #004899;
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.file-link:hover {
+	text-decoration: underline;
+}
+
+.edit-icon {
+	cursor: pointer;
+	color: #004899;
+	font-size: 20px;
+	transition: color 0.3s ease;
+}
+
+.edit-icon:hover {
+	color: #003366;
+}

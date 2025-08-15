@@ -1,0 +1,180 @@
+<div class="row animated fadeIn fast" *ngIf="cargando">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+<div class="row animated fadeIn fast" *ngIf="!cargando">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="row pl-2 pr-2">
+          <div class="col-md-3"><components-input-search [label]="'Búsqueda por sede o dirección'" (return)="searchT($event)"></components-input-search></div>
+          <div class="col-md-9" style="text-align: right;">
+            <button type="button" mat-raised-button
+            class="styleButton_sml"
+            style="width: 142px;"
+            data-toggle="modal"
+            data-target="#exampleModal"
+            (click)="initForm(); isUpdating= false;">
+              Agregar
+            </button>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table id="demo-foo-addrow" class="table m-t-0 table-hover no-wrap contact-list footable-loaded footable"
+          data-page-size="5">
+            <thead style="background-color: #004899; color: white;">
+            <tr>
+              <th class="footable-sortable">ID<span class="footable-sort-indicator"></span></th>
+              <th class="footable-sortable">Sede<span class="footable-sort-indicator"></span></th>
+              <th class="footable-sortable">Dirección<span class="footable-sort-indicator"></span></th>
+              <th class="footable-sortable" style="text-align: center;">
+                Acciones
+                <span class="footable-sort-indicator"></span>
+              </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="footable-even" *ngFor="let campus of campusList">
+              <td>{{campus.campusID}}</td>
+              <td>{{campus.campusName | uppercase}}</td>
+              <td>{{campus.provinceName}}/{{campus.cantonName}}/{{campus.parishName}}/{{campus.campusAddress}}</td>
+              <td style="text-align: center;">
+                <a type="button"
+                  matTooltipPosition="above"
+                  matTooltip="Editar"
+                  style="cursor: pointer; color: green;"
+                  (click)="updateCampus(campus);"
+                  data-toggle="modal"
+                  data-target="#exampleModal">
+                  <i class="fa fa-pencil" aria-hidden="true"></i>
+                </a>
+                &nbsp;
+                <a type="button"
+                    matTooltipPosition="above"
+                    matTooltip="Activar"
+                    style="cursor: pointer; color: red;"
+                    *ngIf="!campus.statusID"
+                    (click)="statusCampus(campus, 1)">
+                    <i class="fa fa-toggle-off" aria-hidden="true"></i>
+                </a>
+                <a type="button"
+                    matTooltipPosition="above"
+                    matTooltip="Inactivar"
+                    style="cursor: pointer; color: blue;"
+                    *ngIf="campus.statusID"
+                    (click)="statusCampus(campus, 0)">
+                    <i class="fa fa-toggle-on" aria-hidden="true"></i>
+                </a>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <components-button-arrow [actual]="actual" [totalPage]="totalPage" [count]="count" (result)="changePage($event)"></components-button-arrow>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="height: 40px;">
+        <div class="col-md-4">
+          <h3 class="modal-title" id="exampleModalLabel"><br>Agregar Sede</h3>
+        </div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" #modalClose>
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row animated fadeIn fast" *ngIf="!cargando">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-body">
+                <form (submit)="saveCampus()"
+                      [formGroup]="campusForm">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Nombre Sede</mat-label>
+                        <input type="text" matInput formControlName="campusName">
+                        <mat-error *ngIf="!campusForm.get('campusName')?.value">
+                          Direción es <strong>requerido</strong>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                    <!-- <div class="col-md-12">
+                      <components-combo (parishOut)="getParish( $event )"></components-combo>
+                    </div> -->
+                  <div class="col-4">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Provincia</mat-label>
+                      <mat-select formControlName="provinceID" (selectionChange)="getCantons($event.value)">
+                        <mat-option *ngFor="let i of provinces" [value]="i.provinceID">{{i.provinceName}}</mat-option>
+                      </mat-select>
+                      <mat-error>Campo requerido!</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-4">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Cantón</mat-label>
+                      <mat-select formControlName="cantonID" (selectionChange)="getParish($event.value)">
+                        <mat-option *ngFor="let i of cantons" [value]="i.cantonID">{{i.cantonName}}</mat-option>
+                      </mat-select>
+                      <mat-error>Campo requerido!</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-4">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Parroquia</mat-label>
+                      <mat-select formControlName="parishID">
+                        <mat-option *ngFor="let item of parishes" [value]="item.parishID">{{item.parishName}}</mat-option>
+                      </mat-select>
+                      <mat-error>Campo requerido!</mat-error>
+                    </mat-form-field>
+                  </div>
+                    <div class="col-md-12">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Dirección Sede</mat-label>
+                        <input type="text" matInput formControlName="campusAddress">
+                        <mat-error *ngIf="!campusForm.get('campusAddress')?.value">
+                          Direción es <strong>requerido</strong>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-md-12">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Detalle Sede</mat-label>
+                        <textarea type="text" matInput formControlName="campusDetail"></textarea>
+                        <mat-error *ngIf="!campusForm.get('campusDetail')?.value">
+                          Detalle es <strong>requerido</strong>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-3">
+                      <button type="submit" mat-raised-button class="styleButton">Guardar</button>
+                    </div>
+                    <div class="col-md-3">
+                      <button type="button" mat-raised-button class="styleButton_gray" style="width: 100px;" data-dismiss="modal">Cerrar</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+

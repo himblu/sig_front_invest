@@ -1,0 +1,175 @@
+.border-1 {
+  border: 1px solid #ccc;
+}
+
+.border-right-1 {
+  border-right: 1px solid #ccc;
+}
+
+.border-left-1 {
+  border-left: 1px solid #ccc;
+}
+
+.border-top-1 {
+  border-top: 1px solid #ccc;
+}
+
+.border-bottom-1 {
+  border-bottom: 1px solid #ccc;
+}
+
+.input-container {
+  padding: 4px;
+  text-align: center;
+  height: 30px;
+}
+
+.curriculum-container {
+  display: block;
+
+  .curriculum-header {
+    line-height: 14px;
+    height: 60px;
+    display: flex;
+    font-size: 12px;
+    background: #014898;
+    color: white;
+
+    .curriculum-organization-unit-header {
+      width: 150px;
+      min-width: 150px;
+      display: flex;
+      align-self: center;
+
+      > div {
+        text-align: center;
+        display: flex;
+        align-self: center;
+      }
+    }
+
+    .learning-activities-header {
+      width: 150px;
+      min-width: 150px;
+      display: flex;
+      align-self: center;
+
+      > div {
+        text-align: center;
+        display: flex;
+        align-self: center;
+      }
+    }
+
+    .period-header {
+      .period-name-header {
+        height: 30px;
+        display: flex;
+        justify-content: center;
+
+        .period-name {
+          display: flex;
+          align-self: center;
+        }
+      }
+
+      .period-subject-header {
+        height: 30px;
+        display: flex;
+
+        .period-subject-name-header {
+          width: 113px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        .period-subject-hours-header {
+          width: 69px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+      }
+    }
+
+    .period-hours-header {
+      width: 58px;
+      display: flex;
+      align-self: center;
+      position: sticky;
+      right: 0;
+
+      > div {
+        text-align: center;
+        display: flex;
+        align-self: center;
+      }
+    }
+  }
+
+  .unit-container {
+    .learning-activities-container {
+      width: 150px;
+      height: 120px;
+      font-size: 12px;
+
+      .learning-activity {
+        height: 30px;
+        display: flex;
+        align-items: center;
+
+        &:last-child {
+          font-weight: 500;
+        }
+      }
+    }
+
+    .subject-container {
+      &:hover {
+        background: #e0e0e0;
+      }
+    }
+  }
+}
+
+ul.course-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    height: 40px;
+    padding: 14px;
+    font-size: 12px;
+    letter-spacing: normal;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    cursor: move;
+    color: #014898;
+
+    &:hover {
+      background: #e0e0e0;
+    }
+  }
+}
+
+
+::ng-deep .mat-mdc-menu-content {
+  padding: 0 !important;
+}
+
+.mat-mdc-menu-item {
+  min-height: 41px !important;
+}
+
+::ng-deep .mdc-button__label {
+  letter-spacing: 0 !important;
+}
+
+::ng-deep .mat-mdc-menu-item-text {
+  letter-spacing: 0 !important;
+  font-size: 14px !important;
+  color: black;
+}

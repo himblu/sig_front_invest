@@ -1,0 +1,98 @@
+/*
+Template Name: Admin pro Admin
+Author: Wrappixel
+Email: niravjoshi87@gmail.com
+File: scss
+*/
+/*
+Template Name: Admin Pro Admin
+Author: Wrappixel
+Email: niravjoshi87@gmail.com
+File: scss
+*/
+/*Theme Colors*/
+/*bootstrap Color*/
+/*Light colors*/
+/*Normal Color*/
+/*Extra Variable*/
+/*******************
+Login register and recover password Page
+******************/
+.login-register {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    height: 100%;
+    width: 100%;
+    padding: 10% 0;
+    position: fixed; }
+
+  .login-box {
+    width: 400px;
+    margin: 0 auto; }
+    .login-box .footer {
+      width: 100%;
+      left: 0px;
+      right: 0px; }
+    .login-box .social {
+      display: block;
+      margin-bottom: 30px; }
+
+  #recoverform {
+    display: none; }
+
+  .login-sidebar {
+    padding: 0px;
+    margin-top: 0px; }
+    .login-sidebar .login-box {
+      right: 0px;
+      position: absolute;
+      height: 100%; }
+
+      .color::after{
+        border: 1px solid white !important;
+      }
+
+      .color::before{
+        border: 0px solid white !important;
+      }
+
+
+.ring{
+  width: 50px;
+  height: 50px;
+  border: 0px solid #000;
+  border-radius: 50%;
+  position: absolute;
+}
+.ring:nth-child(1){
+  border-bottom-width: 2px;
+  border-color: rgb(7, 250, 7);
+  animation: rotate 2.5s linear infinite;
+}
+.ring:nth-child(2){
+  border-bottom-width: 2px;
+  border-color: rgb(146, 146, 231);
+  animation: rotate 2s linear infinite;
+}
+.ring:nth-child(3){
+  border-bottom-width: 2px;
+  border-color: rgb(109, 7, 243);
+  animation: rotate 1.5s linear infinite;
+}
+
+.leveling-sidebar {
+	background-image: url('assets/images/unacem_sidebar.png');
+}
+
+.unacem-sidebar {
+	background-image: url('assets/images/itca_sidebar_2.png');
+}
+
+.pt-login-leveling {
+	padding-top: 200px !important;
+}
+
+.pt-login-unacem {
+	padding-top: 90px !important;
+}

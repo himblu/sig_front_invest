@@ -1,0 +1,175 @@
+<div class="animated fadeIn fast">
+    <div class="card">
+        <div class="card-body">
+            <form [formGroup]="myForm"
+                    autocomplete="off"
+                    (submit)="addMyForm()">
+                <div class="row">
+                    <div class="col-md-4">
+                        <mat-form-field class="width" appearance="outline">
+                            <mat-label>Nombres</mat-label>
+                            <input formControlName="names" type="text" matInput>
+                            <mat-error *ngIf="isValidField('names')">{{getFielError('names')}}</mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-3">
+                        <mat-form-field class="width" appearance="outline">
+                            <mat-label>Parentesco</mat-label>
+                            <mat-select formControlName="relationship">
+                                <mat-option>--</mat-option>
+                                <mat-option value="1">Hermana</mat-option>
+                                <mat-option value="2">Hermano</mat-option>
+                            </mat-select>
+                            <mat-error *ngIf="isValidField('relationship')">{{getFielError('relationship')}}</mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-2">
+                        <mat-form-field class="width" appearance="outline">
+                            <mat-label>Edad</mat-label>
+                            <input formControlName="age" type="number" matInput>
+                            <mat-error *ngIf="isValidField('age')">{{getFielError('age')}}</mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-3">
+                        <mat-form-field class="width" appearance="outline">
+                            <mat-label>Estado Civil</mat-label>
+                            <mat-select formControlName="civilStatus">
+                                <mat-option>--</mat-option>
+                                <mat-option *ngFor="let item of civilStatusList" [value]="item.civilStatusID">{{item.civilStatusDesc}}</mat-option>
+                            </mat-select>
+                            <mat-error *ngIf="isValidField('civilStatus')">{{getFielError('civilStatus')}}</mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <mat-form-field class="width" appearance="outline">
+                            <mat-label>Profesión</mat-label>
+                            <mat-select formControlName="profession">
+                                <mat-option>--</mat-option>
+                                <mat-option *ngFor="let item of professionList" [value]="item.professionID">{{item.professionName}}</mat-option>
+                            </mat-select>
+                            <mat-error *ngIf="isValidField('profession')">{{getFielError('profession')}}</mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-4" style="display: flex;">
+                        <div class="col-md-6">
+                            <mat-form-field class="width" appearance="outline">
+                            <mat-label>Ingresos</mat-label>
+                            <input formControlName="income" type="number" matInput>
+                            <mat-error *ngIf="isValidField('income')">{{getFielError('income')}}</mat-error>
+                        </mat-form-field>
+                        </div>
+                        <div class="col-md-6">
+                            <mat-form-field class="width" appearance="outline">
+                            <mat-label>Gastos</mat-label>
+                            <input formControlName="spent" type="number" matInput>
+                            <mat-error *ngIf="isValidField('spent')">{{getFielError('spent')}}</mat-error>
+                        </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <button mat-button class="styleButton">
+                            <i class="fa fa-plus-circle"></i>
+                            &nbsp;
+                            Agregar
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <form [formGroup]="familyForm"
+                    autocomplete="off">
+                <div *ngFor="let item of dynamicArr.controls; let i = index">
+                    <div formArrayName="group">
+                        <h1 class="text-warning">Hermano/a N°:{{i + 1}}</h1>
+                        <div [formGroupName]="i">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Nombres</mat-label>
+                                        <input formControlName="names" type="text" matInput>
+                                        <mat-error *ngIf="isValidField('names')">{{getFielError('names')}}</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Parentesco</mat-label>
+                                        <mat-select formControlName="relationship">
+                                            <mat-option>--</mat-option>
+                                            <mat-option value="1">Hermana</mat-option>
+                                            <mat-option value="2">Hermano</mat-option>
+                                        </mat-select>
+                                        <mat-error *ngIf="isValidField('relationship')">{{getFielError('relationship')}}</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-2">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Edad</mat-label>
+                                        <input formControlName="age" type="number" matInput>
+                                        <mat-error *ngIf="isValidField('age')">{{getFielError('age')}}</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Estado Civil</mat-label>
+                                        <mat-select formControlName="civilStatus">
+                                            <mat-option>--</mat-option>
+                                            <mat-option *ngFor="let item of civilStatusList" [value]="item.civilStatusID">{{item.civilStatusDesc}}</mat-option>
+                                        </mat-select>
+                                        <mat-error *ngIf="isValidField('civilStatus')">{{getFielError('civilStatus')}}</mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Profesión</mat-label>
+                                        <mat-select formControlName="profession">
+                                            <mat-option>--</mat-option>
+                                            <mat-option *ngFor="let item of professionList" [value]="item.professionID">{{item.professionName}}</mat-option>
+                                        </mat-select>
+                                        <mat-error *ngIf="isValidField('profession')">{{getFielError('profession')}}</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-4" style="display: flex;">
+                                    <div class="col-md-6">
+                                        <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Ingresos</mat-label>
+                                        <input formControlName="income" type="number" matInput>
+                                        <mat-error *ngIf="isValidField('income')">{{getFielError('income')}}</mat-error>
+                                    </mat-form-field>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Gastos</mat-label>
+                                        <input formControlName="spent" type="number" matInput>
+                                        <mat-error *ngIf="isValidField('spent')">{{getFielError('spent')}}</mat-error>
+                                    </mat-form-field>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <button mat-raised-button color="warn" type="button" (click)="deleteDynamic(i)">
+                                        <i class="fa fa-trash-o "></i>
+                                        &nbsp;
+                                        Eliminar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="row">
+                <div class="col-md-4"></div>
+                <div class="col-md-4"></div>
+                <div class="col-md-4" *ngIf="valid">
+                    <button mat-button class="styleButton">
+                        <i class="fa fa-save"></i>
+                        &nbsp;
+                        Guardar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

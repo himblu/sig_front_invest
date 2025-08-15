@@ -1,0 +1,121 @@
+
+<div>
+  <mat-tab-group>
+    <mat-tab label="Gestión de espacios">
+      <ng-template matTabContent>
+        <div class="row animated fadeIn fast" *ngIf="isLoading; else body;">
+          <div class="col-md-12">
+            <div class="alert alert-info text-center">
+              <h4 class="alert-heading">Cargando</h4>
+              <i class="fa fa-spin fa-refresh fa-3x"></i>
+              <p class="mb-0">Por favor esperar...</p>
+            </div>
+          </div>
+        </div>
+        <ng-template #body>
+          <div class="card">
+            <div class="card-body">
+              <div class="row pl-2 pr-2">
+                <ng-container [formGroup]="filtersForm">
+                  <div class="col-6">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Buscador</mat-label>
+                      <input type="text" matInput formControlName="search" (input)="getLibrarySpace(false);">
+                      <mat-icon matSuffix>search</mat-icon>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-3"></div>
+                  <div class="col-3" style="text-align: right;">
+                    <button type="button"
+                    mat-raised-button
+                    class="styleButton_sml"
+                    style="max-width: 100px;"
+                    (click)="openDialog();">
+                    Agregar
+                    </button>
+                  </div>
+                </ng-container>
+              </div>
+              <div class="row pl-2 pr-2">
+                <div class="col-12">
+                  <div class="table-responsive">
+                    <table class="table">
+                      <thead style="background-color: #004899; color: white;">
+                        <tr>
+                          <th>Código</th>
+                          <th>Nombre</th>
+                          <th>Descripción</th>
+                          <th>Capacidad</th>
+                          <th>Estado</th>
+                          <th style="text-align: center;">Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody style="color: black;">
+                        <tr *ngFor="let item of librarySpaces">
+                          <td>{{item.librarySpaceID}}</td>
+                          <td>{{item.librarySpaceName}}</td>
+                          <td>{{item.librarySpaceDesc}}</td>
+                          <td>{{item.capacityMax}}</td>
+                          <td>
+                            <ng-container *ngIf="item.statusID; else inactive;">Activo</ng-container>
+                            <ng-template #inactive>Inactivo</ng-template>
+                          </td>
+                          <td style="text-align: center;">
+                            <a type="button"
+                              matTooltipPosition="above"
+                              matTooltip="Activar"
+                              style="cursor: pointer; color: red;"
+                              *ngIf="!item.statusID"
+                              (click)="putLibrarySpaceState(item, 1);">
+                              <i class="fa fa-toggle-off" aria-hidden="true"></i>
+                            </a>
+                            <a type="button"
+                              matTooltipPosition="above"
+                              matTooltip="Inactivar"
+                              style="cursor: pointer; color: blue;"
+                              *ngIf="item.statusID"
+                              (click)="putLibrarySpaceState(item, 0);">
+                              <i class="fa fa-toggle-on" aria-hidden="true"></i>
+                            </a>
+                            &nbsp;
+                            <a type="button"
+                              matTooltipPosition="above"
+                              matTooltip="Editar"
+                              style="cursor: pointer; color: green;"
+                              (click)="openDialog(item);">
+                              <i class="fa fa-pencil" aria-hidden="true"></i>
+                            </a>&nbsp;
+                            <a type="button"
+                              *ngIf="item.statusID"
+                              matTooltipPosition="above"
+                              matTooltip="Ingresar"
+                              style="cursor: pointer; color: black;"
+                              [href]="'/biblioteca/log-espacio/'+item.librarySpaceID">
+                              <i class="fa fa-share" aria-hidden="true"></i>
+                            </a>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <mat-paginator
+                    #paginator
+                    [length]="length"
+                    [pageSize]="pageSize"
+                    [pageSizeOptions]="pageSizeOptions"
+                    (page)="pageEvent = changePage($event)">
+                  </mat-paginator>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </ng-template>
+    </mat-tab>
+    <mat-tab label="Reportería">
+      <ng-template matTabContent>
+        <app-reports></app-reports>
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
+</div>

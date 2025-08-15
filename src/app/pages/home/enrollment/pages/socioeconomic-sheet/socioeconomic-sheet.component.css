@@ -1,0 +1,56 @@
+::ng-deep .custom-header .mat-step-header {
+    background: #014898;
+    border-radius: 4px;
+    height: 1px !important;
+    border-bottom: 1px solid white;
+}
+
+::ng-deep .custom-header .mat-step-header:hover {
+    background: #014898 !important;
+}
+
+
+::ng-deep .custom-header .mat-step-header[aria-selected="true"]  {
+    background: rgba(1, 72, 152, 0.82) !important;
+}
+
+::ng-deep .custom-header .mat-step-icon-selected {
+    background: #014898 !important;
+}
+
+.step-label {
+    color: white;
+    font-size: 85%;
+}
+
+mat-label {
+    font-size: 85%;
+    letter-spacing: 0;
+}
+
+.blue-button {
+    color: white !important;
+    background: #014898 !important;
+    font-size: 85%;
+    letter-spacing: 0;
+}
+
+.green-button {
+    color: white !important;
+    background: #28a745 !important;
+    font-size: 85%;
+    letter-spacing: 0;
+}
+
+.remove-button {
+    background: #dc3545;
+}
+
+::ng-deep .mat-mdc-checkbox label {
+    display: flex;
+    align-self: end;
+}
+
+::ng-deep .mat-step-icon {
+    background: #014898 !important;
+}

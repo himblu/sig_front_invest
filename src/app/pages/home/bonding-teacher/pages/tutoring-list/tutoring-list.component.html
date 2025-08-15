@@ -1,0 +1,108 @@
+<div class="row animated fadeIn fast" *ngIf="charging; else body">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+<ng-template #body>
+  <div class="card">
+    <div class="card-body">
+      <div class="row pl-2 pr-2" [formGroup]="filtersForm">
+        <div class="col-4">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Periodo Académico</mat-label>
+            <mat-select formControlName="periodID" (selectionChange)="getProjectsByTutor();">
+              <mat-option *ngFor="let item of periods" [value]="item.periodID">{{item.periodName}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-4">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Proyectos Específicos</mat-label>
+            <mat-select formControlName="projectInformativeID" (selectionChange)="getLinkageProjectsByTutor();">
+              <mat-option *ngFor="let item of microProjects" [value]="item.projectPracInformativeID">{{item.projectPracInformativeDesc}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-2">
+          <a
+            style="background-color: rgb(84, 158, 77);
+            color: white;"
+            mat-raised-button
+            matTooltipPosition="above"
+            matTooltip="Descargar"
+            href="https://tecnologicoitcaeduec-my.sharepoint.com/personal/encuba_itca_edu_ec/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fencuba%5Fitca%5Fedu%5Fec%2FDocuments%2FCONTRATO%20SISTEMA%20INFORM%C3%81TICO%20DE%20GESTI%C3%93N%20%28SIG%29%20%2D%20ENCUBA%2FMANUALES%20DE%20USUARIO%20%28SIG%29%2FVINCULACI%C3%93N%2F18%5FMU%5FPROCESO%5FASIGNACION%20NOTAS%20VINCULACION%2Epdf&parent=%2Fpersonal%2Fencuba%5Fitca%5Fedu%5Fec%2FDocuments%2FCONTRATO%20SISTEMA%20INFORM%C3%81TICO%20DE%20GESTI%C3%93N%20%28SIG%29%20%2D%20ENCUBA%2FMANUALES%20DE%20USUARIO%20%28SIG%29%2FVINCULACI%C3%93N"
+            target="_blank">
+            <small>Manual Usuario</small>
+          </a>
+        </div>
+      </div>
+      <div class="row pl-2 pr-2">
+        <div class="col-12">
+          <div class="table-responsive">
+            <table class="table">
+              <thead style="background-color: #004899; color: white;">
+                <tr>
+                  <th>Proyecto</th>
+                  <th>Tipo</th>
+                  <th>Nivel</th>
+                  <th>Asignatura</th>
+                  <th>Horas</th>
+                  <th>Estudiantes</th>
+                  <th style="text-align: center;">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngIf="!linkageProjects?.length; else registers;">
+                  <td colspan="7" style="text-align: center;">Sin registros</td>
+                </tr>
+                <ng-template #registers>
+                  <tr *ngFor="let item of linkageProjects">
+                    <td>{{item.projectPracInformativeDesc}}</td>
+                    <td>{{item.modalityPracticeDesc}}</td>
+                    <td>{{item.cycleDesc}}</td>
+                    <td>{{item.courses}}</td>
+                    <td>{{item.projectPracticeHours}}</td>
+                    <td>{{item.qtyStudents}}</td>
+                    <td style="text-align: center;">
+                      <a type="button" style="color: #004899; cursor: pointer;" [matMenuTriggerFor]="menu">
+                        <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                      </a>
+                      <mat-menu #menu="matMenu">
+                        <a type="button"
+                          mat-menu-item
+                          matTooltipPosition="above"
+                          matTooltip="Calificaciones"
+                          href="/vinculacion-docente/calificaciones-tutorias/{{item.projectPracInformativeID}}">
+                          <i style="color: #004899; cursor: pointer;" class="fa fa-book" aria-hidden="true"></i>
+                          &nbsp;<span>Calificaciones</span>
+                        </a>
+                        <a type="button"
+                          mat-menu-item
+                          matTooltipPosition="above"
+                          matTooltip="Descargar PDF">
+                          <i style="color: red; cursor: pointer;" class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                          &nbsp;<span>Reporte</span>
+                        </a>
+                      </mat-menu>
+                    </td>
+                  </tr>
+                </ng-template>
+              </tbody>
+            </table>
+          </div>
+          <mat-paginator
+            #paginator
+            [length]="length"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="pageSizeOptions"
+            (page)="pageEvent = getPaginator($event)">
+          </mat-paginator>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

@@ -1,0 +1,149 @@
+<div class="row animated fadeIn fast" *ngIf="isLoading; else body">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<ng-template #body>
+  <div class="card">
+    <div class="card-body">
+      <div class="col-12" [formGroup]="filtersForm">
+        <div class="row">
+          <div class="col-4">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Contratista</mat-label>
+              <mat-select formControlName="contractorID" (selectionChange)="
+                getCourseStateUnacem();
+                getCourseHoursUnacem();
+                getCourseDesertersUnacem();
+                getCourseDesertionByPhaseUnacem();
+              ">
+                <mat-option [value]="0">Todos</mat-option>
+                <mat-option *ngFor="let item of contractors" [value]="item.contractorID">
+                  {{item.businessName}}
+                </mat-option>
+              </mat-select>
+              <mat-error><small>Campo requerido</small></mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-4">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Periodo</mat-label>
+              <mat-select formControlName="periodSection" (selectionChange)="
+                getCourseStateUnacem();
+                getCourseHoursUnacem();
+                getCourseDesertersUnacem();
+                getCourseDesertionByPhaseUnacem();
+              ">
+                <mat-option [value]="0">Todos</mat-option>
+                <mat-option *ngFor="let item of currentYear-10 | range:currentYear" [value]="item">{{item}}</mat-option>
+              </mat-select>
+              <mat-error><small>Campo requerido</small></mat-error>
+            </mat-form-field>
+          </div>
+          <!-- <div class="col-4">
+            <mat-form-field appearance="outline">
+              <mat-label>Fecha inicio - Fecha fin</mat-label>
+              <mat-date-range-input [rangePicker]="picker">
+                <input matStartDate readonly="true" placeholder="Fecha Inicio" formControlName="initDate">
+                <input matEndDate readonly="true" placeholder="Fecha Fin" formControlName="endDate">
+              </mat-date-range-input>
+              <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-date-range-picker #picker></mat-date-range-picker>
+              <mat-error>Campo requerido</mat-error>
+            </mat-form-field>
+          </div> -->
+        </div>
+        <div class="row mb-3">
+          <div class="col-6 card">
+            <div class="row card-body" style="overflow-y: auto; max-height: 310px;">
+              <div class="col-6">
+                <h3>Participantes</h3>
+              </div>
+              <div class="col-6">
+                <mat-form-field appearance="outline">
+                  <mat-label>Buscador</mat-label>
+                  <input type="text" matInput formControlName="search">
+                </mat-form-field>
+              </div>
+              <ng-container *ngFor="let item of interestedPercentages">
+                <div class="col-6 progress-section">
+                  <small>{{item.fullNameStudent}}</small>
+                </div>
+                <div class="col-4 progress-section" style="cursor: pointer;"
+                  matTooltip="{{item.courseName}}">
+                  <mat-progress-bar
+                    color="warn"
+                    [mode]="'determinate'"
+                    [value]="item.percentage"
+                    [bufferValue]="100">
+                  </mat-progress-bar>
+                </div>
+                <div class="col-2 progress-section">
+                  <small>{{item.percentage}}%</small>
+                </div>
+                <div class="col-12"><hr></div>
+              </ng-container>
+            </div>
+          </div>
+          <div class="col card ml-1">
+            <div class="row card-body" style="overflow: auto; max-height: 310px;">
+              <div class="col-12">
+                <h3>Cursos</h3>
+              </div>
+              <ng-container>
+                <canvas min-height="150" max-height='300' id='coursesChart'>
+                  {{coursesChart}}
+                </canvas>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-6 card">
+            <div class="row card-body" style="overflow: auto; max-height: 310px;">
+              <div class="col-12">
+                <h3>Horas</h3>
+              </div>
+              <ng-container>
+                <canvas min-height="150" max-height='300' id='hoursChart'>
+                  {{hoursChart}}
+                </canvas>
+              </ng-container>
+            </div>
+          </div>
+          <div class="col card ml-1">
+            <div class="row card-body" style="overflow-y: auto; max-height: 310px;">
+              <div class="col-12">
+                <h3>Deserción</h3>
+              </div>
+              <ng-container>
+                <canvas min-height="150" max-height='300' id='desertersChart'>
+                  {{desertersChart}}
+                </canvas>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6 card">
+            <div class="row card-body" style="overflow-y: auto; max-height: 310px;">
+              <div class="col-12">
+                <h3>Deserción por fase</h3>
+              </div>
+              <ng-container>
+                <canvas min-height="150" max-height='300' id='desertionsByPhaseChart'>
+                  {{desertionsByPhaseChart}}
+                </canvas>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

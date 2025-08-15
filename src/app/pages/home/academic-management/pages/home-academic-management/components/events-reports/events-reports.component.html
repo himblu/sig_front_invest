@@ -1,0 +1,57 @@
+
+<div style="display: flex; justify-content: end; align-items: center; background: transparent;" class="p-2">
+  <mat-icon style="cursor: pointer; color: red;" [matDialogClose]="false" class="red-icon" matRipple>close</mat-icon>
+</div>
+
+<mat-dialog-content>
+  <div *ngIf="isLoading; else form">
+    <spinner-loader></spinner-loader>
+  </div>
+
+  <ng-template #form>
+    <div class="row animated fadeIn fast">
+      <div class="col-md-12">
+        <p>Descargar Reporte</p>
+        <div class="card">
+          <div class="card-body">
+            <ng-container [formGroup]="reportsForm">
+              <div class="row">
+                <div class="col-8">
+                  <mat-form-field>
+                    <mat-label>Periodo Académico</mat-label>
+                    <mat-select formControlName="periodID">
+                      <mat-option *ngFor="let item of periods" [value]="item.periodID">{{item.periodName}}</mat-option>
+                    </mat-select>
+                    <mat-error></mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-4">
+                  <mat-form-field>
+                    <mat-label>Estado:</mat-label>
+                    <mat-select formControlName="statusID">
+                      <mat-option [value]="0">Todos</mat-option>
+                      <mat-option [value]="1">Activos</mat-option>
+                    </mat-select>
+                    <mat-error></mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-4">
+                  <button
+                    [disabled]="!reportsForm.get('periodID')?.value"
+                    class="download-button"
+                    mat-raised-button
+                    (click)="getCalendarEventReport()">
+                    Descargar Excel
+                    <mat-icon class="green-icon">assignment</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</mat-dialog-content>

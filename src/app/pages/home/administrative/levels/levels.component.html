@@ -1,0 +1,98 @@
+<div class="row animated fadeIn fast">
+    <div class="col-md-12">
+        <div class="card" style="margin-bottom: -10px;">
+            <div class="card-body">
+                <form [formGroup]="myForm"
+                    autocomplete="off"
+                    (submit)="charging()">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Periodo Académico</mat-label>
+                                <input formControlName="cycleName" type="text" matInput>
+                                <mat-error *ngIf="isValidField('cycleName')">{{getFielError('cycleName')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-4">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Rango de fecha</mat-label>
+                                <mat-date-range-input
+                                    [rangePicker]="campaignOnePicker">
+                                    <input matStartDate placeholder="Start date" formControlName="startDate">
+                                    <input matEndDate placeholder="End date" formControlName="endDate">
+                                </mat-date-range-input>
+                                <mat-hint>dd/mm/aaaa – dd/mm/aaaa</mat-hint>
+                                <mat-datepicker-toggle matIconSuffix [for]="campaignOnePicker"></mat-datepicker-toggle>
+                                <mat-date-range-picker #campaignOnePicker></mat-date-range-picker>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Nombre del nivel</mat-label>
+                                <input formControlName="levelName" type="text" matInput>
+                                <mat-error *ngIf="isValidField('levelName')">{{getFielError('levelName')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-4">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Horas total del semestre</mat-label>
+                                <input formControlName="teachingContact" type="number" matInput>
+                                <mat-error *ngIf="isValidField('teachingContact')">{{getFielError('teachingContact')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="styleButton" mat-raised-button color="accent">
+                                <i class="fa fa-plus-circle"></i>
+                                &nbsp;
+                                <span>Agregar Periodo</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <form [formGroup]="levelsForm"
+                        autocomplete="off">
+                        <div *ngFor="let item of dynamicArr.controls; let i = index">
+                            <div formArrayName="levels">
+                                <div class="row" [formGroupName]="i">
+                                    <div class="col-md-4">
+                                        <mat-form-field class="width" appearance="outline">
+                                            <mat-label>Nombre del nivel</mat-label>
+                                            <input formControlName="levelName" type="text" matInput>
+                                            <mat-error *ngIf="isValidFieldInArray(dynamicArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <mat-form-field class="width" appearance="outline">
+                                            <mat-label>Horas total del semestre</mat-label>
+                                            <input formControlName="teachingContact" type="number" matInput>
+                                            <mat-error *ngIf="isValidFieldInArray(dynamicArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button type="button" (click)="deleteDynamic(i)" mat-raised-button color="warn">
+                                            <i class="fa fa-trash-o"></i>
+                                            &nbsp;
+                                            <span>Eliminar</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </form>
+
+                <button *ngIf="dynamicArr.length > 0" class="styleButton" (click)="saveLevels()" mat-raised-button color="primary">
+                    <i class="fa fa-floppy-o"></i>
+                    Guardar Nivel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

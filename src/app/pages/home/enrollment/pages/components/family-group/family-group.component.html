@@ -1,0 +1,107 @@
+<div class="row animated fadeIn fast" *ngIf="cargando">
+    <div class="col-md-12">
+        <div class="alert alert-info text-center">
+            <h4 class="alert-heading">Cargando</h4>
+            <i class="fa fa-spin fa-refresh fa-3x"></i>
+            <p class="mb-0">Por favor esperar...</p>
+        </div>
+    </div>
+</div>
+<div class=" animated fadeIn fast" *ngIf="!cargando">
+    <form [formGroup]="groupForm"
+            autocomplete="off"
+            (submit)="saveData()">
+        <div class="row mt-1">
+            <div class="col-md-4">
+                <mat-form-field class="width" appearance="outline">
+                    <mat-label>Nombres Padre</mat-label>
+                    <input formControlName="fatherName" type="text" matInput>
+                    <mat-error *ngIf="isValidField('fatherName')">{{getFielError('fatherName')}}</mat-error>
+                </mat-form-field>
+            </div>
+            <div class="col-md-4">
+                <mat-form-field class="width" appearance="outline">
+                    <mat-label>Profesión/Ocupación</mat-label>
+                    <mat-select formControlName="professionF">
+                        <mat-option>--</mat-option>
+                        <mat-option *ngFor="let item of professionList" [value]="item.professionID">{{item.professionName}}</mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="isValidField('professionF')">{{getFielError('professionF')}}</mat-error>
+                </mat-form-field>
+            </div>
+            <div class="col-md-4">
+                <mat-form-field class="width" appearance="outline">
+                    <mat-label>Instrucción</mat-label>
+                    <mat-select formControlName="instructionF">
+                        <mat-option>--</mat-option>
+                        <mat-option *ngFor="let item of instructionList" [value]="item.academicInstructionID">{{item.academicInstructionName}}</mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="isValidField('instructionF')">{{getFielError('instructionF')}}</mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <mat-form-field class="width" appearance="outline">
+                    <mat-label>Nombres Madre</mat-label>
+                    <input formControlName="motherName" type="text" matInput>
+                    <mat-error *ngIf="isValidField('motherName')">{{getFielError('motherName')}}</mat-error>
+                </mat-form-field>
+            </div>
+            <div class="col-md-4">
+                <mat-form-field class="width" appearance="outline">
+                    <mat-label>Profesión/Ocupación</mat-label>
+                    <mat-select formControlName="professionM">
+                        <mat-option>--</mat-option>
+                        <mat-option *ngFor="let item of professionList" [value]="item.professionID">{{item.professionName}}</mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="isValidField('professionM')">{{getFielError('professionM')}}</mat-error>
+                </mat-form-field>
+            </div>
+            <div class="col-md-4">
+                <mat-form-field class="width" appearance="outline">
+                    <mat-label>Instrucción</mat-label>
+                    <mat-select formControlName="instructionM">
+                        <mat-option>--</mat-option>
+                        <mat-option *ngFor="let item of instructionList" [value]="item.academicInstructionID">{{item.academicInstructionName}}</mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="isValidField('instructionM')">{{getFielError('instructionM')}}</mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <mat-form-field class="width" appearance="outline">
+                    <mat-label>Cantidad de Hijos</mat-label>
+                    <input formControlName="numberChildren" type="number" matInput>
+                    <mat-error *ngIf="isValidField('numberChildren')">{{getFielError('numberChildren')}}</mat-error>
+                </mat-form-field>
+            </div>
+            <div class="col-md-4">
+                <mat-form-field class="width" appearance="outline">
+                    <mat-label>Hombres</mat-label>
+                    <input formControlName="men" type="number" matInput>
+                    <mat-error *ngIf="isValidField('men')">{{getFielError('men')}}</mat-error>
+                </mat-form-field>
+            </div>
+            <div class="col-md-4">
+                <mat-form-field class="width" appearance="outline">
+                    <mat-label>Mujeres</mat-label>
+                    <input formControlName="woman" type="number" matInput>
+                    <mat-error *ngIf="isValidField('woman')">{{getFielError('woman')}}</mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4"></div>
+            <div class="col-md-4"></div>
+            <div class="col-md-4" *ngIf="!valid">
+                <button mat-button  matStepperNext type="submit" class="styleButton">
+                    <i class="fa fa-save"></i>
+                    &nbsp;
+                    Guardar
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

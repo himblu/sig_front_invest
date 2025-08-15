@@ -1,0 +1,10 @@
+<mat-form-field class="width" appearance="outline">
+    <mat-label>{{name}}</mat-label>
+    <input type="text" matInput [formControl]="nameCampusFormControl" [errorStateMatcher]="matcher">
+    <mat-error *ngIf="nameCampusFormControl.hasError('pattern') && !nameCampusFormControl.hasError('required')">
+        Solo Letras y Números
+    </mat-error>
+    <mat-error *ngIf="nameCampusFormControl.hasError('required')">
+        {{field}} es <strong>requerido</strong>
+    </mat-error>
+</mat-form-field>

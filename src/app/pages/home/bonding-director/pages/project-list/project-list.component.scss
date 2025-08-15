@@ -1,0 +1,7 @@
+.single-line {
+	max-width: 300px;
+	min-width: 25px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}

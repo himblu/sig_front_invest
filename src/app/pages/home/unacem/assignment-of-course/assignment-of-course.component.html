@@ -1,0 +1,138 @@
+<div class="animated fadeIn fast">
+	<div class="form-row">
+		<div class="col-12">
+			<div class="card">
+				<div class="card-body p-1">
+					<div class="form-row">
+
+						<div class="col-12" >
+							<div class="card">
+								<div class="card-body">
+									<div class="form-row">
+										<div class="col-6 mb-2">
+											<!-- <button class="btn btn-sm btn-light mr-2" (click)="toggleFilters()">
+												<i class="fa mr-1 text-primary-color" [ngClass]="{'fa-chevron-right': !body.show, 'fa-chevron-left': body.show}"></i>Filtros
+											</button> -->
+											{{assignments.length}} registros
+										</div>
+										<div class="col-6 mb-2 text-right">
+											<button class="btn btn-sm bg-primary-color" (click)="toggleAssignment()">
+												<i class="fa fa-plus mr-1"></i>Nueva Asignación de Cursos
+											</button>
+										</div>
+										<!-- <div class="col-12 text-center text-secondary" *ngIf="!assignments.length">
+											<i class="fa fa-times fa-3x"></i><br>
+											No se encontraron registros.
+										</div> -->
+										<div class="col-12">
+											<ul class="list-group">
+												<li class="list-group-item p-1">
+													<div class="form-row">
+														<div class="col-4">
+															<!-- <button class="btn btn-sm btn-light mr-2">
+																<i class="fa fa-square-o mr-1"></i>Seleccionar
+															</button> -->
+															<button class="btn btn-sm bg-primary-color" [disabled]="!filter.startDate || !filter.endDate" (click)="getReport()">
+																<i class="fa fa-download mr-1"></i>
+																Descargar
+															</button>
+														</div>
+														<div class="col-3">
+															<input type="text" name="byText" placeholder="BUSCAR POR TEXTO" [(ngModel)]="byText" class="form-control form-control-sm text-uppercase text-center"
+                              (input)="getAssignmentsWithFilterAndPagination();">
+														</div>
+														<div class="col-5 text-right">
+															<div class="form-row">
+																<div class="col-4">
+																	<input type="date" name="startDate" [(ngModel)]="filter.startDate" id="" class="form-control form-control-sm">
+																</div>
+																<div class="col-4">
+																	<input type="date" name="endDate" (change)="getAssignmentsWithFilterAndPagination();" [min]="filter.startDate" [disabled]="!filter.startDate" [(ngModel)]="filter.endDate" id="" class="form-control form-control-sm">
+																</div>
+																<div class="col-4">
+																	<select name="statusID" (change)="getAssignmentsWithFilterAndPagination();" [(ngModel)]="filter.state" class="form-control form-control-sm">
+																		<option [ngValue]="0">INACTIVO</option>
+																		<option [ngValue]="1">ACTIVO</option>
+																	</select>
+																</div>
+															</div>
+														</div>
+													</div>
+												</li>
+												<li class="list-group-item bg-primary-color p-1">
+													<div class="form-row">
+														<div class="col-5">
+															Nombre del Curso
+														</div>
+														<div class="col-2">
+															Estado
+														</div>
+														<div class="col-1 text-center">
+															# Part.
+														</div>
+														<div class="col-1 text-right">
+															Inicio
+														</div>
+														<div class="col-1 text-right">
+															Fin
+														</div>
+														<div class="col-2 text-right">
+															Acciones
+														</div>
+													</div>
+												</li>
+												<li class="list-group-item p-1 font-sm" *ngFor="let i of assignments | filter:byText">
+													<div class="form-row">
+														<div class="col-5">
+															<!-- <button class="btn btn-sm btn-light mr-1">
+																<i class="fa fa-square-o"></i>
+															</button> -->
+															{{i.courseName | uppercase}}
+														</div>
+														<div class="col-2">
+															{{i.statusID === 1 ? 'Activo' : 'Inactivo' | uppercase}}
+														</div>
+														<div class="col-1 text-center">
+															<i class="fa fa-users mr-1"></i>{{i.enroll}}
+														</div>
+														<div class="col-1 text-right pt-1">
+															<small>
+																<i class="fa fa-calendar mr-1"></i>{{i.startDate | date: 'dd-MM-yyyy'}}
+															</small>
+														</div>
+														<div class="col-1 text-right pt-1">
+															<small>
+																<i class="fa fa-calendar mr-1"></i>{{i.endDate | date: 'dd-MM-yyyy'}}
+															</small>
+														</div>
+														<div class="col-2 text-right">
+															<button class="btn btn-light btn-sm text-primary-color rounded-circle mr-2" [disabled]="i.flgCanEdit===0" (click)="toggleAssignment(i)">
+																<i class="fa fa-edit" style="font-size: medium;"></i>
+															</button>
+															<button class="btn btn-sm rounded-circle" [disabled]="i.flgCanDelete===0" [ngClass]="{'btn-danger': i.statusID === 1, 'bg-primary-color': i.statusID === 0 }" (click)="deleteAssignment(i)">
+																<i class="fa" [ngClass]="{'fa-trash': i.statusID === 1, 'fa-arrow-up': i.statusID === 0 }"></i>
+															</button>
+														</div>
+													</div>
+												</li>
+											</ul>
+										</div>
+                    <div class="col-12" style="text-align: right;">
+                      <mat-paginator
+                        #paginator
+                        [length]="length"
+                        [pageSize]="pageSize"
+                        [pageSizeOptions]="pageSizeOptions"
+                        (page)="pageEvent = changePage($event)">
+                      </mat-paginator>
+                    </div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

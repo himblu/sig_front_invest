@@ -1,0 +1,84 @@
+
+<div style="display: flex; justify-content: end; align-items: center; background: transparent;" class="p-2">
+  <mat-icon style="cursor: pointer; color: red;" [matDialogClose]="false" class="red-icon" matRipple>close</mat-icon>
+</div>
+
+<mat-dialog-content>
+  <div *ngIf="isLoading; else form">
+    <spinner-loader></spinner-loader>
+  </div>
+
+  <ng-template #form>
+    <div class="row animated fadeIn fast">
+      <div class="col-md-12">
+        <p>Disposición administrativa</p>
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-12">
+                <h4 style="color: #004899;">NOMBRE: <label style="color: black;">{{colaborator?.fullName}}</label></h4>
+              </div>
+              <div class="col-10">
+                <h4 style="color: #004899;">NRO IDENTIFICACIÓN: <label style="color: black;">{{colaborator?.PersonDocumentNumber}}</label></h4>
+              </div>
+              <div class="col-2">
+                <a style="color: #004899; font-size: 20px; cursor: pointer;"
+                  *ngIf="!isAddingCharges"
+                  (click)="isAddingCharges = !isAddingCharges"
+                  matTooltip="Agregar cargos"
+                  matTooltipClass="blue-tooltip">
+                  <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                </a>
+                <a style="color: #004899; font-size: 20px; cursor: pointer;"
+                  *ngIf="isAddingCharges"
+                  (click)="isAddingCharges = !isAddingCharges"
+                  matTooltip="Listado de cargos"
+                  matTooltipClass="blue-tooltip">
+                  <i class="fa fa-list" aria-hidden="true"></i>
+                </a>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12" style="max-height: 200px; overflow-y: auto;" *ngIf="!isAddingCharges">
+                <table class="table">
+                  <thead style="background-color: #004899; color: white;">
+                    <tr>
+                      <th colspan="3" style="text-align: center;">Lista de cargos</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of colaboratorPosition; let i=index;">
+                      <td>{{i+1}}</td>
+                      <td>{{item.positionName}}</td>
+                      <td>{{item.careerName}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="col-md-12" *ngIf="isAddingCharges" [formGroup]="chargesForm">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Cargos</mat-label>
+                  <mat-select formControlName="charges" multiple>
+                    <mat-option *ngFor="let item of positionContracts" [value]="item.positionID">{{item.positionName}}</mat-option>
+                  </mat-select>
+                  <mat-error>Seleccione al menos una asignatura</mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-8"></div>
+                <div class="col-2">
+                  <button type="submit" mat-raised-button class="styleButton_sml" style="max-width: 100px;" *ngIf="isAddingCharges" (click)="onSubmit();">
+                    Guardar
+                  </button>
+                </div>
+                <div class="col-2">
+                  <button type="button" mat-raised-button class="styleButton_gray" style="max-width: 100px;" [matDialogClose]="false" matRipple>Cerrar</button>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</mat-dialog-content>

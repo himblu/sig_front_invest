@@ -1,0 +1,127 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="!charging">
+  <div class="table-responsive">S
+    <table id="demo-foo-addrow"
+           class="table m-t-0 table-hover no-wrap contact-list footable-loaded footable"
+           data-page-size="5">
+      <thead>
+        <tr>
+          <td colspan="2"></td>
+          <td class="head" colspan="6"><small>{{gradesList[0].evaluationName}}</small></td>
+          <td class="head" colspan="6"><small>{{gradesList[1].evaluationName}}</small></td>
+        </tr>
+        <tr style="background-color: #004899; color: white;">
+          <th><small>Nro. Doc</small></th>
+          <th><small>Estudiante</small></th>
+
+          <th><small>{{gradesList[0].activities[0].abbr}}</small></th>
+          <th><small>{{gradesList[0].activities[1].abbr}}</small></th>
+          <th><small>{{gradesList[0].activities[2].abbr}}</small></th>
+          <th><small>{{gradesList[0].activities[3].abbr}}</small></th>
+          <th><small>{{gradesList[0].activities[4].abbr}}</small></th>
+          <th><small>Prom</small></th>
+
+          <th><small>{{gradesList[1].activities[0].abbr}}</small></th>
+          <th><small>{{gradesList[1].activities[1].abbr}}</small></th>
+          <th><small>{{gradesList[1].activities[2].abbr}}</small></th>
+          <th><small>{{gradesList[1].activities[3].abbr}}</small></th>
+          <th><small>{{gradesList[1].activities[4].abbr}}</small></th>
+          <th><small>Prom</small></th>
+
+          <th><small>Logros</small></th>
+          <th><small>Suma</small></th>
+          <th><small>Recup</small></th>
+          <th><small>Grac</small></th>
+          <th><small>Prom. F</small></th>
+          <th><small>%P1</small></th>
+          <th><small>%P2</small></th>
+          <th><small>Ast</small></th>
+          <th><small>Estado</small></th>
+        </tr>
+      </thead>
+      <tbody style="color: black;" *ngIf="studentsList">
+      <tr *ngFor="let item of studentsList" [ngStyle]="item.flgPayment === 1 && {'background-color': item.backgroundColor, 'color': item.fontColor}">
+        <td><small>{{item.documentIdentity}}</small></td>
+        <td><small>{{item.student}}</small></td>
+        <td>{{item.n1}}</td>
+        <td>{{item.n2}}</td>
+        <td>{{item.n3}}</td>
+        <td>{{item.n4}}</td>
+        <td>{{item.n5}}</td>
+        <td>{{item.avg1}}</td>
+        <td>{{item.n6}}</td>
+        <td>{{item.n7}}</td>
+        <td>{{item.n8}}</td>
+        <td>{{item.n9}}</td>
+        <td>{{item.n10}}</td>
+        <td>{{item.avg2}}</td>
+        <td>{{item.exL}}</td>
+        <td>{{item.sum}}</td>
+        <td>
+          <ng-container *ngIf="item.flgSup">
+            <div class="row" style="width: 70px;" *ngIf="item.flgPayment === 0">
+              <input #grade matInput type="number" [min]="0.1" [max]="10" style="width: 50px;">&nbsp;
+              <a style="cursor: pointer; color: green" matTooltipPosition="above" matTooltip="Guardar" (click)="putNotes(item, +grade.value, 'ES')">
+                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+              </a>
+              <mat-error *ngIf="+grade.value < 0.1 || +grade.value > 10">No válido</mat-error>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="!item.flgSup">{{item.newGradeSup}}</ng-container>
+        </td>
+        <td>
+          <ng-container *ngIf="item.flgGra">
+            <div class="row" style="width: 70px;" *ngIf="item.flgPayment === 0">
+              <input #grade matInput type="number" [min]="0.1" [max]="10" style="width: 50px;">&nbsp;
+              <a style="cursor: pointer; color: green" matTooltipPosition="above" matTooltip="Guardar" (click)="putNotes(item, +grade.value, 'EG')">
+                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+              </a>
+              <mat-error *ngIf="+grade.value < 0.1 || +grade.value > 10">No válido</mat-error>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="!item.flgGra">{{item.newGradeGra}}</ng-container>
+        </td>
+        <td>{{item.avgTot}}</td>
+        <td>{{item.percentageP1}}</td>
+        <td>{{item.percentageP2}}</td>
+        <td>{{item.attendance}}%</td>
+        <td>
+          <span
+            *ngIf="item.eq === 'R'"
+            matTooltipPosition="above"
+            matTooltip="Reprobado, no ha alcanzado el promedio mayor o igual a 7."
+            class="badge"
+            style="background-color: red; cursor: pointer;">
+            {{item.eq}}
+          </span>
+          <span
+            *ngIf="item.eq === 'A'"
+            matTooltipPosition="above"
+            matTooltip="Aprobado con un promedio mayor a 7."
+            class="badge"
+            style="background-color: green; cursor: pointer;">
+            {{item.eq}}
+          </span>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <mat-paginator
+    #paginator
+    [length]="length"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="pageSizeOptions"
+    (page)="pageEvent = changePage($event)">
+  </mat-paginator>
+</div>
+

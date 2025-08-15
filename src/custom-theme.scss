@@ -1,0 +1,148 @@
+
+// Custom Theming for Angular Material
+// For more information: https://material.angular.io/guide/theming
+@use '../node_modules/@angular/material/index' as mat;
+// Plus imports for other components in your app.
+
+// Include the common styles for Angular Material. We include this here so that you only
+// have to load a single css file for Angular Material in your app.
+// Be sure that you only ever include this mixin once!
+@include mat.core();
+
+// Define the palettes for your theme using the Material Design palettes available in palette.scss
+// (imported above). For each palette, you can optionally specify a default, lighter, and darker
+// hue. Available color palettes: https://material.io/design/color/
+//$dark-primary-text: rgba(black, 0.87);
+//$light-primary-text: white;
+//$blue-palette: (
+//  50: #e3f3fd,
+//  100: #bcfffb,
+//  200: #91ccf9,
+//  300: #66b8f6,
+//  400: #44a8f5,
+//  500: #084BA2,
+//  600: #1e8ce6,
+//  700: #187ad3,
+//  800: #1369c1,
+//  900: #084BA2,
+//  A100: #80d8ff,
+//  A200: #40c4ff,
+//  A400: #00b0ff,
+//  A700: #0091ea,
+//  contrast: (
+//    50: $dark-primary-text, // Puedes ajustar el color de texto claro según tus necesidades
+//    100: $dark-primary-text,
+//    200: $dark-primary-text,
+//    300: $dark-primary-text,
+//    400: $dark-primary-text,
+//    500: $light-primary-text,
+//    600: $light-primary-text,
+//    700: $light-primary-text,
+//    800: $light-primary-text,
+//    900: $light-primary-text,
+//    A100: $light-primary-text,
+//    A200: $light-primary-text,
+//    A400: $light-primary-text,
+//    A700: $light-primary-text,
+//  )
+//);
+//$green-palette: (
+//  50: #f2f9e5,
+//  100: #ebf7cc,
+//  200: #d6ef99,
+//  300: #c2e566,
+//  400: #addc33,
+//  500: #94c11e,
+//  600: #8bbf09,
+//  700: #7ab408,
+//  800: #6aa207,
+//  900: #5d8e05,
+//  A100: #d8ff80,
+//  A200: #c4ff40,
+//  A400: #b0ff00,
+//  A700: #91ea00,
+//  contrast: (
+//    50: $dark-primary-text,
+//    100: $dark-primary-text,
+//    200: $dark-primary-text,
+//    300: $dark-primary-text,
+//    400: $dark-primary-text,
+//    500: $light-primary-text,
+//    600: $light-primary-text,
+//    700: $light-primary-text,
+//    800: $light-primary-text,
+//    900: $light-primary-text,
+//    A100: $dark-primary-text,
+//    A200: $light-primary-text,
+//    A400: $light-primary-text,
+//    A700: $light-primary-text,
+//  )
+//);
+//
+
+//$font-size,
+//$line-height: $font-size,
+//$font-weight: 400,
+//$font-family: null,
+//$letter-spacing:
+
+$sig-typography: mat.define-typography-config(
+  $font-family: 'Monserrat',
+  $headline-1: mat.define-typography-level(24px, 32px, 300, null, -0.05em),
+  $headline-2: mat.define-typography-level(20px, 32px, 400, null, 0.125em),
+  $headline-3: mat.define-typography-level(16px, 28px, 400, null, 0.009375em),
+  $headline-4: mat.define-typography-level(16px, 24px, 400, null, 0.03125em),
+  $headline-5: mat.define-typography-level(20px, 32px, 400, null, 0.125em),
+  $headline-6: mat.define-typography-level(20px, 32px, 400, null, 0.125em),
+  $subtitle-1: mat.define-typography-level(16px, 24px, 400, null, 0.03125em),
+  $subtitle-2: mat.define-typography-level(20px, 32px, 400, null, 0.125em),
+  $body-1: mat.define-typography-level(16px, 28px, 400, null, 0.009375em),
+  $body-2: mat.define-typography-level(16px, 28px, 400, null, 0.009375em),
+  $caption: mat.define-typography-level(16px, 28px, 400, null, 0.009375em),
+  $button: mat.define-typography-level(16px, 28px, 400, null, 0.009375em),
+  $overline: mat.define-typography-level(16px, 28px, 400, null, 0.009375em),
+);
+
+$sig-primary: mat.define-palette(mat.$light-blue-palette);
+//$sig-primary: mat.define-palette($blue-palette);
+$sig-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
+//$sig-accent: mat.define-palette($green-palette, A200, A100, A400);
+$sig-warn: mat.define-palette(mat.$red-palette);
+//$sig-warn: mat.define-palette(mat.$red-palette);
+
+// Create the theme object. A theme consists of configurations for individual
+// theming systems such as "color" or "typography".
+$sig-theme: mat.define-light-theme((
+  color: (
+    primary: $sig-primary,
+    accent: $sig-accent,
+    warn: $sig-warn,
+  ),
+  density: -3
+));
+
+@include mat.core-theme($sig-theme);
+
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+@include mat.all-component-themes($sig-theme);
+@include mat.private-form-field-density(-5);
+@include mat.select-density(-5);
+@include mat.input-density(-5);
+@include mat.icon-density(-5);
+@include mat.icon-button-density(-5);
+@include mat.button-toggle-density(-5);
+@include mat.paginator-density(-5);
+@include mat.button-density(-1);
+@include mat.list-density(-5);
+@include mat.chips-density(-5);
+@include mat.fab-density(-5);
+
+.mat-mdc-form-field-icon-prefix>.mat-icon, .mat-mdc-form-field-icon-suffix>.mat-icon {
+  padding: 6px !important;
+}
+
+.mat-mdc-text-field-wrapper {
+ min-height: 36px !important;
+}

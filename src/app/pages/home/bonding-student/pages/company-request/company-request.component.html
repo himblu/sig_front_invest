@@ -1,0 +1,269 @@
+<div class="row animated fadeIn fast" *ngIf="loading">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<div class="row animated fadeIn fast" *ngIf="!loading">
+  <div class="col-md-12">
+    <h2 style="text-align: center; color: #004899;">SOLICITUD DE EMPRESAS</h2>
+    <div class="card" style="border-radius: 15px;">
+      <div class="card-body">
+        <section>
+          <div class="row pl-2 pr-2">
+            <div class="col-2" style="text-align: right;">
+              <h2>Indicaciones: </h2>
+            </div>
+            <div class="col-1">
+              <a
+                class="download-button"
+                mat-raised-button
+                matTooltipPosition="above"
+                matTooltip="Descargar PDF"
+                href="../../../../../assets/Doc/REQUISITOS CALIFICACIÓN_EMPRESA-PP.pdf"
+                target="_blank">
+                PDF
+                <mat-icon class="red-icon">picture_as_pdf</mat-icon>
+              </a>
+            </div>
+            <div class="col-10"></div>
+            <div class="col-4" [formGroup]="searchForm">
+              <mat-form-field appearance="outline">
+                <mat-label>Buscar por nombre de empresa</mat-label>
+                <input matInput autocomplete="off" formControlName="search" (input)="getApprovalRequestBus()">
+                <mat-icon matSuffix>search</mat-icon>
+              </mat-form-field>
+            </div>
+            <div class="col-2">
+              <a
+                style="background-color: rgb(84, 158, 77);
+                color: white;"
+                mat-raised-button
+                matTooltipPosition="above"
+                matTooltip="Descargar"
+                href="https://tecnologicoitcaeduec-my.sharepoint.com/personal/encuba_itca_edu_ec/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fencuba%5Fitca%5Fedu%5Fec%2FDocuments%2FCONTRATO%20SISTEMA%20INFORM%C3%81TICO%20DE%20GESTI%C3%93N%20%28SIG%29%20%2D%20ENCUBA%2FMANUALES%20DE%20USUARIO%20%28SIG%29%2FVINCULACI%C3%93N%2FMU%5FPROCESO%5FSOLICITUD%20DE%20EMPRESA%5FROL%20ESTUDIANTE%2Epdf&parent=%2Fpersonal%2Fencuba%5Fitca%5Fedu%5Fec%2FDocuments%2FCONTRATO%20SISTEMA%20INFORM%C3%81TICO%20DE%20GESTI%C3%93N%20%28SIG%29%20%2D%20ENCUBA%2FMANUALES%20DE%20USUARIO%20%28SIG%29%2FVINCULACI%C3%93N"
+                target="_blank">
+                <small>Manual Usuario</small>
+              </a>
+            </div>
+            <div class="col-4"></div>
+            <div class="col-2" style="text-align: right;">
+              <button type="button" mat-raised-button class="styleButton_sml" style="max-width: 100px;" data-toggle="modal" data-target="#projectModal">
+                Solicitar
+              </button>
+            </div>
+          </div>
+        </section>
+        <div class="table-responsive">
+          <div id="add-contact" class="modal fade in" tabindex="-1" role="dialog"
+               aria-labelledby="myModalLabel" aria-hidden="true">
+          </div>
+          <table id="demo-foo-addrow"
+                 class="table m-t-0 table-hover no-wrap contact-list footable-loaded footable"
+                 data-page-size="5">
+            <thead style="background-color: #004899; color: white;">
+            <tr>
+              <th class="footable-sortable">
+                Ruc
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                EMPRESA
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                TIPO DE EMPRESA
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                JUSTIFICACIÓN
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                ESTADO
+                <span class="footable-sort-indicator"></span>
+              </th>
+            </tr>
+            </thead>
+            <tbody style="color: black;">
+            <tr *ngFor="let item of subjectsList let i=index">
+              <td>{{item.ruc}}</td>
+              <td>{{item.bussinesName}}</td>
+              <td>{{item.typeBusiness}}</td>
+              <td>{{item.justification}}</td>
+              <td>{{item.stateApproval}}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <mat-paginator
+          #paginator
+          [length]="length"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions"
+          (page)="pageEvent = getApprovalRequestPaginator($event)">
+        </mat-paginator>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="projectModal" tabindex="-1" aria-labelledby="projectModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <ng-container>
+        <div class="modal-header" style="height: 40px;">
+          <div class="col-md-4">
+            <h3 class="modal-title" id="projectModalLabel"><br>Solicitar empresa</h3>
+          </div>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" #modalClose>
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="col-md-12">
+            <div class="card">
+              <div class="card-body">
+                <form [formGroup]="agreementForm"
+                      (submit)="onSubmit()">
+                      <div class="row">
+                        <div class="col-4">
+                          <mat-form-field appearance="outline">
+                            <mat-label>Ruc</mat-label>
+                            <input matInput
+                            oninput="this.value=this.value.replace(/[^\d]/,'')"
+                            formControlName="p_ruc"
+                            [minlength]="13"
+                            [maxlength]="13"
+                            [min]="0"
+                            #input
+                            (blur)="getApprovalRequestRucValidation(+input.value);">
+                            <mat-error>Campo requerido</mat-error>
+                          </mat-form-field>
+                        </div>
+                        <div class="col-4">
+                          <mat-form-field appearance="outline">
+                            <mat-label>Tipo de empresa</mat-label>
+                            <mat-select formControlName="p_typeBusiness">
+                              <mat-option *ngFor="let item of approvalBusinessType" [value]="item.typeBusinessDesc">{{item.typeBusinessDesc}}</mat-option>
+                            </mat-select>
+                            <mat-error>Campo requerido</mat-error>
+                          </mat-form-field>
+                        </div>
+                        <div class="col-4">
+                          <mat-form-field appearance="outline">
+                            <mat-label>Razón social</mat-label>
+                            <input matInput autocomplete="off" formControlName="p_bussinesName">
+                            <mat-error>Campo requerido</mat-error>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-4">
+                          <h4>REGISTRO DE DOCUMENTOS:</h4>
+                        </div>
+                        <div class="col-4">
+                          <a href="https://encubaec-my.sharepoint.com/:w:/g/personal/presidencia_encuba_ec/EY0uRjIDaAhKpl9W8GO5jREB53Mm5v2MSHnfd6pV9yscsA?e=X6aV16"
+                            target="_blank"
+                            class="download-button"
+                            mat-raised-button
+                            matTooltipPosition="above"
+                            matTooltip="Descargar PDF">
+                            PDF
+                            <mat-icon class="red-icon">picture_as_pdf</mat-icon>
+                          </a>
+                        </div>
+                        <div class="col-2"></div>
+                      </div>
+                      <div class="row">
+                        <div class="col-4">
+                          <h4>RUC*:</h4>
+                        </div>
+                        <div class="col-8">
+                          <input type="file"
+                          formControlName="p_rucBusinessFile"
+                          autocomplete="off"
+                          accept="application/pdf"
+                          #rucBusinessFile
+                          (change)="onChangeInput(rucBusinessFile.files, 0, rucBusinessFile);">
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-4">
+                          <h4>CÉDULA*:</h4>
+                        </div>
+                        <div class="col-8">
+                          <input type="file"
+                          formControlName="p_cedulaBusinessFile"
+                          autocomplete="off"
+                          accept="application/pdf"
+                          #cedulaBusinessFile
+                          (change)="onChangeInput(cedulaBusinessFile.files, 1, cedulaBusinessFile);">
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-4">
+                          <h4>PLANILLA SEGURO SOCIAL:</h4>
+                        </div>
+                        <div class="col-8">
+                          <input type="file"
+                          formControlName="p_sheetBusineesFile"
+                          autocomplete="off"
+                          accept="application/pdf"
+                          #sheetBusineesFile
+                          (change)="onChangeInput(sheetBusineesFile.files, 2, sheetBusineesFile);">
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-4">
+                          <h4>ARCHIVO FIRMADO*:</h4>
+                        </div>
+                        <div class="col-8">
+                          <input type="file"
+                          formControlName="p_signedFile"
+                          autocomplete="off"
+                          accept="application/pdf"
+                          #signedFile
+                          (change)="onChangeInput(signedFile.files, 3, signedFile);">
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-4">
+                          <h4>NOMBRAMIENTO:</h4>
+                        </div>
+                        <div class="col-8">
+                          <input type="file"
+                          formControlName="p_appointmentFile"
+                          autocomplete="off"
+                          accept="application/pdf"
+                          #appointmentFile
+                          (change)="onChangeInput(appointmentFile.files, 4, appointmentFile);">
+                        </div>
+                      </div>
+                      <div class="row" *ngIf="loadingModal">
+                        <div class="col-12">
+                          <spinner-loader></spinner-loader>
+                        </div>
+                      </div>
+                      <div class="row" *ngIf="!loadingModal">
+                        <div class="col-9"></div>
+                        <div class="col-2" style="text-align: right;">
+                          <button type="submit" mat-raised-button class="styleButton_sml" style="max-width: 100px;">
+                            Guardar
+                          </button>
+                        </div>
+                      </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>

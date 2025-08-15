@@ -1,0 +1,33 @@
+:host {
+	display: block;
+	max-height: calc(100vh - 120px); // Ajusta este valor según necesites
+	overflow: hidden;
+}
+
+.modal-content {
+	height: 100%;
+	padding: 20px;
+}
+
+.card {
+	margin-bottom: 0;
+}
+
+.row {
+	margin: 0;
+}
+
+label {
+	margin-bottom: 0.5rem;
+}
+.card {
+	margin-bottom: 0;
+	box-shadow: rgba(17, 17, 26, 0.5) 0px 8px 24px, rgba(17, 17, 26, 0.5) 0px 16px 56px, rgba(17, 17, 26, 0.5) 0px 24px 80px;
+	border: none;
+	background-color: white;
+}
+
+.card-header {
+	background-color: white;
+	border-bottom: none;
+}

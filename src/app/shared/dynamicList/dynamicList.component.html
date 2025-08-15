@@ -1,0 +1,49 @@
+<div class="d-flex ">
+  <mat-card-content class="w-100">
+    <div class="container" [formGroup]="form">
+      <div class="list-container">
+        <div class="list-panel">
+          <h3 class="panel-title">Evaluadores</h3>
+          <mat-form-field class="filter text-left">
+            <mat-label>Buscar</mat-label>
+            <input matInput [formControl]="filterAvailable">
+          </mat-form-field>
+          <mat-checkbox formControlName="allAvailableSelected" (change)="toggleSelectAllAvailable()">
+            Seleccionar todos
+          </mat-checkbox>
+          <mat-selection-list class="text-left" formControlName="selectedAvailable"
+                              (selectionChange)="checkSelectAllAvailable()">
+            <mat-list-option *ngFor="let evaluator of filteredAvailableEvaluators" [value]="evaluator">
+              <span> {{ evaluator?.label?.fullName }}</span>
+            </mat-list-option>
+          </mat-selection-list>
+        </div>
+        <div class="buttons">
+          <button class="btn bg-primary-color" (click)="moveToSelected()">>></button>
+          <button class="btn bg-primary-color" (click)="moveToAvailable()"><<</button>
+        </div>
+        <div class="list-panel">
+          <h3 class="panel-title">Evaluados</h3>
+          <mat-form-field class="filter text-left">
+            <mat-label>Buscar</mat-label>
+            <input matInput [formControl]="filterSelected">
+          </mat-form-field>
+          <mat-checkbox formControlName="allSelectedSelected" (change)="toggleSelectAllSelected()">
+            Seleccionar todos
+          </mat-checkbox>
+          <mat-selection-list class="text-left" formControlName="selectedSelected"
+                              (selectionChange)="checkSelectAllSelected()">
+            <mat-list-option *ngFor="let evaluated of filteredSelectedEvaluators" [value]="evaluated">
+              <span> {{ evaluated?.label?.fullName }}</span>
+            </mat-list-option>
+          </mat-selection-list>
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+
+  <button class="btn bg-primary-color h-25 m-2" (click)="create()">
+    <i class="fa fa-gear mr-1"></i>Añadir grupo
+  </button>
+
+</div>

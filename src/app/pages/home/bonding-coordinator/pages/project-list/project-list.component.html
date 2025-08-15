@@ -1,0 +1,175 @@
+<div class="row animated fadeIn fast" *ngIf="loading">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<div class="card" *ngIf="!loading">
+  <div class="card-body">
+    <form [formGroup]="filtersForm" autocomplete="off">
+      <div class="row pl-2 pr-2">
+        <div class="col-4" style="text-align: center;">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Periodo académico</mat-label>
+            <mat-select formControlName="periodID" placeholder="Seleccione un periodo" (selectionChange)="filtersForm.markAllAsTouched(); getSchools();">
+              <mat-option *ngFor="let period of periods" [value]="period.periodID">
+                {{period.periodName}}</mat-option>
+            </mat-select>
+            <mat-error>Seleccione un periodo</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-4" style="text-align: center;">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Escuela</mat-label>
+            <mat-select formControlName="schoolID" placeholder="Seleccione una escuela" (selectionChange)="getCareers($event.value)">
+              <mat-option *ngFor="let school of schools" [value]="school.schoolID">
+                {{school.schoolName}}</mat-option>
+            </mat-select>
+            <mat-error>Seleccione una escuela</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-4" style="text-align: center;">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Carrera</mat-label>
+            <mat-select formControlName="careerID" placeholder="Seleccione una carrera" (selectionChange)="getStudyPlan($event.value); getModalities($event.value);">
+              <mat-option *ngFor="let career of careers" [value]="career.careerID">
+                {{career.careerName}}</mat-option>
+            </mat-select>
+            <mat-error>Seleccione una carrera</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-4" style="text-align: center;">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Malla curricular</mat-label>
+            <mat-select formControlName="studyPlanID" placeholder="Seleccione una malla" (selectionChange)="filtersForm.get('modalityID').patchValue('');">
+              <mat-option *ngFor="let study of studyPlan" [value]="study.studyPlanID">
+                {{study.studyPlanDesc}}</mat-option>
+            </mat-select>
+            <mat-error>Seleccione una malla</mat-error>
+            <mat-error></mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-4" style="text-align: center;">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Modalidad</mat-label>
+            <mat-select formControlName="modalityID" placeholder="Seleccione una modalidad" (selectionChange)="getProjectPractices(); getCycles();">
+              <mat-option *ngFor="let modality of modalities" [value]="modality.modalityID">
+                {{modality.modalityName}}</mat-option>
+            </mat-select>
+            <mat-error>Seleccione una modalidad</mat-error>
+            <mat-error></mat-error>
+          </mat-form-field>
+        </div>
+        <!--<div class="col-4" style="text-align: center;">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Nivel</mat-label>
+            <mat-select formControlName="cycleID" placeholder="Seleccione un nivel" (selectionChange)="getProjectPractices();">
+              <mat-option [value]="0">Todos</mat-option>
+              <mat-option *ngFor="let item of cycleDetail" [value]="item.cycleID">
+                {{item.cycleName}}</mat-option>
+            </mat-select>
+            <mat-error>Seleccione una asignatura</mat-error>
+            <mat-error></mat-error>
+          </mat-form-field>
+        </div>-->
+      </div>
+    </form>
+  </div>
+</div>
+<br>
+<div class="row animated fadeIn fast" *ngIf="!loading">
+  <div class="col-md-12">
+    <div class="card" style="border-radius: 15px;">
+      <div class="card-body">
+        <section [formGroup]="filtersForm">
+          <div class="row pl-2 pr-2">
+            <div class="col-4">
+              <mat-form-field appearance="outline">
+                <mat-label>Buscar</mat-label>
+                <input matInput autocomplete="off" formControlName='search' (input)="getProjectPractices();">
+                <mat-icon matSuffix>search</mat-icon>
+              </mat-form-field>
+            </div>
+            <div class="col-4">
+              <mat-form-field appearance="outline">
+                <mat-label>Estado</mat-label>
+                <mat-select formControlName='state' (selectionChange)="getProjectPractices();">
+                  <mat-option [value]="0">Todos</mat-option>
+                  <mat-option *ngFor="let item of states" [value]="item.stateProjectID">{{item.stateDesc}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-2">
+              <a
+                style="background-color: rgb(84, 158, 77);
+                color: white;"
+                mat-raised-button
+                matTooltipPosition="above"
+                matTooltip="Descargar"
+                href="https://tecnologicoitcaeduec-my.sharepoint.com/personal/encuba_itca_edu_ec/_layouts/15/onedrive.aspx?ga=1&id=%2Fpersonal%2Fencuba%5Fitca%5Fedu%5Fec%2FDocuments%2FCONTRATO%20SISTEMA%20INFORM%C3%81TICO%20DE%20GESTI%C3%93N%20%28SIG%29%20%2D%20ENCUBA%2FMANUALES%20DE%20USUARIO%20%28SIG%29%2FVINCULACI%C3%93N%2F16%5FMU%5FPROCESO%20DE%20PROYECTOS%20ESPEC%C3%8DFICOS%2Epdf&parent=%2Fpersonal%2Fencuba%5Fitca%5Fedu%5Fec%2FDocuments%2FCONTRATO%20SISTEMA%20INFORM%C3%81TICO%20DE%20GESTI%C3%93N%20%28SIG%29%20%2D%20ENCUBA%2FMANUALES%20DE%20USUARIO%20%28SIG%29%2FVINCULACI%C3%93N"
+                target="_blank">
+                <small>Manual Usuario</small>
+              </a>
+            </div>
+          </div>
+        </section>
+        <div class="table-responsive">
+          <table class="table">
+            <thead style="background-color: #004899; color: white;">
+            <tr>
+              <th>Modalidad</th>
+              <th>Carrera</th>
+              <th>Nombre</th>
+              <th>Fecha inicio - fin</th>
+              <th style="text-align: center;">Acciones</th>
+            </tr>
+            </thead>
+            <tbody style="color: black;">
+              <tr *ngFor="let item of projectPractices">
+                <td>{{item.modalityName}}</td>
+                <td>{{item.careerName}}</td>
+                <td class="single-line"
+                  matTooltipPosition="above"
+                  matTooltip="{{item.nameProyect}}">
+                  {{item.nameProyect}}
+                </td>
+                <td>{{item.initdateEstimated | date: 'dd/MM/yyyy' :'UTC'}} - {{item.enddateEstimated | date: 'dd/MM/yyyy' :'UTC'}}</td>
+                <td style="text-align: center;">
+                  <a style="cursor: pointer;"
+                    matTooltipPosition="above"
+                    matTooltip="Continuar proceso"
+                    (click)="completeProject(item);">
+                    <i class="fa fa-file-text-o" aria-hidden="true" style="color: blue;"></i>
+                  </a>&nbsp;
+                  <a style="cursor: pointer;"
+                    matTooltipPosition="above"
+                    matTooltip="Descargar PDF"
+                    (click)="getProjectPracticesPdfContent(item);">
+                    <i style="color: red;" class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                  </a>&nbsp;
+                  <a style="cursor: pointer;"
+                    matTooltipPosition="above"
+                    matTooltip="Proyectos Específicos"
+                    (click)="microProjectsView(item);">
+                    <i style="color: blue;" class="fa fa-list" aria-hidden="true"></i>
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <mat-paginator
+          #paginator
+          [length]="length"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions"
+          (page)="pageEvent = getPaginator($event)">
+        </mat-paginator>
+      </div>
+    </div>
+  </div>
+</div>

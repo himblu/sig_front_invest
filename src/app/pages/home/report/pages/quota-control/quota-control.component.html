@@ -1,0 +1,358 @@
+<div class="animated fadeIn fast">
+  <div class="container-fluid">
+    <section [formGroup]="filtersForm">
+      <div class="row pr-2">
+        <div class="col-3">
+          <mat-form-field appearance="outline">
+            <mat-label>Periodo Académico</mat-label>
+            <mat-select
+              (selectionChange)="getQuotaControls()"
+              formControlName="period"
+              placeholder="Filtrar por Periodo Académico"
+            >
+              <mat-option [value]="0">Todos</mat-option>
+              <mat-option
+                *ngFor="let period of periods; trackBy: trackByPeriodId"
+                [value]="period.periodID"
+              >
+                {{ period.periodName }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-3">
+          <mat-form-field appearance="outline">
+            <mat-label>Cuotas pagadas</mat-label>
+            <mat-select
+              (selectionChange)="getQuotaControls()"
+              formControlName="quotaNumber"
+              placeholder="Filtrar por cuota pagada"
+            >
+              <mat-option [value]="0">Todos</mat-option>
+              <mat-option
+                *ngFor="
+                  let availableQuota of availableQuotas;
+                  trackBy: trackByAvailableQuota
+                "
+                [value]="availableQuota.quota"
+              >
+                {{ availableQuota.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col-5">
+          <mat-form-field appearance="outline">
+            <mat-label>Buscar por Estudiante, Nro de Documento...</mat-label>
+            <input matInput formControlName="search" autocomplete="off" />
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <div class="col-2 pb-2 d-flex">
+          <button
+            [disabled]="!filtersForm.get('period')?.value"
+            class="download-button"
+            mat-raised-button
+            data-toggle="modal"
+            data-target="#reportsModal"
+            matTooltipPosition="above"
+            matTooltip="Listado de Notas"
+            (click)="isGettingNotes = true; initReportsForm(null)"
+          >
+            Reporte de cuotas
+            <mat-icon class="blue-icon">assignment</mat-icon>
+          </button>
+        </div>
+
+        <div class="col-2 pb-2 d-flex">
+          <button
+            [disabled]="!filtersForm.get('period')?.value"
+            class="download-button"
+            mat-raised-button
+            matTooltipPosition="above"
+            matTooltip="Reporte financiero"
+            (click)="openDialog();">
+            Reporte financiero
+            <mat-icon class="blue-icon">assignment</mat-icon>
+          </button>
+        </div>
+
+        <div style="position: relative; width: 100%">
+          <spinner-loader
+            [absolute]="true"
+            *ngIf="loadingQuotaControl"
+          ></spinner-loader>
+          <mat-table
+            [dataSource]="dataSource"
+            matSort
+            (matSortChange)="getQuotaControls($event)"
+          >
+            <!-- document number -->
+            <ng-container matColumnDef="PersonDocumentNumber">
+              <mat-header-cell *matHeaderCellDef>Documento</mat-header-cell>
+              <mat-cell *matCellDef="let row; let i = index">
+                <small>{{ row.PersonDocumentNumber }}</small>
+              </mat-cell>
+            </ng-container>
+
+            <!-- student Name -->
+            <ng-container matColumnDef="PersonFullName">
+              <mat-header-cell *matHeaderCellDef>Estudiante</mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                <small>{{ row.PersonFullName }}</small>
+              </mat-cell>
+            </ng-container>
+
+            <!-- student phone -->
+            <ng-container matColumnDef="numberPhone">
+              <mat-header-cell *matHeaderCellDef>Teléfono</mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                <small>{{ row.numberPhone }}</small>
+              </mat-cell>
+            </ng-container>
+            <!-- student phone -->
+            <ng-container matColumnDef="careerName">
+              <mat-header-cell *matHeaderCellDef>Carrera</mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                <small>{{ row.careerName }}</small>
+              </mat-cell>
+            </ng-container>
+
+            <!-- paymentOption -->
+            <ng-container matColumnDef="paymentOptionDesc">
+              <mat-header-cell *matHeaderCellDef
+                >Opción de pago</mat-header-cell
+              >
+              <mat-cell *matCellDef="let row">
+                <small
+                  >{{ row.paymentOptionDesc }}:
+                  {{ row.maxQuotas }} cuota/s</small
+                >
+              </mat-cell>
+            </ng-container>
+
+            <!-- amount -->
+            <ng-container matColumnDef="totalAmount">
+              <mat-header-cell *matHeaderCellDef>Cantidad</mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                <small>{{ row.totalAmount }}</small>
+              </mat-cell>
+            </ng-container>
+
+            <!-- amount -->
+            <ng-container matColumnDef="paidQuotasInfo">
+              <mat-header-cell *matHeaderCellDef>Cuotas</mat-header-cell>
+              <mat-cell *matCellDef="let row" style="display: flex; gap: 3px">
+                <div
+                  *ngFor="
+                    let quotaInfo of [].constructor(row.maxQuotas);
+                    let i = index
+                  "
+                >
+                  <button
+                    [ngClass]="
+                      row.paidQuotasInfo[i]
+                        ? 'btn-paid-quota'
+                        : 'btn-not-paid-quota'
+                    "
+                    [matMenuTriggerFor]="menu"
+                    #menuTrigger="matMenuTrigger"
+                  >
+                    Cuota {{ i + 1 }}
+                  </button>
+                  <mat-menu #menu="matMenu">
+                    <div *ngIf="row.paidQuotasInfo[i]">
+                      <div
+                        style="
+                          display: flex;
+                          flex-direction: column;
+                          padding: 0 10px 0 10px;
+                        "
+                      >
+                        <small>
+                          <strong> Fecha de pago:</strong>
+                          {{ row.paidQuotasInfo[i].payDay }}
+                        </small>
+                        <small>
+                          <strong> Monto pagado:</strong>
+                          ${{ row.paidQuotasInfo[i].amount }}
+                        </small>
+                      </div>
+                      <button
+                        style="font-size: small"
+                        mat-menu-item
+                        (click)="openFile(row.paidQuotasInfo[i].urlFile)"
+                      >
+                        <mat-icon>open_in_new</mat-icon>
+                        Ver Comprobante
+                      </button>
+                    </div>
+                  </mat-menu>
+                </div>
+              </mat-cell>
+            </ng-container>
+
+            <!-- noData -->
+            <ng-container matColumnDef="noData">
+              <mat-footer-cell *matFooterCellDef>
+                <p *ngIf="!studentQuotaControl.length">
+                  No hay resultados que coincidan con los términos de búsqueda
+                </p>
+              </mat-footer-cell>
+            </ng-container>
+
+            <mat-header-row
+              *matHeaderRowDef="displayedColumns"
+            ></mat-header-row>
+            <mat-row
+              matRipple
+              *matRowDef="let row; columns: displayedColumns"
+              class="mat-row"
+            ></mat-row>
+            <mat-footer-row
+              *matFooterRowDef="['noData']"
+              [ngClass]="{ hide: !studentQuotaControl.length }"
+            ></mat-footer-row>
+          </mat-table>
+
+          <mat-paginator
+            #paginator
+            [length]="length"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="pageSizeOptions"
+            (page)="pageEvent = getQuotaControlFromPaginator($event)"
+          >
+          </mat-paginator>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- reportsModal -->
+<div
+  class="modal fade"
+  id="reportsModal"
+  tabindex="-1"
+  aria-labelledby="reportsModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="height: 40px">
+        <div class="col-md-8">
+          <h3 class="modal-title" id="reportsModalLabel">
+            <br />
+            Reporte de cuotas
+          </h3>
+        </div>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+          #reportsModalClose
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-12">
+                  <form [formGroup]="reportsForm" autocomplete="off">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <mat-form-field class="width" appearance="outline">
+                          <mat-label>Carrera</mat-label>
+                          <mat-select
+                            formControlName="careerID"
+                            (click)="
+                              studyPlans = [];
+                              reportsForm.get('studyPlanID').patchValue('')
+                            "
+                            (selectionChange)="getStudyPlans($event.value)"
+                          >
+                            <mat-option
+                              *ngFor="let career of careers"
+                              [value]="career.careerID"
+                              >{{ career.careerName }}</mat-option
+                            >
+                          </mat-select>
+                          <mat-error>Campo requerido!</mat-error>
+                        </mat-form-field>
+                      </div>
+                      <div class="col-md-6">
+                        <mat-form-field class="width" appearance="outline">
+                          <mat-label>Malla Curricular</mat-label>
+                          <mat-select formControlName="studyPlanID">
+                            <mat-option
+                              *ngFor="let studyPlan of studyPlans"
+                              [value]="studyPlan.studyPlanID"
+                              >{{ studyPlan.studyPlanDesc }}</mat-option
+                            >
+                          </mat-select>
+                          <mat-error>Campo requerido!</mat-error>
+                        </mat-form-field>
+                      </div>
+                      <!-- Cuotas -->
+                      <ng-container>
+                        <div class="col-md-6">
+                          <mat-form-field class="width" appearance="outline">
+                            <mat-label>Nivel</mat-label>
+                            <mat-select
+                              formControlName="cycleID"
+                              (selectionChange)="getParallelsByCycle()"
+                            >
+                              <mat-option
+                                *ngFor="let cycle of cycles"
+                                [value]="cycle.cycleID"
+                                >{{ cycle.cycleDesc }}</mat-option
+                              >
+                            </mat-select>
+                            <mat-error>Campo requerido!</mat-error>
+                          </mat-form-field>
+                        </div>
+                        <div class="col-md-6">
+                          <mat-form-field class="width" appearance="outline">
+                            <mat-label>Paralelo</mat-label>
+                            <mat-select formControlName="parallelCode">
+                              <mat-option value="-">Todos</mat-option>
+                              <mat-option
+                                *ngFor="let item of parallelsByCycle"
+                                [value]="item.parallelCode"
+                                >{{ item.parallelCode }}</mat-option
+                              >
+                            </mat-select>
+                            <mat-error>Campo requerido!</mat-error>
+                          </mat-form-field>
+                        </div>
+                        <div class="col-md-6">
+                          <button
+                            [disabled]="!reportsForm.get('cycleID').value"
+                            (click)="generateQuotaReport()"
+                            class="download-button"
+                            mat-raised-button
+                            matTooltipPosition="above"
+                            matTooltip="Descargar PDF"
+                          >
+                            Descargar Reporte
+                            <mat-icon class="red-icon">picture_as_pdf</mat-icon>
+                          </button>
+                        </div>
+                      </ng-container>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

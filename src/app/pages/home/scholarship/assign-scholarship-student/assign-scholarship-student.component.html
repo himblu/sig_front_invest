@@ -1,0 +1,98 @@
+<div class="animated fadeIn fast">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-9">
+                            Información de Estudiante Candidato para <strong>ASIGNAR</strong> el Beneficio
+                        </div>
+                        <div class="col-3 text-right">
+                            <button class="btn btn-sm btn-light text-danger" (click)="back()">
+                                <i class="fa fa-chevron-left mr-1"></i>Volver
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <!-- Información del Estudiante -->
+                            <div class="card mb-3">
+                                <div class="card-header bg-primary-color">
+                                    <i class="fa fa-info mr-1"></i>Información Básica del Estudiante
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">Nombre del Estudiante</h5>
+                                    <p class="card-text">Información básica del estudiante...</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <!-- Configuración de Beca -->
+                            <div class="card">
+                                <div class="card-header bg-primary-color">
+                                    <i class="fa fa-cog mr-1"></i>{{scholarship.name || 'BECA ASIGNADA'}}
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">Información de la beca asignada: Nombre, Descripción...</p>
+                                    <!-- Cantidad de cuotas del semestre -->
+                                    <h6>Cuotas del Semestre</h6>
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item">Cuota 1: $500</li>
+                                        <li class="list-group-item">Cuota 2: $500</li>
+                                        <li class="list-group-item">Cuota 3: $500</li>
+                                        <li class="list-group-item">Cuota 4: $500</li>
+                                        <li class="list-group-item">Cuota 5: $500</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="studentDetailsModal" tabindex="-1" aria-labelledby="studentDetailsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="studentDetailsLabel">Detalle del Estudiante y Beca Asignada</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Información del Estudiante -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Nombre del Estudiante</h5>
+                        <p class="card-text">Información básica del estudiante...</p>
+                    </div>
+                </div>
+
+                <!-- Configuración de Beca -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Beca Asignada</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Información de la beca asignada: Nombre, Descripción...</p>
+
+                        <!-- Cantidad de cuotas del semestre -->
+                        <h6>Cuotas del Semestre</h6>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">Cuota 1: $500</li>
+                            <li class="list-group-item">Cuota 2: $500</li>
+                            <li class="list-group-item">Cuota 3: $500</li>
+                            <li class="list-group-item">Cuota 4: $500</li>
+                            <li class="list-group-item">Cuota 5: $500</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>

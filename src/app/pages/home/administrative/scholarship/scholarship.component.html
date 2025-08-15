@@ -1,0 +1,205 @@
+<div class="row fadeIn animated fast">
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <div class="row">
+          <div class="col-8 pt-1">
+            <i class="fa fa-cog mr-1"></i>Administración de Becas
+          </div>
+          <div class="col-4 text-right">
+            <button class="btn btn-sm btn-primary" (click)="toggleScholarship()">
+              <i class="fa fa-plus mr-1"></i>Nueva
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="card-body text-center" *ngIf="!scholarships.length">
+        <i class="fa fa-times fa-3x"></i><br>
+        No existen becas registradas
+      </div>
+      <div class="card-body" *ngIf="scholarships.length">
+        <form [formGroup]="searchBecaForm">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Buscar en becas</mat-label>
+            <input type="text" formControlName="textFilter" matInput>
+          </mat-form-field>
+        </form>
+        <ul class="list-group">
+          <li class="list-group-item" *ngFor="let s of scholarships">
+            <div class="form-row">
+              <div class="col-8 pt-1">
+                {{s.typeBecaDesc | uppercase}}
+              </div>
+              <div class="col-4 text-right">
+                <button class="btn btn-sm btn-primary mr-2 rounded-circle" (click)="toggleScholarship(s)">
+                  <i class="fa fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-danger rounded-circle" (click)="deleteScholarship(s)">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-8" *ngIf="scholarshipSelected">
+    <div class="card">
+      <div class="card-header">
+        <div class="row">
+          <div class="col-8">
+            <span>{{newScholarship ? 'Nueva Beca' : 'Editando Beca'}}</span>
+          </div>
+          <div class="col-4 text-right">
+            <button class="btn btn-sm btn-danger" (click)="toggleScholarship()">
+              <i class="fa fa-times mr-1"></i>Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <form [formGroup]="scholarshipForm">
+          <div class="row">
+            <div class="col-md-5">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Nombre de Beca</mat-label>
+                <input type="text" formControlName="typeBecaName" matInput>
+              </mat-form-field>
+            </div>
+            <div class="col-md-7">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Descripción de Beca</mat-label>
+                <textarea formControlName="typeBecaDesc" style="resize: none;" rows="3" matInput></textarea>
+              </mat-form-field>
+            </div>
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header">
+                  Configuración de Beca
+                </div>
+                <div class="card-body">
+                  <ul class="list-group">
+                    <ng-container *ngIf="scholarshipConfigs.length">
+                      <li class="list-group-item p-1" *ngFor="let i of scholarshipConfigs">
+                        <div class="row">
+                          <div class="col-8 pt-1">
+                            <span class="badge badge-success">{{i.periodName}}</span>&nbsp;
+                            <span class="badge badge-success">{{i.modalityName}}</span>&nbsp;
+                            <span class="badge badge-success">{{i.schoolName}}</span>&nbsp;
+                            <span class="badge badge-success">{{i.careerName}}</span>&nbsp;
+                          </div>
+                          <div class="col-1">
+                            <span class="fa fa-file"></span><br>
+                            {{i.fileNumber}}
+                          </div>
+                          <div class="col-3 pt-1 text-right">
+                            <button class="btn btn-sm btn-themecolor mr-2 rounded-circle" (click)="toggleScholarshipConfig(i)">
+                              <i class="fa fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger rounded-circle">
+                              <i class="fa fa-trash"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </li>
+                    </ng-container>
+                    <li class="list-group-item text-center p-1" *ngIf="!scholarshipConfigs.length">
+                      <i class="fa fa-times fa-2x"></i><br>
+                      No se tienen configuraciones para esta Beca.
+                    </li>
+                    <li class="list-group-item text-center p-1">
+                      <button class="btn btn-primary btn-sm" (click)="toggleScholarshipConfig()">
+                        <i class="fa fa-plus mr-1"></i>Agregar
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12 mt-3 text-center">
+              <button class="btn btn-sm btn-primary" (click)="saveScholarship()">
+                <i class="fa fa-check mr-1"></i>Guardar
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div bsModal #scholarshipModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name2">
+  <div class="modal-dialog modal-nm">
+    <div class="modal-content" *ngIf="scholarshipConfigSelected">
+      <div class="modal-header">
+        <h4 id="dialog-sizes-name2" class="modal-title pull-left">
+          {{scholarshipConfigSelected.editing ? 'Editando Configuración de Beca' : 'Creando Configuración de Beca'}}
+        </h4>
+        <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="toggleScholarshipConfig()">
+          <span aria-hidden="true" class="visually-hidden">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="scholarshipConfigForm">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Periodo</mat-label>
+            <mat-select formControlName="periodID">
+              <mat-option *ngFor="let i of periods" [value]="i.periodID">{{i.periodName}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Modalidad</mat-label>
+            <mat-select formControlName="modalityID">
+              <mat-option *ngFor="let i of modalities" [value]="i.modalityID">{{i.modalityName}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Facultad</mat-label>
+            <mat-select formControlName="schoolID" (selectionChange)="selectSchool()">
+              <mat-option *ngFor="let i of schools" [value]="i.schoolID">{{i.schoolName}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Carrera</mat-label>
+            <mat-select formControlName="careerID" [disabled]="!scholarshipConfigForm.get('schoolID').value">
+              <mat-option *ngFor="let i of careers" [value]="i.careerID">{{i.careerName}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field class="width pt-2" appearance="outline">
+            <mat-label>Número de archivos</mat-label>
+            <input type="number" formControlName="fileNumber" matInput>
+          </mat-form-field>
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Número minimo de archivos</mat-label>
+            <input type="number" [max]="" formControlName="fileMinimalNumber" matInput>
+          </mat-form-field>
+          <ul class="list-group" style="max-height: 250px !important; overflow: auto;">
+            <caption class="text-uppercase">Tipos de Archivos a subir</caption>
+            <li class="list-group-item p-1" *ngFor="let f of fileTypes">
+              <div class="row">
+                <div class="col-10">
+                  <small>
+                    {{f.fileTypeName | uppercase}}
+                  </small>
+                </div>
+                <div class="col-2 text-end">
+                  <button class="btn btn-sm rounded-circle" [ngClass]="{'btn-light': !f.selected, 'btn-success': f.selected}" (click)="toggleSelectFileType(f)">
+                    <i class="fa" [ngClass]="{'fa-circle': !f.selected, 'fa-check-circle': f.selected}"></i>
+                  </button>
+                </div>
+              </div>
+            </li>
+          </ul>
+          <div class="row">
+            <div class="col-md-12 text-center">
+              <button class="btn btn-sm btn-themecolor" (click)="saveScholarshipConfig()">
+                <i class="fa fa-save mr-1"></i>Guardar Configuración
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,719 @@
+<div class="animated fadeIn fast">
+  <div class="form-row">
+    <div class="col-12">
+      <div class="card mb-3">
+        <div class="card-header">
+          <div class="form-row">
+            <div class="col-8 pt-1">
+              <i class="fa fa-repeat mr-1"></i>Sincronización de Usuarios
+            </div>
+            <div class="col-4">
+              <select name="rowNumber" [(ngModel)]="body.pagination.numberRow" (change)="resetSearch()" class="form-control form-control-sm">
+                <option *ngFor="let r of rowNumbers" [ngValue]="r">{{r}}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="card-body p-1">
+          <div class="form-row">
+            <div class="col-4"></div>
+            <div class="col-4 text-center mb-2">
+              <div class="form-row" *ngIf="pages.length > 15">
+                <div class="col-4 text-right pt-1">Pagina</div>
+                <div class="col-8">
+                  <select name="currentPage" [(ngModel)]="body.pagination.currentPage" (change)="changePage()" class="form-control form-control-sm">
+                    <option *ngFor="let p of pages" [value]="p">{{p}}</option>
+                  </select>
+                </div>
+              </div>
+              <ul class="pagination pagination-sm justify-content-center" *ngIf="!(pages.length > 15)">
+                <li class="page-item hand" *ngFor="let p of pages" (click)="changePage(p)" [ngClass]="{'active': body.pagination.currentPage === p}" aria-current="page">
+                  <span class="page-link">{{p}}</span>
+                </li>
+              </ul>
+            </div>
+            <div class="col-4 text-right">
+              <button class="btn btn-sm bg-primary-color" [disabled]="body.validating" *ngIf="body.selecteds > 0" (click)="sync()">
+                <i class="fa fa-repeat mr-1"></i>{{body.validating ? 'Sincronizando' : 'Sincronizar personas'}}
+              </button>
+            </div>
+            <div class="col-12">
+              <ul class="list-group">
+                <li class="list-group-item p-1">
+                  <div class="form-row">
+                    <div class="col-11">
+                      <input type="text" name="byText" [(ngModel)]="body.filter.text" placeholder="BUSCAR POR" class="form-control form-control text-uppercase">
+                    </div>
+                    <div class="col-1">
+                      <button class="btn bg-primary-color" [disabled]="!body.filter.text" (click)="resetSearch()">
+                        <i class="fa fa-search mr-1"></i>Buscar
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="col-12" style="max-height: 350px; overflow: auto;">
+              <ul class="list-group">
+                <li class="list-group-item p-1" *ngFor="let p of persons; let i = index">
+                  <div class="form-row">
+                    <div class="col-9 pt-1">
+                      <span *ngIf="p.personFullName">
+                        {{i+1}}.- {{p.personFullName | uppercase}}
+                      </span>
+                      <span *ngIf="!p.personFullName">
+                        < SIN DATOS PERSONALES >
+                      </span>
+                    </div>
+                    <div class="col-3 text-right">
+                      <span class="badge badge-danger" *ngIf="!p.validated && p.exclude">
+                        <i class="fa fa-eye mr-1"></i>REVISAR
+                      </span>
+                      <ng-container *ngIf="p.validated">
+                        <span class="badge badge-danger" *ngIf="p.error" title="Hubo un error al sincronizar la persona. Se seguirá visualizando">
+                          <i class="fa fa-check mr-1"></i>Error
+                        </span>
+                        <span class="badge badge-light text-primary-color border-primary-color" *ngIf="!p.error" title="En la proxima carga NO se visualizará">
+                          <i class="fa fa-check mr-1"></i>Validado
+                        </span>
+                      </ng-container>
+                      <ng-container *ngIf="!p.validating && !p.validated && !p.error">
+                        <button class="btn btn-sm" *ngIf="!p.exclude" [ngClass]="{'bg-primary-color': p.selected, 'btn-light text-primary-color': !p.selected}" (click)="toggleSelectPerson(p)">
+                          <i class="fa mr-1" [ngClass]="{'fa-circle-o': p.selected, 'fa-circle': !p.selected}"></i>{{p.selected ? 'Quitar' : 'Incluir'}}
+                        </button>
+                      </ng-container>
+                      <ng-container *ngIf="p.validating">
+                        <span><i class="fa fa-spin fa-spinner mr-1"></i>Validando</span>
+                      </ng-container>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Configuración de Periodos -->
+      <div class="card mb-3">
+        <div class="card-header p-1 pl-3 pt-2">
+          <div class="form-row">
+            <div class="col-7 pt-1">
+              <i class="fa fa-cog mr-1"></i>Configuración de Periodos
+            </div>
+            <div class="col-5 text-right">
+              <button class="btn btn-sm btn-ligh text-primary-color" (click)="toggleShowPeriods()">
+                {{!showPeriods ? 'Ver' : 'Ocultar'}}&nbsp;Configuración
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body p-1" *ngIf="showPeriods">
+          <tabset #configNivelationTabs>
+            <tab heading="Carreras" id="career">
+              <div class="form-row">
+                <div class="col-3">
+                  <label for="branchID">Campus</label>
+                  <select name="branchID" [(ngModel)]="filter.branchID" (change)="getCareerAdmissionPeriod()" id="" class="form-control">
+                    <option [ngValue]="undefined">--SELECCIONE--</option>
+                    <option *ngFor="let b of branchs" [ngValue]="b.campusID">{{b.campusName | uppercase}}</option>
+                  </select>
+                  <label for="periodID">Periodo de Matricula</label>
+                  <select name="periodID" [(ngModel)]="filter.periodID" (change)="getCareerAdmissionPeriod()" id="" class="form-control">
+                    <option [ngValue]="undefined">--SELECCIONE--</option>
+                    <option *ngFor="let p of enrollPeriods" [ngValue]="p.periodID">{{p.periodName | uppercase}}</option>
+                  </select>
+                  <label for="admissionPeriodID">Periodos de Admisión</label>
+                  <select name="admissionPeriodID" [(ngModel)]="filter.admissionPeriodID" (change)="getCareerAdmissionPeriod()" class="form-control">
+                    <option [ngValue]="undefined">--SELECCIONE--</option>
+                    <option *ngFor="let p of allAdmissionPeriods" [ngValue]="p.admissionPeriodID">{{p.admissionPeriodName | uppercase}}</option>
+                  </select>
+                </div>
+                <div class="col-9" *ngIf="filter.branchID && filter.periodID && filter.admissionPeriodID" style="max-height: 400px; overflow: auto;">
+                  <label for="">CARRERAS PROFESIONALES</label>
+                  <ul class="list-group">
+                    <!-- <caption></caption> -->
+                    <!-- <li class="list-group-item" *ngFor="let c of careers"> -->
+                    <li class="list-group-item p-1" *ngFor="let c of careerSettings">
+                      <div class="form-row">
+                        <div class="col-10 pt-1">
+                          <div class="form-row">
+                            <div class="col-2"><small>{{c.modalityName | uppercase}}</small></div>
+                            <div class="col-5"><small>{{c.schoolName | uppercase}}</small></div>
+                            <div class="col-5"><small><span class="badge badge-success mr-1">{{c.abrev}}</span>{{c.careerName | uppercase}}</small></div>
+                          </div>
+                        </div>
+                        <div class="col-2 text-right">
+                          <button class="btn btn-sm" [ngClass]="{'btn-light text-primary-color': !c.activate, 'btn-success': c.activate}" *ngIf="filter.admissionPeriodID && filter.branchID && filter.periodID" (click)="toggleActivate(c)">
+                            <i class="fa mr-1" [ngClass]="{'fa-circle-o text-secondary': !c.activate, 'fa-check-circle': c.activate}"></i>{{!c.activate ? 'Activar' : 'Desactivar'}}
+                          </button>
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </tab>
+            <tab heading="Periodos" id="period">
+              <div class="form-row p-2">
+                <div class="col-9 pt-1">
+                  Configuración de Periodos de Nivelación
+                </div>
+                <div class="col-3 text-right">
+                  <button class="btn btn btn-sm bg-primary-color" (click)="toggleAdmissionPeriod()">
+                    <i class="fa fa-plus mr-1"></i>Nuevo
+                  </button>
+                </div>
+                <div class="col-12 mt-3">
+                  <ul class="list-group">
+                    <li class="list-group-item p-1">
+                      <div class="form-row">
+                        <div class="col-5 text-center">
+                          <small class="text-primary-color">Detalle de Periodo de Admisión</small>
+                        </div>
+                        <div class="col-4 text-center">
+                          <small class="text-primary-color">Inicio y Fin</small>
+                        </div>
+                        <div class="col-3 text-center"></div>
+                      </div>
+                    </li>
+                    <li class="list-group-item p-2" *ngFor="let p of allAdmissionPeriods">
+                      <div class="form-row">
+                        <div class="col-5 pt-2">
+                          {{p.admissionPeriodName | uppercase}}
+                        </div>
+                        <div class="col-4 pt-2 text-center">
+                          {{p.admissionStart | date:'dd/MM/yyyy'}} a {{p.admissionEnd | date:'dd/MM/yyyy'}}
+                        </div>
+                        <div class="col-3 text-right">
+                          <button class="btn btn-sm btn-light text-primary-color mr-2" (click)="toggleAdmissionPeriod(p)">
+                            <i class="fa fa-edit"></i>
+                          </button>
+                          <!-- <button class="btn btn-sm btn-light text-danger">
+                            <i class="fa fa-trash"></i>
+                          </button> -->
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </tab>
+          </tabset>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header p-1 pl-3 pt-2">
+          <div class="form-row">
+            <div class="col-6" [ngClass]="{'pt-1': !showCategories, 'pt-2': showCategories}">
+              <i class="fa fa-cog mr-1"></i>Categorias
+            </div>
+            <div class="col-3">
+              <select name="category-branchID" [(ngModel)]="categoryFilter.branchID" [disabled]="showCategories" id="" class="form-control">
+                <option [ngValue]="undefined">--SELECCIONE SEDE--</option>
+                <option *ngFor="let c of branchs" [ngValue]="c.campusID">{{c.campusName | uppercase}}</option>
+              </select>
+            </div>
+            <div class="col-3 text-right pt-1">
+              <button class="btn btn-sm btn-ligh text-primary-color" *ngIf="categoryFilter.branchID" (click)="toggleShowCategories()">
+                {{!showCategories ? 'Ver' : 'Ocultar'}}&nbsp;Categorias
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body p-1" *ngIf="showCategories">
+          <div class="form-row">
+            <div class="col-12">
+              <ul class="list-group">
+                <li class="list-group-item p-1" *ngFor="let c of categories">
+                  <div class="form-row">
+                    <div class="col-7 pt-1 pb-1">
+                      <span class="badge badge-info mr-1">{{c.categoryID}}</span>
+                      {{c.name | uppercase}}
+                    </div>
+                    <div class="col-5 text-right">
+                      <button class="btn btn-sm mr-2" [ngClass]="{'btn-light text-primary-color': !c.showDetail, 'bg-primary-color': c.showDetail}" *ngIf="c.admissionPeriodID" (click)="toggleShowDetail(c)">
+                        <i class="fa mr-1" [ngClass]="{'fa-eye': !c.showDetail, 'fa-eye-slash': c.showDetail}"></i>{{c.showDetail ? 'Ocultar' : 'Ver'}} Detalle
+                      </button>
+                      <button class="btn btn-sm btn-light text-info" (click)="toggleCategoryModal(c)">
+                        <i class="fa fa-edit mr-1"></i>Editar
+                      </button>
+                    </div>
+                    <div class="col-12 mt-3 mb-3" *ngIf="c.showDetail && c.careerSettings">
+                      <ng-container *ngIf="showButtonsConfigCourse">
+                        <button class="btn btn-sm btn-light text-primary-color pull-right mr-2" (click)="toggleMigrateCourse(c)" *ngIf="c.courseToMigrate.length">
+                          <i class="fa fa-repeat mr-1"></i>Migrar Cursos restantes
+                        </button>
+
+                        <button class="btn btn-sm btn-light text-primary-color pull-right" (click)="toggleRelationateCourse(c)" *ngIf="!c.courseToMigrate.length && c.courseToRelationate.length">
+                          <i class="fa fa-repeat mr-1"></i>Relacionar Cursos y Cohortes
+                        </button>
+                      </ng-container>
+                      <button class="btn btn-sm bg-primary-color float-right" (click)="passPostulant(c)">
+                        <i class="fa fa-plus mr-1"></i>Pase Postulantes
+                      </button>
+                      <tabset #categoryTabs>
+                        <tab heading="Cohortes" (selectTab)="selectTab(0)" id="cohort">
+                          <ng-container *ngIf="c.cohorts">
+                            <div class="form-row">
+                              <div class="col-4"></div>
+                              <div class="col-4 text-center">
+                                <span *ngIf="!c.cohorts.length"><i class="fa fa-times mr-1"></i>No se registraron Cohortes </span><button class="ml-3 btn btn-sm btn-light text-primary-color" *ngIf="c.cohorts.length !== c.careerSettings.length" (click)="toggleCohortModal(c)"><i class="fa fa-plus mr-1"></i>Agregar Cohortes</button>
+                              </div>
+                              <div class="col-4 text-right">
+                                <span class="badge badge-light">
+                                  <i class="fa fa-circle text-success mr-1"></i>Curso Generico
+                                </span>
+                                <!-- <button class="btn btn-sm btn-light text-primary-color" *ngIf="c.cohorts.length && c.courses.length" (click)="toggleCourse(c, true)">
+                                  <i class="fa fa-plus mr-1"></i>0 Cursos Genéricos
+                                </button> -->
+                              </div>
+                            </div>
+                          </ng-container>
+                          <ul class="list-group mt-2 ml-3" *ngIf="c.cohorts.length">
+                            <li class="list-group-item p-1" *ngFor="let h of c.cohorts">
+                              <div class="form-row">
+                                <div class="col-7 pt-1">
+                                  {{h.idnumber}} - {{h.name | uppercase}}
+                                </div>
+                                <div class="col-5 text-right">
+                                  <!-- <button class="btn btn-sm btn-light text-primary-color mr-1" *ngIf="c.courses.length" (click)="toggleCourse(c, false, h)">
+                                    <i class="fa fa-plus mr-1"></i>Agregar curso
+                                  </button> -->
+                                  <button class="btn btn-sm mr-1" [ngClass]="{'btn-light text-primary-color': !h.showCourses, 'bg-primary-color': h.showCourses}" *ngIf="h.courses && h.courses.length" (click)="toggleShowCourses(h)">
+                                    <i class="fa mr-1" [ngClass]="{'fa-eye': !h.showCourses, 'fa-eye-slash': h.showCourses}"></i>{{h.showCourses ? 'Ocultar' : 'Ver'}}&nbsp;Cursos
+                                  </button>
+                                </div>
+                                <div class="col-12 mt-3 mb-3" *ngIf="h.showCourses">
+                                  <div class="alert alert-info mb-2 p-1">
+                                    <i class="fa fa-triangle-info mr-1"></i>La Información de los cursos es referencial e ideal, esto quiere decir que la configuración del campo <code>Nombre corto del curso</code> del <strong>CURSO</strong> en MOODLE, deberia llevar como valor el <code>idnumber</code>(identificador) del <strong>COHORTE</strong>. Para una mejor representación de la Configuración de <strong>COHORTES vs CURSOS</strong>.
+                                  </div>
+                                  <ul class="list-group">
+                                    <li class="list-group-item list-group-item-secondary p-1"*ngFor="let x of h.courses">
+                                      <div class="form-row">
+                                        <div class="col-9">
+                                          <small>
+                                            <span class="badge badge-success mr-1">{{x.shortname | uppercase}}</span>{{x.displayname | uppercase}}
+                                          </small>
+                                        </div>
+                                        <div class="col-3 text-right">
+                                          <span class="badge badge-light mr-2" *ngIf="x.isGeneric">
+                                            <i class="fa fa-circle text-success mr-1"></i>Curso Generico
+                                          </span>
+                                          <button class="btn btn-sm btn-light text-primary-color" *ngIf="(x.migrated && x.relationed) || x.isGeneric" (click)="goToInfo(x, h)">
+                                            <i class="fa fa-list-alt mr-1"></i>Ver Info del Curso
+                                          </button>
+                                        </div>
+                                      </div>
+                                    </li>
+                                  </ul>
+                                </div>
+                              </div>
+                            </li>
+                          </ul>
+                        </tab>
+                        <tab heading="Cursos" (selectTab)="selectTab(1)" id="section">
+                          <ng-container *ngIf="c.courses">
+                            <div class="form-row">
+                              <div class="col-4"></div>
+                              <div class="col-4 text-center">
+                                <div class="text-center" *ngIf="!c.courses.length">
+                                  <span><i class="fa fa-times mr-1"></i>No se registraron Cursos </span> <br>
+                                  <div class="alert alert-info text-center">
+                                    <i class="fa fa-info mr-1"></i>Necesitas crear cursos desde Moodle para poder visualizarlos, vincularlos con los <strong>COHORTES</strong>, agregar <strong>POSTULANTES</strong> y asignar <strong>NOTAS</strong> respectivamente.
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="col-4 text-right">
+                                <!-- <button class="btn btn-sm btn-light text-primary-color" (click)="toggleCourse(c, true)">
+                                  <i class="fa fa-plus mr-1"></i>0 Cursos Genéricos
+                                </button> -->
+                              </div>
+                            </div>
+                          </ng-container>
+                          <ul class="list-group mt-2 ml-3" *ngIf="c.courses.length">
+                            <li class="list-group-item p-1" [ngClass]="{'list-group-item-success': h.isGeneric}" *ngFor="let h of c.courses">
+                              <div class="form-row">
+                                <div class="col-7 pt-1">
+                                  <small>
+                                    <span class="badge badge-success">{{h.id}}</span>&nbsp;{{h.displayname | uppercase}}
+                                  </small>
+                                </div>
+                                <div class="col-5 text-right">
+                                  <span class="badge badge-light" *ngIf="h.isGeneric">
+                                    <i class="fa fa-circle text-success mr-1"></i>Curso Generico
+                                  </span>
+                                  <!-- <button class="btn btn-sm btn-light text-primary-color mr-1" (click)="toggleCourse(c, false, h)">
+                                    <i class="fa fa-plus mr-1"></i>Agregar curso
+                                  </button>
+                                  <button class="btn btn-sm btn-light text-primary-color mr-1" (click)="toggleShowCourses(h)">
+                                    <i class="fa mr-1" [ngClass]="{'fa-eye': !h.showCourses, 'fa-eye-slash': h.showCourses}"></i>{{h.showCourses ? 'Ocultar' : 'Ver'}}&nbsp;Cursos
+                                  </button> -->
+                                </div>
+                              </div>
+                            </li>
+                          </ul>
+                        </tab>
+                      </tabset>
+                    </div>
+                  </div>
+                </li>
+                <!-- <li class="list-group-item text-center p-1">
+                  <button class="btn btn-sm btn-light text-primary-color" (click)="toggleCategoryModal()">
+                    <i class="fa fa-plus mr-1"></i>Agregar Categoria
+                  </button>
+                </li> -->
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" bsModal #categoryModal="bs-modal" [config]="{backdrop: 'static'}" tabindex="-1" role="dialog" aria-labelledby="dialog-static-name">
+  <div class="modal-dialog modal-nm">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="col-9 pt-1">
+            <i class="fa fa-plus mr-1"></i>{{!newCategory.editing ? 'Nueva' : 'Editando'}}&nbsp;Categoria
+          </div>
+          <div class="col-3 text-right">
+            <button class="btn btn-sm btn-light text-danger" (click)="toggleCategoryModal()">
+              <i class="fa fa-times mr-1"></i>Cerrar
+            </button>
+          </div>
+          <div class="col-12">
+            <hr>
+          </div>
+          <div class="col-12">
+            <div class="form-row">
+              <div class="col-12">
+                <label for="name">Nombre</label>
+                <input type="text" disabled class="form-control text-uppercase" name="categoryName" [(ngModel)]="newCategory.name" placeholder="Nombre de Categoria" required>
+              </div>
+              <div class="col-12">
+                <label for="desc">Descripción</label>
+                <textarea name="desc" disabled rows="3" [(ngModel)]="newCategory.categoryDesc" class="form-control"></textarea>
+              </div>
+              <div class="col-12">
+                <label for="admissionPeriodID">Periodo de Admisión</label>
+                <select name="admissionPeriodID" [(ngModel)]="newCategory.admissionPeriodID" class="form-control" required>
+                  <option [ngValue]="undefined">--SELECCIONE--</option>
+                  <option *ngFor="let a of admissionPeriodsFiltereds" [ngValue]="a.admissionPeriodID">{{a.admissionPeriodName | uppercase}}</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <label for="startDate">Inicio</label>
+                <input type="date" class="form-control" name="startDate" [(ngModel)]="newCategory.startDate">
+              </div>
+              <div class="col-6">
+                <label for="endDate">Fin</label>
+                <input type="date" [min]="newCategory.startDate" class="form-control" name="endDate" [(ngModel)]="newCategory.endDate">
+              </div>
+              <div class="col-12 text-center mt-3">
+                <button class="btn btn-sm" [ngClass]="{'bg-primary-color': !newCategory.editing, 'btn-success': newCategory.editing}" (click)="saveCategory()">
+                  <i class="fa mr-1" [ngClass]="{'fa-save': !newCategory.editing, 'fa-edit': newCategory.editing}"></i>{{!newCategory.editing ? 'Guardar' : 'Editar'}}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" bsModal #cohortModal="bs-modal" [config]="{backdrop: 'static'}" tabindex="-1" role="dialog" aria-labelledby="dialog-static-name">
+  <div class="modal-dialog modal-nm">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="col-9 pt-1">
+            <i class="fa fa-plus mr-1"></i>{{!newCohort.editing ? 'Nuevos' : 'Editando'}}&nbsp;Cohortes
+          </div>
+          <div class="col-3 text-right">
+            <button class="btn btn-sm btn-light text-danger" (click)="toggleCohortModal()">
+              <i class="fa fa-times mr-1"></i>Cerrar
+            </button>
+          </div>
+          <div class="col-12">
+            <hr>
+          </div>
+          <div class="col-12">
+            <div class="form-row" *ngIf="newCohort.careerSettings">
+              <div class="col-4">
+                <small class="badge badge-primary">Cohortes Totales = {{newCohort.careerSettings.length}}</small>
+              </div>
+              <div class="col-4">
+                <small class="badge badge-primary">Cohortes a crear = {{newCohort.quantitySelecteds}}</small>
+              </div>
+              <div class="col-4 text-right">
+                <small class="badge badge-primary">Cohortes creados = {{newCohort.quantityCreateds}}</small>
+              </div>
+              <div class="col-12" style="max-height: 350px; overflow: auto;">
+                <ul class="list-group">
+                  <li class="list-group-item p-1" *ngFor="let c of newCohort.careerSettings" style="line-height: 90%;">
+                    <div class="form-row">
+                      <div class="col-8 pt-1">
+                        <small>
+                          <strong>{{newCohort.categoryIdNumber}}-{{c.abrev}}</strong><br>
+                          {{c.careerName | uppercase}}
+                        </small>
+                      </div>
+                      <div class="col-4 pt-2 text-right">
+                        <small>
+                          <span *ngIf="c.created" class="text-success">
+                            <i class="fa fa-check mr-1"></i>Creado
+                          </span>
+                          <span *ngIf="!c.created">
+                            <span *ngIf="c.creating" class="text-secondary">
+                              <i class="fa fa-spin fa-spinner mr-1"></i>Creando
+                            </span>
+                            <span *ngIf="!c.creating" class="hand" [ngClass]="{'text-primary-color': !c.selected, 'text-danger': c.selected}" (click)="toggleSelectToCreate(c)">
+                              <i class="fa mr-1" [ngClass]="{'fa-times': c.selected, 'fa-plus': !c.selected}"></i>{{c.selected ? 'Quitar' : 'Seleccionar'}}
+                            </span>
+                          </span>
+                        </small>
+                        <!-- <button class="btn btn-sm" [ngClass]="{'btn-success': c.selected, 'btn-light text-primary-color': c.selected}" >
+                          <i class="fa" [ngClass]="{'fa-circle-o text-secondary': !c.selected, 'fa-circle': c.selected}"></i>
+                        </button> -->
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              <div class="col-12 text-center mt-3">
+                <button class="btn btn-sm" [disabled]="newCohort.quantitySelecteds === 0" [ngClass]="{'bg-primary-color': !newCohort.editing, 'btn-success': newCohort.editing}" (click)="saveCohort()">
+                  <i class="fa mr-1" [ngClass]="{'fa-save': !newCohort.editing, 'fa-edit': newCohort.editing}"></i>{{!newCohort.editing ? 'Crear' : 'Editar'}}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" bsModal #courseModal="bs-modal" [config]="{backdrop: 'static'}" tabindex="-1" role="dialog" aria-labelledby="dialog-static-name">
+  <div class="modal-dialog modal-nm">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="col-9 pt-1">
+            <i class="fa fa-plus mr-1"></i>Cursos&nbsp;
+            <span *ngIf="courseConfig.isGeneric">Genéricos</span>
+            <span *ngIf="!courseConfig.isGeneric && courseConfig.cohort">del Cohorte: <small>{{courseConfig.cohort.name | uppercase}}</small></span>
+          </div>
+          <div class="col-3 text-right">
+            <button class="btn btn-sm btn-light text-danger" (click)="toggleCourse()">
+              <i class="fa fa-times mr-1"></i>Cerrar
+            </button>
+          </div>
+          <div class="col-12">
+            <hr>
+          </div>
+          <div class="col-12">
+            <ul class="list-group">
+              <li class="list-group-item">
+                <div class="form-row">
+                  <div class="col-12">
+                    <strong>
+                      Registrar Nuevo Curso
+                    </strong>
+                  </div>
+                  <div class="col-12">
+                    <label for="name">Nombre del Curso</label>
+                    <input type="text" name="name" [(ngModel)]="newCourse.name" class="form-control">
+                  </div>
+                  <div class="col-12">
+                    <label for="description">Descripción</label>
+                    <textarea name="description" rows="3" [(ngModel)]="newCourse.description" class="form-control"></textarea>
+                  </div>
+                  <div class="col-12 text-center" (click)="resetNewCourse()">
+                    <button class="btn btn-light text-danger btn-sm mr-5">
+                      <i class="fa fa-times mr-1"></i>Cancelar
+                    </button>
+                    <button class="btn bg-primary-color btn-sm">
+                      <i class="fa fa-check mr-1"></i>Guardar
+                    </button>
+                  </div>
+                </div>
+              </li>
+              <ng-container *ngIf="courseConfig.isGeneric">
+                <li class="list-group-item" *ngFor="let a of [1,2,3,4,5,6]">
+                  Curso Generico&nbsp;{{a}}
+                </li>
+              </ng-container>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" bsModal #migrateCourseModal="bs-modal" [config]="{backdrop: 'static'}" tabindex="-1" role="dialog" aria-labelledby="dialog-static-name">
+  <div class="modal-dialog modal-nm">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="col-9 pt-1">
+            <i class="fa fa-repeat mr-1"></i>Migración de Cursos
+          </div>
+          <div class="col-3 text-right">
+            <button class="btn btn-sm btn-light text-danger" (click)="toggleMigrateCourse()">
+              <i class="fa fa-times mr-1"></i>Cerrar
+            </button>
+          </div>
+          <div class="col-12">
+            En esta sección podras seleccionar los cursos que quieres migrar a la BD de ITCA, cabe señalar que los <strong class="text-info">CURSOS</strong> son creados en MOODLE.
+          </div>
+          <div class="col-12">
+            <hr>
+          </div>
+          <div class="col-12">
+            <ul class="list-group" *ngIf="categorySelected.courseToMigrate" style="max-height: 450px; overflow: auto;">
+              <li class="list-group-item p-1" *ngFor="let c of categorySelected.courseToMigrate">
+                <div class="form-row">
+                  <div class="col-9 pt-1" style="line-height: 90%;">
+                    <small>
+                      <strong>{{c.shortname | uppercase}}</strong> <br>
+                      {{c.displayname}}
+                    </small>
+                  </div>
+                  <div class="col-3 text-right">
+                    <button class="btn btn-sm" [ngClass]="{'btn-success': c.selected, 'btn-ligh text-primary-color': !c.selected}" (click)="toggleSelectecCourse(c, categorySelected.courseToMigrate)">
+                      <i class="fa mr-1" [ngClass]="{'fa-check-circle': c.selected, 'fa-circle-o': !c.selected}"></i>{{c.selected ? 'Quitar' : 'Seleccionar'}}
+                    </button>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="col-12 mt-3 text-center">
+            <button class="btn btn-sm bg-primary-color" *ngIf="categorySelected.existsSomeSelected" [disabled]="migrating" (click)="migrateCourses()">
+              <i class="fa fa-save mr-1"></i>Migrar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" bsModal #relationCourseModal="bs-modal" [config]="{backdrop: 'static'}" tabindex="-1" role="dialog" aria-labelledby="dialog-static-name">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="col-9 pt-1">
+            <i class="fa fa-repeat mr-1"></i>Relacion de Cursos con Cohortes
+          </div>
+          <div class="col-3 text-right">
+            <button class="btn btn-sm btn-light text-danger" (click)="toggleRelationateCourse()">
+              <i class="fa fa-times mr-1"></i>Cerrar
+            </button>
+          </div>
+          <div class="col-12">
+            En esta sección podras seleccionar los cursos que quieres <strong class="text-info">RELACIONAR</strong> con los cohortes de la categoria en la BD de ITCA, cabe señalar que este proceso es <strong class="text-ingo text-uppercase">masivo y no tiene reversión</strong>. <br>
+            Los <span class="badge badge-danger">CURSOS GENÉRICOS</span>, se relacionaran automaticamente con <strong class="text-uppercase">todos los cohortes</strong> de la Categoria.
+          </div>
+          <div class="col-12">
+            <hr>
+          </div>
+          <div class="col-12">
+            <ul class="list-group" *ngIf="categorySelected.courseToRelationate" style="max-height: 450px; overflow: auto;">
+              <ng-container *ngFor="let c of categorySelected.courseToRelationate">
+                <li class="list-group-item p-1" *ngIf="!c.isGeneric">
+                  <div class="form-row" style="line-height: 90%;">
+                    <div class="col-5 pt-1">
+                      <small>
+                        <strong>{{c.shortname | uppercase}}</strong><strong class="ml-3 text-danger" *ngIf="c.isGeneric">CURSO GENÉRICO</strong><br>
+                        {{c.displayname}}
+                      </small>
+                    </div>
+                    <div class="col-4 pt-1 text-center">
+                      <small *ngIf="!c.isGeneric && c.cohortName">
+                        {{c.cohortName | uppercase}}
+                      </small>
+                      <small *ngIf="!c.isGeneric && !c.cohortName" class="text-danger text-uppercase">
+                        No existe Cohorte para relacionar
+                      </small>
+                    </div>
+                    <div class="col-3 text-right">
+                      <button class="btn btn-sm" *ngIf="c.cohortName" [ngClass]="{'btn-success': c.selected, 'btn-ligh text-primary-color': !c.selected}" (click)="toggleSelectecCourse(c, categorySelected.courseToRelationate)">
+                        <i class="fa mr-1" [ngClass]="{'fa-check-circle': c.selected, 'fa-circle-o': !c.selected}"></i>{{c.selected ? 'Quitar' : 'Seleccionar'}}
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              </ng-container>
+            </ul>
+          </div>
+          <div class="col-12 mt-3 text-center">
+            <button class="btn btn-sm bg-primary-color" *ngIf="categorySelected.existsSomeSelected" [disabled]="relationating" (click)="relationateCourses()">
+              <i class="fa fa-save mr-1"></i>Relacionar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" bsModal #admissionPeriodModal="bs-modal" [config]="{backdrop: 'static'}" tabindex="-1" role="dialog" aria-labelledby="dialog-static-name">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-body">
+        <form #admissionPeriodForm="ngForm">
+          <div class="form-row">
+            <div class="col-9 pt-1">
+              <i class="fa fa-plus mr-1"></i>Periodos de Nivelación
+            </div>
+            <div class="col-3 text-right">
+              <button class="btn btn-sm btn-light text-danger" (click)="toggleAdmissionPeriod()">
+                <i class="fa fa-times mr-1"></i>Cerrar
+              </button>
+            </div>
+            <div class="col-12">
+              <hr>
+            </div>
+            <div class="col-12">
+              <small>Nombre</small>
+              <input type="text" name="admissionPeriodName" [(ngModel)]="newAdmissionPeriod.admissionPeriodName" class="form-control form-control-sm text-uppercase" required>
+            </div>
+            <div class="col-12">
+              <small>Descripción</small>
+              <textarea rows="5" name="admissionPeriodDesc" [(ngModel)]="newAdmissionPeriod.admissionPeriodDesc" class="form-control form-control-sm text-uppercase" required placeholder="DESCRIBA EL PERIODO"></textarea>
+            </div>
+            <div class="col-12">
+              <small>Nivel</small>
+              <select name="levelID" [(ngModel)]="newAdmissionPeriod.levelID" class="form-control form-control-sm" required>
+                <option [ngValue]="undefined">--SELECCIONE--</option>
+                <option *ngFor="let l of levels" [ngValue]="l.levelID">{{l.levelName | uppercase}}</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <small>Inicio</small>
+              <input type="date" name="initDate" [(ngModel)]="newAdmissionPeriod.initDate" class="form-control form-control-sm" required>
+            </div>
+            <div class="col-12">
+              <small>Fin</small>
+              <input type="date" name="endDate" [disabled]="!newAdmissionPeriod.initDate" [min]="newAdmissionPeriod.initDate" [(ngModel)]="newAdmissionPeriod.endDate" class="form-control form-control-sm">
+            </div>
+            <div class="col-12 mt-3 text-center">
+              <button class="btn btn-sm" [ngClass]="{'bg-primary-color': !newAdmissionPeriod.editing, 'btn-success': newAdmissionPeriod.editing}" [disabled]="admissionPeriodForm.invalid" (click)="addAdmissionPeriod()">
+                <i class="fa fa-save mr-1"></i>{{newAdmissionPeriod.editing ? 'Editar' : 'Agregar'}}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,672 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<div class="card" *ngIf="!charging">
+  <div class="card-body">
+    <form [formGroup]="filtersForm" autocomplete="off">
+      <div class="row pl-2 pr-2">
+        <div class="col-4" style="text-align: center;">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Periodo académico</mat-label>
+            <mat-select formControlName="periodID" placeholder="Seleccione un periodo" (selectionChange)="filtersForm.markAllAsTouched()">
+              <mat-option *ngFor="let period of periods" [value]="period.periodID" (onSelectionChange)="getSchools(period, $event);">
+                {{period.periodName}}</mat-option>
+            </mat-select>
+            <mat-error>Seleccione un periodo</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-4" style="text-align: center;">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Escuela</mat-label>
+            <mat-select formControlName="schoolID" placeholder="Seleccione una escuela" (selectionChange)="getCareers($event.value);">
+              <mat-option *ngFor="let school of schools" [value]="school.schoolID">
+                {{school.schoolName}}</mat-option>
+            </mat-select>
+            <mat-error>Seleccione una escuela</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-4" style="text-align: center;">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Carrera</mat-label>
+            <mat-select formControlName="careerID" placeholder="Seleccione una carrera" (selectionChange)="getStudyPlan($event.value);">
+              <mat-option *ngFor="let career of careers" [value]="career.careerID">
+                {{career.careerName}}</mat-option>
+            </mat-select>
+            <mat-error>Seleccione una carrera</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-4" style="text-align: center;">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Malla curricular</mat-label>
+            <mat-select formControlName="studyPlanID" placeholder="Seleccione una malla" (selectionChange)="getCycles($event.value);">
+              <mat-option *ngFor="let study of study_plan" [value]="study.studyPlanID">
+                {{study.studyPlanDesc}}</mat-option>
+            </mat-select>
+            <mat-error>Seleccione una malla</mat-error>
+            <mat-error></mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-4" style="text-align: center;">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Nivel</mat-label>
+            <mat-select formControlName="cycleID" placeholder="Seleccione un nivel" (selectionChange)="getSubjects($event.value);">
+              <mat-option *ngFor="let item of cycleDetail" [value]="item.cycleID">
+                {{item.cycleName}}</mat-option>
+            </mat-select>
+            <mat-error>Seleccione una asignatura</mat-error>
+            <mat-error></mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-4" style="text-align: center;">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Asignatura</mat-label>
+            <mat-select formControlName="courseID" placeholder="Seleccione una asignatura" (selectionChange)="getModalities(); getList(); initPlan1Form();" >
+              <mat-option *ngFor="let subject of subjects" [value]="subject.courseID">
+                {{subject.courseName}}</mat-option>
+            </mat-select>
+            <mat-error>Seleccione una asignatura</mat-error>
+            <mat-error></mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-4" style="text-align: center;">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Modalidad</mat-label>
+            <mat-select formControlName="modalityID" placeholder="Seleccione una modalidad" (selectionChange)="getResultsLearning(); getPlan1SubjectData(); getHours(); getSubjectPlan();">
+              <mat-option *ngFor="let modality of modalities" [value]="modality.modalityID">
+                {{modality.modalityName}}</mat-option>
+            </mat-select>
+            <mat-error>Seleccione una asignatura</mat-error>
+            <mat-error></mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-4" *ngIf="filtersForm.get('periodID').value" style="text-align: -webkit-left;">
+          <button
+            class="download-button"
+            mat-raised-button
+            matTooltipPosition="above"
+            matTooltip="Reportes"
+            [matMenuTriggerFor]="menu">
+            Reportes
+            <mat-icon class="red-icon">description</mat-icon>
+          </button>
+        </div>
+        <mat-menu #menu="matMenu">
+          <button
+            mat-menu-item
+            matTooltipPosition="above"
+            matTooltip="Descargar Excel"
+            (click)="getReportPending('coordinator/report-pea-state','Reporte Estado Pea');">
+            <i style="color: green; cursor: pointer;" class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp;
+            <span>Reporte Estado Peas</span>
+          </button>
+          <button
+            mat-menu-item
+            matTooltipPosition="above"
+            matTooltip="Descargar Excel"
+            (click)="getReportPending('coordinator/gap-uncompleted','Reporte Estado Gaps');">
+            <i style="color: green; cursor: pointer;" class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp;
+            <span>Reporte Estado Gaps</span>
+          </button>
+          </mat-menu>
+      </div>
+
+      <div class="row">
+        <div class="col-10"></div>
+        <div class="col-2" style="text-align: right;">
+          <a
+            style="background-color: rgb(84, 158, 77);
+            color: white;"
+            mat-raised-button
+            matTooltipPosition="above"
+            matTooltip="Descargar"
+            href="https://tecnologicoitcaeduec-my.sharepoint.com/personal/encuba_itca_edu_ec/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fencuba%5Fitca%5Fedu%5Fec%2FDocuments%2FCONTRATO%20SISTEMA%20INFORM%C3%81TICO%20DE%20GESTI%C3%93N%20%28SIG%29%20%2D%20ENCUBA%2FMANUALES%20DE%20USUARIO%20%28SIG%29%2FPLAN%20DE%20ESTUDIOS%20DE%20LA%20ASIGNTURA%20%28PEA%29%2FMU%5FPROCESO%5FPEA%5FROL%20COORDINADOR%20DE%20CARRERA%2Epdf&parent=%2Fpersonal%2Fencuba%5Fitca%5Fedu%5Fec%2FDocuments%2FCONTRATO%20SISTEMA%20INFORM%C3%81TICO%20DE%20GESTI%C3%93N%20%28SIG%29%20%2D%20ENCUBA%2FMANUALES%20DE%20USUARIO%20%28SIG%29%2FPLAN%20DE%20ESTUDIOS%20DE%20LA%20ASIGNTURA%20%28PEA%29"
+            target="_blank">
+            <small>Manual Usuario</small>
+          </a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div><br>
+
+<div class="card" *ngIf="!charging">
+  <div class="card-body">
+    <mat-stepper #hStepper>
+
+      <!-- PEA -->
+      <mat-step completed="false">
+        <ng-template matStepLabel><a style="color: #3f51b5;">Pea</a></ng-template>
+        <div>
+          <!--<h2 *ngIf="isRegistered === true">Pea ya Registrado</h2>-->
+          <mat-stepper orientation="vertical" [linear]="false" #vStepper>
+            <!-- PLAN1 -->
+            <mat-step [stepControl]="plan1Form" completed="false">
+              <ng-template matStepLabel><a style="color: #3f51b5;">PLAN 1 - DATOS DE LA ASIGNATURA</a></ng-template>
+              <div class="card" style="background-color: rgb(221, 238, 243);">
+                <div class="card-body">
+                  <form [formGroup]="plan1Form"
+                    autocomplete="off"
+                    (submit)="onSubmitPlan1()">
+                    <div class="ml-1 mr-1">
+                      <div class="row" formArrayName="data">
+                        <div class="col-12">
+                          <h3>CONTRIBUCIÓN DE LA ASIGNATURA PARA LA FORMACIÓN PROFESIONAL (PERFIL PROFESIONAL)&nbsp;<a style="cursor: pointer;">
+                            <i class="fa fa-question-circle-o" aria-hidden="true" matTooltipPosition="above"
+                            matTooltip="Hace referencia a la o las competencias específicas o genéricas del perfil profesional."></i></a>
+                          </h3>
+                        </div>
+                        <div class="col-12" [formGroupName]="0">
+                          <mat-form-field class="width" appearance="outline">
+                            <mat-label>Contribución de la asignatura</mat-label>
+                            <textarea type="text" matInput formControlName="planDetailSettingDesc" #contributionDesc
+                            (input)="wordLimit(contributionDesc, hintContributionDesc, 1000)"></textarea>
+                            <mat-hint><label #hintContributionDesc><small>Palabras: 0</small></label></mat-hint>
+                            <mat-error>Campo <strong>requerido</strong></mat-error>
+                          </mat-form-field>
+                        </div>
+                        <div class="col-12">
+                          <h3>RESULTADO DE APRENDIZAJE DE LA ASIGNATURA (PERFIL DE EGRESO)&nbsp;<a style="cursor: pointer;">
+                            <i class="fa fa-question-circle-o" aria-hidden="true" matTooltipPosition="above"
+                            matTooltip="Hace referencia al resultado de aprendizaje correspondiente a la asignatura."></i></a>
+                          </h3>
+                        </div>
+                        <div class="col-12" [formGroupName]="1">
+                          <mat-form-field class="width" appearance="outline">
+                            <mat-label>Resultado de aprendizaje</mat-label>
+                            <textarea type="text" matInput formControlName="planDetailSettingDesc" #resultDesc
+                            (input)="wordLimit(resultDesc, hintResultDesc, 100)"></textarea>
+                            <mat-hint><label #hintResultDesc><small>Palabras: 0</small></label></mat-hint>
+                            <mat-error>Campo <strong>requerido</strong></mat-error>
+                          </mat-form-field>
+                        </div>
+                        <div class="col-12">
+                          <h3>RESULTADOS Y CONTRIBUCIONES A LAS COMPETENCIAS PROFESIONALES&nbsp;<a style="cursor: pointer;">
+                            <i class="fa fa-question-circle-o" aria-hidden="true" matTooltipPosition="above"
+                            matTooltip="Los resultados de aprendizaje propuestos para cada unidad, están en relación con el resultado de aprendizaje de la asignatura (perfil de egreso)."></i></a>&nbsp;
+                            <a style="cursor: pointer;" (click)="addAchievementsRow()" *ngIf="getAchievementsRow().length < 5"><i class="fa fa-plus-circle" aria-hidden="true" matTooltipPosition="above" matTooltip="Agregar nuevo"></i></a>
+                          </h3>
+                        </div>
+                        <div class="col-6">
+                          <label>LOGRO O RESULTADO DE APRENDIZAJE (PERFIL DE EGRESO)&nbsp;<a style="cursor: pointer;">
+                            <i class="fa fa-question-circle-o" aria-hidden="true" matTooltipPosition="above"
+                            matTooltip="Están directamente relacionados con lo que el estudiante sea capaz de hacer (competencias del perfil profesional) al término de cada una unidad didáctica."></i></a>
+                          </label>
+                        </div>
+                        <div class="col-3">
+                          <label>
+                            Tipo de resultado/evaluación
+                          </label>
+                        </div>
+                        <div class="col-2-5">
+                          <label>
+                            Contribución (Alto/Medio)
+                          </label>
+                        </div>
+                      </div>
+                      <div formArrayName="achievements">
+                        <div class="row" *ngFor="let item of getAchievementsRow().controls; let i=index" [formGroupName]="i">
+                          <div class="col-0-5" style="text-align: center;">
+                            {{i+1}}
+                          </div>
+                          <div class="col-5-5">
+                            <mat-form-field class="width" appearance="outline">
+                              <mat-label>Logro o resultado</mat-label>
+                              <textarea type="text" matInput formControlName="planDetailSettingDesc" #description
+                              (input)="wordLimit(description, hintDescription, 50)"></textarea>
+                              <mat-hint><label #hintDescription><small>Palabras: 0</small></label></mat-hint>
+                              <mat-error>Campo <strong>requerido</strong></mat-error>
+                            </mat-form-field>
+                          </div>&nbsp;
+                          <div class="col-5">
+                            <mat-form-field class="width" appearance="outline">
+                              <mat-label>Seleccione: </mat-label>
+                              <mat-select formControlName="resultTypeID">
+                                <mat-option *ngFor="let item of resultTypeList" [value]="item.resultTypeID">{{item.resultTypeDesc}} - {{item.contribution}}</mat-option>
+                              </mat-select>
+                              <mat-error>Campo <strong>requerido</strong></mat-error>
+                            </mat-form-field>
+                          </div>
+                          <div class="col-0-5" style="text-align: center;">
+                            <a style="cursor: pointer; color: red;" (click)="deleteAchievementsRow(i)" *ngIf="getAchievementsRow().length > 1 && isLinear === true"><i class="fa fa-minus-circle" aria-hidden="true" matTooltipPosition="above" matTooltip="Eliminar"></i></a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-12" style="text-align: right;">
+                      <button type="submit" mat-raised-button class="styleButton_sml" *ngIf="!loadingPlan">Siguiente</button>
+                      <spinner-loader *ngIf="loadingPlan"></spinner-loader>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </mat-step>
+
+            <!-- PLAN2 -->
+            <mat-step [stepControl]="plan2Form" completed="false">
+              <ng-template matStepLabel><a style="color: #3f51b5;">PLAN 2 - PROGRAMACIÓN DE LA ASIGNATURA</a></ng-template>
+              <div class="card" style="background-color: rgb(221, 238, 243);">
+                <div class="card-body" *ngIf="hours">
+                  <mat-stepper orientation="vertical" #nestStepper [linear]="false" style="background-color: rgb(221, 238, 243);" *ngIf="unitsList">
+                    <div *ngFor="let unit of unitsList; let i=index">
+                      <mat-step [stepControl]="plan2Form">
+                        <ng-template matStepLabel><a style="color: #3f51b5;">{{unit.unitName}}</a></ng-template>
+                        <form [formGroup]="plan2Form"
+                          autocomplete="off"
+                          (submit)="onSubmitPlan2(unit)">
+                          <div class="ml-1 mr-1">
+                            <div class="row" *ngIf="resultLearning.length > 0">
+                              <div class="col-12" style="text-align: left;">
+                                <h4>LOGRO O RESULTADO DE APRENDIZAJE: {{resultLearning[i].planDetailSettingDesc}}</h4>
+                              </div>
+                            </div>
+                            <div formArrayName="weeks">
+                              <div class="row" [formGroupName]="0">
+                                <div class="col-2">
+                                  <h3>Semana</h3>
+                                </div>
+                                <div class="col-4">
+                                  <mat-form-field class="width" appearance="outline">
+                                    <mat-label>Fecha inicio:</mat-label>
+                                    <input type="date" [min]="minDatePlan2" [max]="maxDatePlan2" formControlName="startDateUnit" #startDateUnit matInput
+                                    (click)="startDateUnit.showPicker()">
+                                    <mat-icon style="cursor: pointer;" matSuffix (click)="startDateUnit.showPicker()">calendar_month</mat-icon>
+                                    <mat-hint>dd/mm/aaaa</mat-hint>
+                                    <mat-error>Campo <strong>requerido</strong></mat-error>
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-4">
+                                  <mat-form-field class="width" appearance="outline">
+                                    <mat-label>Fecha fin:</mat-label>
+                                    <input type="date" [min]="startDateUnit.value" [max]="maxDatePlan2" formControlName="endDateUnit" #endDateUnit matInput
+                                    (click)="endDateUnit.showPicker()" (change)="onDateChange()">
+                                    <mat-icon style="cursor: pointer;" matSuffix (click)="endDateUnit.showPicker()">calendar_month</mat-icon>
+                                    <mat-hint>dd/mm/aaaa</mat-hint>
+                                    <mat-error>Campo <strong>requerido</strong></mat-error>
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-2">
+                                  <mat-form-field appearance="outline">
+                                    <mat-label>Semanas:</mat-label>
+                                    <input type="text" matInput readonly="true" formControlName="numberWeek">
+                                    <mat-error></mat-error>
+                                  </mat-form-field>
+                                </div>
+                              </div>
+                            </div>
+                            <div formArrayName="contents">
+                              <div class="row" [formGroupName]="0">
+                                <div class="col-2">
+                                  <h3>Nombre de la Unidad
+                                    &nbsp;<a style="cursor: pointer;">
+                                      <i class="fa fa-question-circle-o" aria-hidden="true" matTooltipPosition="above"
+                                      matTooltip="Los contenidos y subcontenidos deben estar en relación a los resultados de aprendizaje."></i></a>
+                                  </h3>
+                                </div>
+                                <div class="col-7">
+                                  <mat-form-field class="width" appearance="outline">
+                                    <mat-label>Nombre de la Unidad</mat-label>
+                                    <textarea type="text" matInput formControlName="settingUnitDesc" #contentDesc
+                                    (input)="wordLimit(contentDesc, hintContentDesc, 30)"></textarea>
+                                    <mat-hint><label #hintContentDesc><small>Palabras: 0</small></label></mat-hint>
+                                    <mat-error>Campo <strong>requerido</strong></mat-error>
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-2">
+                                  <label>
+                                    Agregar contenido
+                                    &nbsp;<a style="cursor: pointer;" (click)="addPlan2Row('subcontents', 2)">
+                                      <i class="fa fa-plus-circle" aria-hidden="true" matTooltipPosition="above" matTooltip="Nuevo"></i>
+                                    </a>
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+                            <div formArrayName="subcontents">
+                              <div class="row" *ngFor="let item of getPlan2Row('subcontents').controls; let i=index" [formGroupName]="i">
+                                <div class="col-3"></div>
+                                <div class="col-1">{{i+1}}</div>
+                                <div class="col-7">
+                                  <mat-form-field class="width" appearance="outline">
+                                    <mat-label>Contenido</mat-label>
+                                    <textarea type="text" matInput formControlName="settingUnitDesc" #description
+                                    (input)="wordLimit(description, hintDescription, 30)"></textarea>
+                                    <mat-hint><label #hintDescription><small>Palabras: 0</small></label></mat-hint>
+                                    <mat-error>Campo <strong>requerido</strong></mat-error>
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-1">
+                                  <a style="cursor: pointer; color: red;" (click)="deletePlan2Row(i, 'subcontents')" *ngIf="getPlan2Row('subcontents').length > 1 && isLinear === true"><i class="fa fa-minus-circle" aria-hidden="true" matTooltipPosition="above" matTooltip="Eliminar"></i></a>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="row">
+                              <div class="col-12">
+                                <h3>
+                                  APRENDIZAJE EN CONTACTO CON EL DOCENTE ({{hours[0].hoursTeachContact}} horas)
+                                  &nbsp;<a style="cursor: pointer;">
+                                    <i class="fa fa-question-circle-o" aria-hidden="true" matTooltipPosition="above"
+                                    matTooltip="Conjunto de actividades individuales o grupales desarrolladas con intervención y supervisión directa del docente (de forma presencial o virtual, sincrónica o asincrónica) que comprenden:
+                                    Clases, conferencias, seminarios, talleres, proyectos en aula presencial o virtual y otras que el Modelo educativo Institucional mencione. Se puede incluir también las tutorías individuales o grupales.
+                                    Además, se debe integrar el uso de Tic's como estrategia pedagógica para la informatización del aprendizaje."></i></a>
+                                  &nbsp;<a style="cursor: pointer;" (click)="addPlan2Row('teacher', 3)">
+                                    <i class="fa fa-plus-circle" aria-hidden="true" matTooltipPosition="above" matTooltip="Nuevo"></i>
+                                  </a>
+                                </h3>
+                              </div>
+                            </div>
+                            <div formArrayName="teacher">
+                              <div class="row" *ngFor="let item of getPlan2Row('teacher').controls; let i=index" [formGroupName]="i">
+                                <div class="col-1" style="text-align: right;">{{i+1}}</div>
+                                <div class="col-7">
+                                  <mat-form-field class="width" appearance="outline">
+                                    <mat-label>Aprendizaje</mat-label>
+                                    <textarea type="text" matInput formControlName="settingUnitDesc" #description
+                                    (input)="wordLimit(description, hintDescription, 1000)"></textarea>
+                                    <mat-hint><label #hintDescription><small>Palabras: 0</small></label></mat-hint>
+                                    <mat-error>Campo <strong>requerido</strong></mat-error>
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-2">
+                                  <mat-form-field class="width" appearance="outline">
+                                    <mat-label>Horas</mat-label>
+                                    <input type="number" matInput formControlName="hours" (blur)="calculateTeacherHours()">
+                                    <mat-error>Campo <strong>requerido</strong></mat-error>
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-1">
+                                  <a style="cursor: pointer;"><i class="fa fa-question-circle-o" aria-hidden="true" matTooltipPosition="above"
+                                    matTooltip="El tiempo asignado a las actividades académicas, está en relación a las semanas planificadas."></i>
+                                  </a>&nbsp;
+                                  <a style="cursor: pointer; color: red;" (click)="deletePlan2Row(i, 'teacher')" *ngIf="getPlan2Row('teacher').length > 1 && isLinear === true"><i class="fa fa-minus-circle" aria-hidden="true" matTooltipPosition="above" matTooltip="Eliminar"></i></a>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="row">
+                              <div class="col-12">
+                                <h3>
+                                  APRENDIZAJE PRÁCTICO EXPERIMENTAL ({{hours[0].hoursPracExp}} horas)
+                                  &nbsp;<a style="cursor: pointer;">
+                                    <i class="fa fa-question-circle-o" aria-hidden="true" matTooltipPosition="above"
+                                    matTooltip="Conjunto de actividades individuales o grupales de aplicación de contenidos conceptuales, procedimentales, técnicos, entre otros, a la resolución de problemas prácticos, comprobación, experimentación,
+                                    contrastación y replicación y demás que consten en el Modelo Educativo Institucional; de casos, fenómenos, métodos y otros que puedan requerir de infrestructura física o virtual, equipos, instrumentos y demás materiales."></i></a>
+                                  &nbsp;<a style="cursor: pointer;" (click)="addPlan2Row('practice', 4)">
+                                    <i class="fa fa-plus-circle" aria-hidden="true" matTooltipPosition="above" matTooltip="Nuevo"></i>
+                                  </a>
+                                </h3>
+                              </div>
+                            </div>
+                            <div formArrayName="practice">
+                              <div class="row" *ngFor="let item of getPlan2Row('practice').controls; let i=index" [formGroupName]="i">
+                                <div class="col-1" style="text-align: right;">{{i+1}}</div>
+                                <div class="col-7">
+                                  <mat-form-field class="width" appearance="outline">
+                                    <mat-label>Aprendizaje</mat-label>
+                                    <textarea type="text" matInput formControlName="settingUnitDesc" #description
+                                    (input)="wordLimit(description, hintDescription, 1000)"></textarea>
+                                    <mat-hint><label #hintDescription><small>Palabras: 0</small></label></mat-hint>
+                                    <mat-error>Campo <strong>requerido</strong></mat-error>
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-2">
+                                  <mat-form-field class="width" appearance="outline">
+                                    <mat-label>Horas</mat-label>
+                                    <input type="number" matInput formControlName="hours" (blur)="calculatePracticeHours()">
+                                    <mat-error>Campo <strong>requerido</strong></mat-error>
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-1">
+                                  <a style="cursor: pointer;"><i class="fa fa-question-circle-o" aria-hidden="true" matTooltipPosition="above"
+                                    matTooltip="El tiempo asignado a las actividades académicas, está en relación a las semanas planificadas."></i>
+                                  </a>&nbsp;
+                                  <a style="cursor: pointer; color: red;" (click)="deletePlan2Row(i, 'practice')" *ngIf="getPlan2Row('practice').length > 1  && isLinear === true"><i class="fa fa-minus-circle" aria-hidden="true" matTooltipPosition="above" matTooltip="Eliminar"></i></a>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="row">
+                              <div class="col-12">
+                                <h3>
+                                  APRENDIZAJE AUTÓNOMO ({{hours[0].hoursAutonomous}} horas)
+                                  &nbsp;<a style="cursor: pointer;">
+                                    <i class="fa fa-question-circle-o" aria-hidden="true" matTooltipPosition="above"
+                                    matTooltip="Conjunto de actividades de aprendizaje individuales o grupales desarrolladas de forma independiente por el estudiante sin contacto con el docente. Las actividades son: lectura crítica de textos, investigación documental,
+                                    escritura académica o científica, elaboración de informes, portafolios, proyectos, planes, presentaciones, etc. así como otras que establezca el modelo educativo."></i></a>
+                                  &nbsp;<a style="cursor: pointer;" (click)="addPlan2Row('standAlone', 5)">
+                                    <i class="fa fa-plus-circle" aria-hidden="true" matTooltipPosition="above" matTooltip="Nuevo"></i>
+                                  </a>
+                                </h3>
+                              </div>
+                            </div>
+                            <div formArrayName="standAlone">
+                              <div class="row" *ngFor="let item of getPlan2Row('standAlone').controls; let i=index" [formGroupName]="i">
+                                <div class="col-1" style="text-align: right;">{{i+1}}</div>
+                                <div class="col-7">
+                                  <mat-form-field class="width" appearance="outline">
+                                    <mat-label>Aprendizaje</mat-label>
+                                    <textarea type="text" matInput formControlName="settingUnitDesc" #description
+                                    (input)="wordLimit(description, hintDescription, 1000)"></textarea>
+                                    <mat-hint><label #hintDescription><small>Palabras: 0</small></label></mat-hint>
+                                    <mat-error>Campo <strong>requerido</strong></mat-error>
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-2">
+                                  <mat-form-field class="width" appearance="outline">
+                                    <mat-label>Horas</mat-label>
+                                    <input type="number" matInput formControlName="hours" (blur)="calculateStandAloneHours()">
+                                    <mat-error>Campo <strong>requerido</strong></mat-error>
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-1">
+                                  <a style="cursor: pointer;"><i class="fa fa-question-circle-o" aria-hidden="true" matTooltipPosition="above"
+                                    matTooltip="El tiempo asignado a las actividades académicas, está en relación a las semanas planificadas."></i>
+                                  </a>&nbsp;
+                                  <a style="cursor: pointer; color: red;" (click)="deletePlan2Row(i, 'standAlone')" *ngIf="getPlan2Row('standAlone').length > 1 && isLinear === true"><i class="fa fa-minus-circle" aria-hidden="true" matTooltipPosition="above" matTooltip="Eliminar"></i></a>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-md-12" style="text-align: right;">
+                            <ng-container *ngIf="!loadingPlan">
+                              <button *ngIf="unit.unitID === 1" type="button" mat-raised-button class="styleButton_sml" (click)="stepperPrev(); getResultsLearning(); getPlan1SubjectData(); getHours(); getSubjectPlan();">Plan 1</button>
+                              <button *ngIf="unit.unitID != 1" type="button" mat-raised-button class="styleButton_sml" matStepperPrevious (click)="getPlan2(unit.unitID-1, 0)">Anterior</button>&nbsp;
+                              <button type="submit" mat-raised-button class="styleButton_sml">Siguiente</button>
+                            </ng-container>
+                            <spinner-loader *ngIf="loadingPlan"></spinner-loader>
+                          </div>
+                        </form>
+                      </mat-step>
+                    </div>
+                    <mat-step>
+                      <ng-template matStepLabel>Finalizar</ng-template>
+                      <p>Ha finalizado el Plan 2.</p>
+                      <div class="col-md-12" style="text-align: right;">
+                        <button mat-raised-button class="styleButton_sml" (click)="getPlan2(4, 0); nestStepperPrev();">Anterior</button>&nbsp;
+                        <button mat-raised-button class="styleButton_sml" (click)="stepperNext(); getPlan4();">Siguiente</button>
+                      </div>
+                    </mat-step>
+                  </mat-stepper>
+                </div>
+              </div>
+            </mat-step>
+
+            <!-- PLAN4 -->
+            <mat-step [stepControl]="plan4Form" completed="false">
+              <ng-template matStepLabel><a style="color: #3f51b5;">PLAN 4 - MÉTODOS Y TÉCNICAS DE APRENDIZAJE</a></ng-template>
+              <div class="card" style="background-color: rgb(221, 238, 243);">
+                <div class="card-body">
+                  <form [formGroup]="plan4Form"
+                    autocomplete="off"
+                    (submit)="onSubmitPlan4()">
+                    <div class="ml-1 mr-1">
+                      <div class="row" formArrayName="data">
+                        <div class="col-2" style="text-align: center;">
+                          <h3>Métodos</h3>
+                        </div>
+                        <div class="col-9" [formGroupName]="0">
+                          <mat-form-field class="width" appearance="outline">
+                            <mat-label>Métodos</mat-label>
+                            <textarea type="text" matInput formControlName="planDetailSettingDesc" #methods
+                            (input)="wordLimit(methods, hintMethods, 150)"></textarea>
+                            <mat-hint><label #hintMethods><small>Palabras: 0</small></label></mat-hint>
+                            <mat-error>Campo <strong>requerido</strong></mat-error>
+                          </mat-form-field>
+                        </div>
+                        <div class="col-2" style="text-align: center;">
+                          <h3>Técnicas</h3>
+                        </div>
+                        <div class="col-9" [formGroupName]="1">
+                          <mat-form-field class="width" appearance="outline">
+                            <mat-label>Técnicas</mat-label>
+                            <textarea type="text" matInput formControlName="planDetailSettingDesc" #techniques
+                            (input)="wordLimit(techniques, hintTechniques, 75)"></textarea>
+                            <mat-hint><label #hintTechniques><small>Palabras: 0</small></label></mat-hint>
+                            <mat-error>Campo <strong>requerido</strong></mat-error>
+                          </mat-form-field>
+                        </div>
+                        <div class="col-2" style="text-align: center;">
+                          <h3>Recursos necesarios</h3>
+                        </div>
+                        <div class="col-9" [formGroupName]="2">
+                          <mat-form-field class="width" appearance="outline">
+                            <mat-label>Recursos necesarios</mat-label>
+                            <textarea type="text" matInput formControlName="planDetailSettingDesc" #resources
+                            (input)="wordLimit(resources, hintResources, 75)"></textarea>
+                            <mat-hint><label #hintResources><small>Palabras: 0</small></label></mat-hint>
+                            <mat-error>Campo <strong>requerido</strong></mat-error>
+                          </mat-form-field>
+                        </div>
+                        <div class="col-2" style="text-align: center;">
+                          <h3>Evaluación del curso</h3>
+                        </div>
+                        <div class="col-9" [formGroupName]="3">
+                          <mat-form-field class="width" appearance="outline">
+                            <mat-label>Evaluación del curso</mat-label>
+                            <textarea type="text" matInput formControlName="planDetailSettingDesc" #evaluation
+                            (input)="wordLimit(evaluation, hintEvaluation, 75)"></textarea>
+                            <mat-hint><label #hintEvaluation><small>Palabras: 0</small></label></mat-hint>
+                            <mat-error>Campo <strong>requerido</strong></mat-error>
+                          </mat-form-field>
+                        </div>
+                        <div class="col-12">
+                          <h3>COMPROMISOS ACORDADOS ENTRE DOCENTES Y ESTUDIANTES
+                            &nbsp;<a style="cursor: pointer;" (click)="addPlan4AchievementsRow()" *ngIf="getPlan4AchievementsRow().length < 20">
+                              <i class="fa fa-plus-circle" aria-hidden="true" matTooltipPosition="above" matTooltip="Nuevo"></i></a>
+                          </h3>
+                        </div>
+                      </div>
+                      <div formArrayName="achievements">
+                        <div class="row" *ngFor="let item of getPlan4AchievementsRow().controls; let i=index" [formGroupName]="i">
+                          <div class="col-1"></div>
+                          <div class="col-1">{{i+1}}</div>
+                          <div class="col-7">
+                            <mat-form-field class="width" appearance="outline">
+                              <mat-label>Subcontenido</mat-label>
+                              <textarea type="text" matInput formControlName="planDetailSettingDesc" #description></textarea>
+                              <mat-hint><label #hintResultDesc><small>Palabras: 0</small></label></mat-hint>
+                              <mat-error>Campo <strong>requerido</strong></mat-error>
+                            </mat-form-field>
+                          </div>
+                          <div class="col-1">
+                            <a style="cursor: pointer; color: red;" (click)="deletePlan4AchievementsRow(i)" *ngIf="getPlan4AchievementsRow().length > 1 && isLinear === true"><i class="fa fa-minus-circle" aria-hidden="true" matTooltipPosition="above" matTooltip="Eliminar"></i></a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-12" style="text-align: right;">
+                      <ng-container *ngIf="!loadingPlan">
+                        <button mat-raised-button class="styleButton_sml" matStepperPrevious>Plan 2</button>&nbsp;
+                        <button type="submit" mat-raised-button class="styleButton_sml">Siguiente</button>
+                      </ng-container>
+                      <spinner-loader *ngIf="loadingPlan"></spinner-loader>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </mat-step>
+
+            <mat-step>
+              <ng-template matStepLabel><a style="color: #3f51b5;">TÉRMINOS Y CONDICIONES </a></ng-template>
+              <div class="card" style="background-color: rgb(221, 238, 243);">
+                <div class="card-body">
+                  <ng-container *ngIf="termsAndConditions">
+                    <div class="row" *ngFor="let item of termsAndConditions">
+                      <div class="col-12" style="text-align: justify;">
+                        <h4>{{item.conditionsMessageDesc}}</h4>
+                      </div>
+                      <div class="col-12" style="text-align: center;" *ngIf="isLinear === true">
+                        <button type="button" mat-raised-button class="styleButton_sml" style="width: 140px;" (click)="onSubmitTermsConditions(item.termsAndConditionsID)">
+                          Aceptar
+                        </button>
+                      </div>
+                      <div class="col-md-12" style="text-align: center;" *ngIf="isLinear === false">
+                        <button mat-raised-button class="styleButton_sml" (click)="stepperPrev();" (click)="getPlan4()">Plan 4</button>
+                      </div>
+                    </div>
+                  </ng-container>
+                </div>
+              </div>
+            </mat-step>
+            <!-- -->
+          </mat-stepper>
+        </div>
+      </mat-step>
+
+      <!-- LISTADO -->
+      <mat-step completed="false">
+        <ng-template matStepLabel><a style="color: #3f51b5;">Listado</a></ng-template>
+        <div class="table-responsive">
+          <table id="demo-foo-addrow"
+                 class="table m-t-0 table-hover no-wrap contact-list footable-loaded footable"
+                 data-page-size="5">
+            <thead style="background-color: #004899; color: white;">
+            <tr>
+              <th class="footable-sortable">
+                Malla Curricular
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Asignatura
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Fecha
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Periodo Académico
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable" style="text-align: center;">
+                Acciones
+                <span class="footable-sort-indicator"></span>
+              </th>
+            </tr>
+            </thead>
+            <tbody style="color: black;" *ngIf="syllabusSubjects">
+              <tr *ngFor="let item of syllabusSubjects">
+                <td>{{item.studyPlanDesc}}</td>
+                <td>{{item.courseName}}</td>
+                <td>{{item.dateCreated | date: 'yyyy-MM-dd'}}</td>
+                <td>{{item.periodName}}</td>
+                <td style="text-align: center;">
+                  <a type="button"
+                    matTooltipPosition="above"
+                    matTooltip="Descargar PDF"
+                    style="cursor: pointer; color: red;" (click)="getPdf()"><i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <components-button-arrow [actual]="actualList" [totalPage]="totalPageList" [count]="countList" (result)="changePageList($event)"></components-button-arrow>
+      </mat-step>
+    </mat-stepper>
+  </div>
+</div>

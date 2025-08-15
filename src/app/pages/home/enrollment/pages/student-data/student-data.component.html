@@ -1,0 +1,372 @@
+<div class="row animated fadeIn fast" *ngIf="cargando">
+    <div class="col-md-12">
+        <div class="alert alert-info text-center">
+            <h4 class="alert-heading">Cargando</h4>
+            <i class="fa fa-spin fa-refresh fa-4x"></i>
+            <p class="mb-0">Por favor esperar...</p>
+        </div>
+    </div>
+</div>
+
+<div class="row" *ngIf="!cargando">
+  <div class="col-12" style="text-align: right;">
+    <button mat-raised-button #tooltip="matTooltip" matTooltip="Siguiente: Documentos personales"
+      type="submit" class="styleButton_sml" style="width: 110px; max-width: 142px; height: 35px;"
+      (click)="reValidation()">
+      Guardar
+    </button>
+  </div>
+</div>
+<br>
+<div class="row animated fadeIn fast" *ngIf="!cargando">
+    <form [formGroup]="personForm" autocomplete="off" (submit)="reValidation()">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-label><small>Tipo de Identificación</small></mat-label>
+                                    <mat-select formControlName="typeDocument">
+                                        <mat-option value="">Seleccione una opción</mat-option>
+                                        <mat-option *ngFor="let item of identityList"
+                                            [value]="item.typeDocId">{{item.typeDocName}}</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-icon matSuffix>chrome_reader_mode</mat-icon>
+                                    <mat-label><small>Identificación</small></mat-label>
+                                    <!-- <span matPrefix>+1 &nbsp;</span> -->
+                                    <input formControlName="documentNumber"
+                                           type="text"
+                                           (change)="searchIdentity()" matInput
+                                           mask="S*"
+                                           [patterns]="testPattern"
+                                           (keyup)="searchIdentity()">
+                                    <mat-error *ngIf="isValidField('documentNumber')">
+                                      {{getFielError('documentNumber')}}
+                                    </mat-error>
+                                </mat-form-field>
+                                <section class="width ml-3">
+
+                                    <a type="button" class="btn btn-success" (click)="searchIdentity()" #tooltip="matTooltip" matTooltip="Por favor validar su información">
+                                      <i class="fa fa-check-square-o" aria-hidden="true"></i>
+                                    </a>&nbsp;
+                                    <label style="color: #06d79c;" #tooltip="matTooltip" matTooltip="Por favor validar su información">Validar Información Registro Civil</label>
+                                </section><br>
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-icon matSuffix>perm_identity</mat-icon>
+                                    <mat-label><small>Nombres</small></mat-label>
+                                    <input formControlName="firstName"
+                                           type="text"
+                                           matInput>
+                                    <mat-error *ngIf="isValidField('firstName')">
+                                      {{getFielError('firstName')}}
+                                    </mat-error>
+                                </mat-form-field>
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-icon matSuffix>perm_identity</mat-icon>
+                                    <mat-label><small>Primer Apellido</small></mat-label>
+                                    <input formControlName="surname"
+                                           type="text"
+                                           matInput>
+                                    <mat-error *ngIf="isValidField('surname')">
+                                      {{getFielError('surname')}}
+                                    </mat-error>
+                                </mat-form-field>
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-icon matSuffix>perm_identity</mat-icon>
+                                    <mat-label><small>Segundo Apellido</small></mat-label>
+                                    <input formControlName="secondSurname"
+                                           type="text"
+                                           matInput>
+                                    <mat-error *ngIf="isValidField('secondSurname')">
+                                      {{getFielError('secondSurname')}}
+                                    </mat-error>
+                                </mat-form-field>
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-label><small>Sexo</small></mat-label>
+                                    <mat-select formControlName="sexID">
+                                        <mat-option value="">Seleccione una opción</mat-option>
+                                        <mat-option *ngFor="let item of sexList"
+                                                    [value]="item.sexID">
+                                          {{item.sexDesc}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error *ngIf="isValidField('sexID')">
+                                      {{getFielError('sexID')}}
+                                    </mat-error>
+                                </mat-form-field>
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-label><small>Estado Civil</small></mat-label>
+                                    <mat-select formControlName="civilStatusID">
+                                        <mat-option value="">Seleccione una opción</mat-option>
+                                        <mat-option *ngFor="let item of civilList"
+                                                    [value]="item.civilStatusID">
+                                          {{item.civilStatusDesc}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error *ngIf="isValidField('civilStatusID')">             {{getFielError('civilStatusID')}}
+                                    </mat-error>
+                                </mat-form-field>
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-label><small>Nacionalidad</small></mat-label>
+                                    <mat-select formControlName="countryID">
+                                        <mat-option value="">Seleccione una opción</mat-option>
+                                        <mat-option *ngFor="let item of nationalityList"
+                                                    [value]="item.countryID">
+                                          {{item.nationality_1}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error *ngIf="isValidField('countryID')">   {{getFielError('countryID')}}
+                                    </mat-error>
+                                </mat-form-field>
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-label><small>Autoidentificación</small></mat-label>
+                                    <mat-select formControlName="ethnicityID">
+                                        <mat-option value="">Seleccione una opción</mat-option>
+                                        <mat-option *ngFor="let item of etniaList"
+                                                    [value]="item.ethnicityID">
+                                          {{item.ethnicityDesc}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error *ngIf="isValidField('ethnicityID')">
+                                      {{getFielError('ethnicityID')}}
+                                    </mat-error>
+                                </mat-form-field>
+                                <mat-form-field class="width" appearance="outline" *ngIf="nationalTownsList.length > 0">
+                                    <mat-label><small>Pueblos y Nacionalidades</small></mat-label>
+                                    <mat-select formControlName="nationalTownID">
+                                        <mat-option value="">Seleccione una opción</mat-option>
+                                        <mat-option>--</mat-option>
+                                        <mat-option *ngFor="let item of nationalTownsList"
+                                                    [value]="item.nationalTownID">
+                                          {{item.nationalTownDesc}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error *ngIf="isValidField('nationalTownID')">
+                                      {{getFielError('nationalTownID')}}
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="col-md-4">
+                            <section class="width ml-3">
+                                <mat-slide-toggle formControlName="foreignTitle">
+                                  Título Extranjero
+                                </mat-slide-toggle>
+                            </section>
+                        </div>
+                        <div class="row" style="margin-top: 12px;">
+                            <div class="col-md-4">
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-label><small>Tipo Sangre</small></mat-label>
+                                    <mat-select formControlName="bloodTypeID">
+                                        <mat-option value="">Seleccione una opción</mat-option>
+                                        <mat-option *ngFor="let item of bloodList"
+                                                    [value]="item.bloodTypeID">
+                                          {{item.bloodTypeName}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error *ngIf="isValidField('bloodTypeID')">
+                                      {{getFielError('bloodTypeID')}}
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-md-8">
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-icon matSuffix>mail</mat-icon>
+                                    <mat-label><small>E-mail</small></mat-label>
+                                    <input formControlName="email" class="email" type="mail" matInput>
+                                    <mat-error *ngIf="isValidField('email')">{{getFielError('email')}}</mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-label><small>Género</small></mat-label>
+                                    <mat-select formControlName="genderID">
+                                        <mat-option value="">Seleccione una opción</mat-option>
+                                        <mat-option *ngFor="let item of genderList"
+                                            [value]="item.genderID">{{item.genderDesc}}</mat-option>
+                                    </mat-select>
+                                    <mat-error *ngIf="isValidField('genderID')">{{getFielError('genderID')}}</mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-md-4">
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-label><small>Operadora Telefónica</small></mat-label>
+                                    <mat-select formControlName="operatorName">
+                                        <mat-option value="">Seleccione una opción</mat-option>
+                                        <mat-option *ngFor="let item of operatorsList" (click)="cellularOperator(item)"
+                                            [value]="item.operatorName">{{item.operatorName}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-md-4">
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-icon matSuffix>phone_iphone</mat-icon>
+                                    <mat-label><small>Celular</small></mat-label>
+                                    <input matInput formControlName="celularPhone" #celular maxlength="10" mask="S*"
+                                        [patterns]="phone">
+                                    <mat-error
+                                        *ngIf="isValidField('celularPhone')">{{getFielError('celularPhone')}}</mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-icon matSuffix>phone_enabled</mat-icon>
+                                    <mat-label><small>Convencional</small></mat-label>
+                                    <input formControlName="housePhone" maxlength="9" matInput mask="S*"
+                                        [patterns]="phone">
+                                    <mat-error
+                                        *ngIf="isValidField('housePhone')">{{getFielError('housePhone')}}</mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-md-8"></div>
+                            <div class="col-md-4">
+                              <mat-form-field class="width" appearance="outline">
+                                  <mat-label><small>Fecha Nacimiento</small></mat-label>
+                                  <!-- <input readonly formControlName="birthday" matInput [matDatepicker]="datepicker">
+                                  <mat-hint>dd/mm/aaaa</mat-hint>
+                                  <mat-error
+                                      *ngIf="isValidField('birthday')">{{getFielError('birthday')}}</mat-error>
+                                  <mat-datepicker-toggle matIconSuffix [for]="datepicker"></mat-datepicker-toggle>
+                                  <mat-datepicker #datepicker>
+                                  </mat-datepicker> -->
+                                  <input type="date" formControlName="birthday" #birthday matInput (click)="birthday.showPicker()">
+                                  <mat-icon style="cursor: pointer;" matSuffix (click)="birthday.showPicker()">calendar_month</mat-icon>
+                                  <mat-hint>dd/mm/aaaa</mat-hint>
+                                  <mat-error *ngIf="isValidField('birthday')">{{getFielError('birthday')}}</mat-error>
+                              </mat-form-field>
+                          </div>
+
+                            <div class="col-md-12">
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-icon matSuffix>location_on</mat-icon>
+                                    <mat-label><small>Lugar de nacimiento</small></mat-label>
+                                    <input formControlName="birthPlace" type="text" matInput>
+                                    <mat-error
+                                        *ngIf="isValidField('birthPlace')">{{getFielError('birthPlace')}}</mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="row">
+
+                            <div class="col-md-12">
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-icon matSuffix>home</mat-icon>
+                                    <mat-label><small>Dirección Domicilio</small></mat-label>
+                                    <input formControlName="placeResidence" type="text" matInput>
+                                    <mat-error
+                                        *ngIf="isValidField('placeResidence')">{{getFielError('placeResidence')}}</mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <!-- AQUÍ ESTA EL LLAMADO A LOS COMBOS DE PROVINCIA CANTON Y PARROQUIA -->
+                        <!-- -------------------------------------------------------------------------- -->
+                        <enrollment-combo *ngIf="checkIfShowCombo" (parishOut)="getParish( $event )" (provinceOut)="getCanton( $event )"
+                            (cantonOut)="getProvince( $event )" (getStatusForm)="getStatusForm($event)" [province]="province" [canton]="canton"
+                            [parish]="parish"></enrollment-combo>
+                        <!-- -------------------------------------------------------------------------- -->
+                        <!-- -------------------------------------------------------------------------- -->
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <mat-form-field class="width" appearance="outline">
+                                    <mat-label><small>Discapacidad</small></mat-label>
+                                    <mat-select formControlName="disabilityID">
+                                        <mat-option>--</mat-option>
+                                        <mat-option *ngFor="let item of disabilityList"
+                                            [value]="item.disabilityID">{{item.disabilityName}}</mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="isValidField('disabilityID')">{{getFielError('disabilityID')}}</mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-md-2">
+                                <mat-form-field class="width" appearance="outline"
+                                    *ngIf="personForm.get('disabilityID')?.value">
+                                    <mat-icon matSuffix>percent</mat-icon>
+                                    <mat-label>Porcentaje</mat-label>
+                                    <input formControlName="percentageDisability" maxlength="3" matInput mask="S*" [max]="100"
+                                        [patterns]="phone" appMaxValue>
+                                    <mat-error
+                                        *ngIf="isValidField('percentageDisability')">{{getFielError('percentageDisability')}}</mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-md-6">
+                                <mat-form-field class="width" appearance="outline"
+                                    *ngIf="personForm.get('disabilityID')?.value">
+                                    <mat-icon matSuffix>info</mat-icon>
+                                    <mat-label>Información adicional</mat-label>
+                                    <input formControlName="cometaryDisability" type="text" matInput>
+                                    <mat-error
+                                        *ngIf="isValidField('cometaryDisability')">{{getFielError('cometaryDisability')}}</mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="row">
+                          <strong class="ml-2 col-md-12">
+                            <h3>Contacto de emergencia</h3>
+                          </strong>
+
+                          <div class="col-md-4">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-icon matSuffix>person_pin</mat-icon>
+                                <mat-label><small>Contacto Emergencia</small></mat-label>
+                                <input formControlName="contactName" type="text" matInput onkeypress='return ((event.charCode >= 65 && event.charCode <= 90) || (event.charCode >= 97 && event.charCode <= 122) || (event.charCode == 32))'>
+                                <mat-error
+                                    *ngIf="isValidField('contactName')">{{getFielError('contactName')}}</mat-error>
+                            </mat-form-field>
+                          </div>
+                          <div class="col-md-4">
+                              <mat-form-field class="width" appearance="outline">
+                                  <mat-icon matSuffix>phone_iphone</mat-icon>
+                                  <mat-label><small>Celular Contacto</small></mat-label>
+                                  <input formControlName="emergencyPhone" maxlength="10" matInput mask="S*"
+                                      [patterns]="phone">
+                                  <mat-error
+                                      *ngIf="isValidField('emergencyPhone')">{{getFielError('emergencyPhone')}}</mat-error>
+                              </mat-form-field>
+                          </div>
+                          <div class="col-md-12">
+                              <mat-form-field class="width" appearance="outline">
+                                  <mat-icon matSuffix>home</mat-icon>
+                                  <mat-label><small>Dirección Contacto</small></mat-label>
+                                  <input formControlName="contactAddress" type="text" matInput>
+                                  <mat-error
+                                      *ngIf="isValidField('contactAddress')">{{getFielError('contactAddress')}}</mat-error>
+                              </mat-form-field>
+                          </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!--<div class="row">
+            <div class="col-md-9"></div>
+            <div class="col-md-2">
+                <button mat-raised-button #tooltip="matTooltip" matTooltip="Siguiente: Documentos personales"
+                    type="submit" class="styleButton">
+                    Guardar
+                </button>
+            </div>
+            <div class="col-md-1"></div>
+        </div>-->
+    </form>
+</div>

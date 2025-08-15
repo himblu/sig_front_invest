@@ -1,0 +1,506 @@
+<div class="container-fluid" [formGroup]="form">
+  <div class="curriculum-buttons row justify-content-between">
+    <div>
+      <div>
+        <button class="button add-button" mat-raised-button (click)="addPeriod();">Añadir Periodo <mat-icon>add</mat-icon></button>
+      </div>
+      <div>
+        <button class="button delete-button" mat-raised-button (click)="removePeriod();">Eliminar Periodo<mat-icon>delete</mat-icon></button>
+      </div>
+      <div>
+        <button class="button add-button" mat-raised-button (click)="addUnit();">Añadir Unidad <mat-icon>add</mat-icon></button>
+      </div>
+<!--      <div>-->
+<!--        <button class="button add-button" mat-raised-button (click)="addPracticeHour();">Añadir Hora de Práctica<mat-icon>add</mat-icon></button>-->
+<!--      </div>-->
+    </div>
+
+    <div class="d-flex align-items-center">
+      <div>
+        <button class="button add-button" mat-raised-button (click)="sendForm();">CREAR MALLA <mat-icon>add</mat-icon></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12 col-md-6 col-lg-4 mt-2">
+      <mat-form-field appearance="outline">
+        <mat-label>Nombre de la Malla Curricular</mat-label>
+        <input type="text" formControlName="name" autocomplete="off" matInput/>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" style="margin: 0 15px 0 -15px;">
+    <mat-tab label="Formulario">
+      <div class="row mt-4 p-1">
+        <div class="col-10">
+          <div class="custom-scroll">
+            <div [style.width]="(periods.length * 183) + 357 + 'px'" class="curriculum-container">
+              <div class="curriculum-header">
+                <div class="curriculum-organization-unit-header border-left-1 border-top-1 h-100">
+                  <div>
+                    <span>UNIDADES DE ORGANIZACIÓN CURRICULAR</span>
+                  </div>
+                </div>
+
+                <div class="learning-activities-header border-left-1 border-top-1 h-100">
+                  <div>
+                    <span>ACTIVIDADES DE APRENDIZAJE</span>
+                  </div>
+                </div>
+
+                <div class="period-header h-100" *ngFor="let period of periods; trackBy: trackByPeriod;">
+                  <div class="border-left-1 border-top-1">
+                    <div class="period-name-header">
+                      <div class="period-name">
+                        <span>{{ period.name }}</span>
+                      </div>
+                    </div>
+                    <div class="period-subject-header">
+                      <div class="period-subject-name-header border-top-1">
+                        <span>ASIGNATURA</span>
+                      </div>
+                      <div class="period-subject-hours-header border-left-1 border-top-1">
+                        <span>HORAS</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="period-hours-header border-left-1 border-top-1 border-right-1 h-100">
+                  <div>
+                    <span>TOTAL HORAS</span>
+                  </div>
+                </div>
+              </div>
+
+              <!--BODY-->
+              <div>
+                <ng-container formArrayName="units">
+                  <div class="unit-container" style="display: flex;" *ngFor="let unit of unitsAsFormArray.controls; let indexUnit = index;">
+                    <ng-container [formGroupName]="indexUnit">
+                      <div class="border-left-1 border-top-1" style="width: 150px; min-width: 150px;">
+                        <div (click)="addRowToUnit(indexUnit);" matRipple style="height: 30px; background: #014898; color: white; cursor: pointer;" class="border-bottom-1">
+                          <div>
+                      <span style="font-size: 12px; padding-top: 3px; display: flex; align-items: center; justify-content: center;">
+                        AÑADIR FILA
+                        <mat-icon class="ml-2">add</mat-icon></span>
+                          </div>
+                        </div>
+                        <div class="input-container pr-2 pl-2" style="display: flex; align-items: center; justify-content: center; min-height: 60px; height: calc(100% - 60px); align-self: center;">
+                          <select
+                            style="width: 135px"
+                            [class.invalid-input]="unit?.get('name').invalid && unit?.get('name').touched"
+                            formControlName="name">
+                            <option value="" disabled>Unidad</option>
+                            <option *ngFor="let organizationUnit of $any(organizationUnits | filterUnits: false)" [ngValue]="organizationUnit.orgUnitID">{{ organizationUnit.orgUnitDesc }}</option>
+                          </select>
+                        </div>
+
+                        <div (click)="removeRowFromUnit(indexUnit);" matRipple style="height: 30px; background: #BE102AAA; color: white; cursor: pointer;">
+                          <div>
+                      <span style="font-size: 12px; padding-top: 3px; display: flex; align-items: center; justify-content: center;">
+                        ELIMINAR FILA
+                        <mat-icon class="ml-2">close</mat-icon></span>
+                          </div>
+                        </div>
+                      </div>
+
+
+                      <div style="display: block;">
+                        <ng-container formArrayName="rows" *ngFor="let row of getRowsOfUnit(indexUnit).controls; let indexRow = index;">
+                          <ng-container [formGroupName]="indexRow">
+                            <div style="display: flex;">
+                              <div class="learning-activities-container border-left-1 border-top-1">
+                                <div class="learning-activity">
+                                  <div class="pl-2 pr-2">
+                                    <span>Contacto Con Docente</span>
+                                  </div>
+                                </div>
+                                <div class="learning-activity border-top-1">
+                                  <div class="pl-2 pr-2">
+                                    <span>Práctico - Experimental</span>
+                                  </div>
+                                </div>
+                                <div class="learning-activity border-top-1">
+                                  <div class="pl-2 pr-2">
+                                    <span>Autónomo</span>
+                                  </div>
+                                </div>
+                                <div class="learning-activity border-top-1">
+                                  <div class="pl-2 pr-2" style="color: black;">
+                                    <span>CRÉDITOS / HORAS</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div style="width: 183px; height: 120px;" class="subject-container" *ngFor="let period of periods; let indexSingleRow = index; trackBy: trackByPeriod;">
+                                <!--              <div style="width: 182px; height: 120px;" class="subject-container" *ngFor="let period of periods; let indexPeriod = index; trackBy: trackByPeriod;">-->
+                                <ng-container
+                                  [ngTemplateOutletContext]="{ indexSingleRow: indexSingleRow, indexUnit: indexUnit, subjectValue: getSingleItemOfUnit(indexUnit, indexRow, indexSingleRow)?.value}"
+                                  [ngTemplateOutlet]="getSingleItemOfUnit(indexUnit, indexRow, indexSingleRow)?.get('courseID')?.value ? hasData : isEmpty">
+                                </ng-container>
+
+                                <ng-template #hasData let-subjectValue="subjectValue" let-indexSingleRow="indexSingleRow" let-indexUnit="indexUnit">
+                                  <div
+                                    matRipple
+                                    [style.background-color]="subjectValue.background"
+                                    [style.color]="subjectValue.color"
+                                    [formGroupName]="indexSingleRow">
+                                    <div
+                                      style="height: 90px; display: flex" class="border-left-1 border-top-1">
+                                      <div style="width: 113px; display: block;">
+                                        <div style="height: 20px; display: flex; justify-content: space-between;">
+                                          <div style="overflow: auto;">
+                                            <div style="height: 20px; display: flex;">
+                                              <div
+                                                (click)="removeDependency(indexUnit, indexRow, indexSingleRow, indexDependency);"
+                                                *ngFor="let dependency of subjectValue.depends; let indexDependency = index"
+                                                [style.background]="dependency.background"
+                                                [style.color]="dependency.color"
+                                                [matTooltip]="dependency.name"
+                                                matTooltipPosition="above"
+                                                style="cursor: pointer; border-radius: 2px; height: 15px; width: 15px; border: 1px solid white; margin: 2px 0 0 2px;">
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div>
+                                            <mat-icon
+                                              [matMenuTriggerFor]="subjectOptions"
+                                              [style.color]="subjectValue.color"
+                                              style="cursor: pointer;">
+                                              more_vert
+                                            </mat-icon>
+                                            <mat-menu #subjectOptions="matMenu" yPosition="above">
+                                              <ng-template matMenuContent>
+                                                <button
+                                                  *ngIf="(takenSubjects | filterSubjectByPeriod: (indexSingleRow + 1): getSubjectDependencies(indexUnit, indexRow, indexSingleRow)).length > 0"
+                                                  mat-menu-item
+                                                  [matMenuTriggerFor]="dependencies">
+                                                  Dependencia
+                                                </button>
+                                                <button mat-menu-item style="color: red;" (click)="removeSubject(indexUnit, indexRow, indexSingleRow);">Borrar Materia</button>
+                                              </ng-template>
+                                            </mat-menu>
+
+                                            <mat-menu #dependencies="matMenu">
+                                              <ng-template matMenuContent>
+                                                <button
+                                                  (click)="addSubjectDependency(indexUnit, indexRow, indexSingleRow, filteredSubject);"
+                                                  *ngFor="let filteredSubject of takenSubjects | filterSubjectByPeriod: (indexSingleRow + 1): getSubjectDependencies(indexUnit, indexRow, indexSingleRow);" mat-menu-item>
+                                                  {{ filteredSubject.courseName }}
+                                                </button>
+                                              </ng-template>
+                                            </mat-menu>
+                                          </div>
+                                        </div>
+                                        <div
+                                          class="text-uppercase"
+                                          style="font-size: 10px; user-select: none; text-align: center; height: 70px; display: flex; justify-content: center; align-items: center;">
+                                          {{ subjectValue.courseName }}
+                                        </div>
+                                      </div>
+                                      <div style="width: 69px;">
+                                        <div class="input-container">
+                                          <input
+                                            [class.invalid-input]="getSingleItemOfUnit(indexUnit, indexRow, indexSingleRow)?.get('faceToFaceHours')?.invalid && getSingleItemOfUnit(indexUnit, indexRow, indexSingleRow)?.get('faceToFaceHours')?.touched"
+                                            type="text" [mask]="'9*'" [allowNegativeNumbers]="false" formControlName="faceToFaceHours" autocomplete="off"/>
+                                        </div>
+                                        <div class="input-container">
+                                          <input
+                                            [class.invalid-input]="getSingleItemOfUnit(indexUnit, indexRow, indexSingleRow)?.get('experimentalHours')?.invalid && getSingleItemOfUnit(indexUnit, indexRow, indexSingleRow)?.get('experimentalHours')?.touched"
+                                            type="text" [mask]="'9*'" [allowNegativeNumbers]="false" formControlName="experimentalHours" autocomplete="off"/>
+                                        </div>
+                                        <div class="input-container">
+                                          <input
+                                            [class.invalid-input]="getSingleItemOfUnit(indexUnit, indexRow, indexSingleRow)?.get('unsupervisedHours')?.invalid && getSingleItemOfUnit(indexUnit, indexRow, indexSingleRow)?.get('unsupervisedHours')?.touched"
+                                            type="text" [mask]="'9*'" [allowNegativeNumbers]="false" formControlName="unsupervisedHours" autocomplete="off"/>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div style="height: 30px; display: flex;" class="border-left-1">
+                                      <div
+                                        [style.color]="subjectValue.color"
+                                        style="width: 113px; padding: 2px; text-align: center; align-self: center;">
+                                        {{ ((subjectValue | hoursPerSubject)/48) | number: '':'en-US' }}
+                                      </div>
+                                      <div
+                                        [style.color]="subjectValue.color"
+                                        style="width: 69px; padding: 2px; text-align: center; align-self: center;">
+                                        {{ (subjectValue | hoursPerSubject) | number: '':'en-US' }}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </ng-template>
+
+                                <ng-template #isEmpty let-indexSingleRow="indexSingleRow" let-indexUnit="indexUnit">
+                                  <div class="border-left-1 border-top-1"
+                                       style="cursor: default; width: 100%;"
+                                       dndDropzone
+                                       (dndDrop)="onDrop($event, indexUnit, indexRow, indexSingleRow)"
+                                       matRipple>
+                                    <!--                                 (click)="addSubject(indexUnit, indexRow)">-->
+                                    <div style="height: 120px; display: flex; justify-content: center; align-items: center;">
+                                      <mat-icon style="color: #fa5e22">assignment_add</mat-icon>
+                                    </div>
+                                  </div>
+                                </ng-template>
+                              </div>
+                            </div>
+                          </ng-container>
+                        </ng-container>
+                      </div>
+
+                      <div class="border-left-1 border-top-1 border-right-1"
+                           style="width: 58px; display: flex; align-items: center; justify-content: center;">
+                        <div>
+                          <span>{{ (getRowsOfUnit(indexUnit).value | hoursPerUnit) | number: '':'en-US' }}</span>
+                        </div>
+                      </div>
+                    </ng-container>
+                  </div>
+                </ng-container>
+              </div>
+
+              <div class="border-bottom-1">
+                <ng-container formArrayName="practiceHours">
+                  <div class="hours-of-practice-container" style="display: flex;" *ngFor="let practiceHour of practiceHoursFormArray.controls; let practiceHourIndex = index;">
+                    <ng-container [formGroupName]="practiceHourIndex">
+                      <div class="border-left-1 border-top-1" style="width: 300px; min-width: 300px;">
+                        <div (click)="addRowToPracticeHour(practiceHourIndex);" matRipple style="height: 30px; background: #014898; color: white; cursor: pointer;" class="border-bottom-1">
+                          <div>
+                      <span style="font-size: 12px; padding-top: 3px; display: flex; align-items: center; justify-content: center;">
+                        AÑADIR FILA
+                        <mat-icon class="ml-2">add</mat-icon></span>
+                          </div>
+                        </div>
+                        <div class="input-container pr-2 pl-2" style="display: flex; align-items: center; justify-content: center; min-height: 60px; height: calc(100% - 60px); align-self: center;">
+                          <select
+                            style="width: 135px"
+                            [class.invalid-input]="practiceHour?.get('name').invalid && practiceHour?.get('name').touched"
+                            formControlName="name">
+                            <option value="" disabled>Unidad</option>
+                            <option *ngFor="let organizationUnit of $any(organizationUnits | filterUnits: true)" [ngValue]="organizationUnit.orgUnitID">{{ organizationUnit.orgUnitDesc }}</option>
+                          </select>
+                        </div>
+
+                        <div (click)="removeRowFromPracticeHour(practiceHourIndex);" matRipple style="height: 30px; background: #BE102AAA; color: white; cursor: pointer;">
+                          <div>
+                            <span style="font-size: 12px; padding-top: 3px; display: flex; align-items: center; justify-content: center;">
+                              ELIMINAR FILA
+                              <mat-icon class="ml-2">close</mat-icon>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div style="display: block;">
+                        <ng-container formArrayName="rows" *ngFor="let row of getRowsOfPracticeHour(practiceHourIndex).controls; let indexRow = index;">
+                          <ng-container [formGroupName]="indexRow">
+                            <div style="display: flex;">
+                              <div style="width: 183px; height: 120px;" class="subject-container" *ngFor="let period of periods; let indexSingleRow = index; trackBy: trackByPeriod;">
+                                <div [formGroupName]="indexSingleRow">
+                                  <div style="height: 120px; padding: 2px; display: flex" class="border-left-1 border-top-1">
+                                    <!--<div style="width: 114px;">
+                                      <textarea
+                                        style="font-size: small;"
+                                        [class.invalid-input]="getSingleItemOfPracticeHour(practiceHourIndex, indexRow, indexSingleRow)?.get('name').invalid && getSingleItemOfPracticeHour(practiceHourIndex, indexRow, indexSingleRow)?.get('name').touched"
+                                        (keyup)="manageRequiredField(practiceHourIndex, indexRow, indexSingleRow);"
+                                        (paste)="manageRequiredField(practiceHourIndex, indexRow, indexSingleRow);"
+                                        (cut)="manageRequiredField(practiceHourIndex, indexRow, indexSingleRow);"
+                                        placeholder="NOMBRE DE LA PRÁCTICA"
+                                        formControlName="name" class="w-100 h-100">
+                                      </textarea>
+                                    </div>-->
+                                    <div class="input-container">
+                                      <h5><small>NOMBRE DE LA PRÁCTICA</small></h5>
+                                      <select
+                                        style="font-size: small; width: 114px;"
+                                        [class.invalid-input]="getSingleItemOfPracticeHour(practiceHourIndex, indexRow, indexSingleRow)?.get('name').invalid && getSingleItemOfPracticeHour(practiceHourIndex, indexRow, indexSingleRow)?.get('name').touched"
+                                        formControlName="name">
+                                        <option value="" disabled>Selecciona una asignatura</option>
+                                        <option *ngFor="let item of takenSubjects | filterSubjectToPracticeHour: (indexSingleRow + 1): updateTakenSubjectsPipe" [ngValue]="item.courseID">{{ item.courseName }}</option>
+                                      </select>
+                                    </div>
+                                    <div style="width: 69px;">
+                                      <div class="input-container" style="height: 60px;">
+                                        <div class="h-100 d-flex align-items-end">
+                                          <input
+                                            [class.invalid-input]="getSingleItemOfPracticeHour(practiceHourIndex, indexRow, indexSingleRow)?.get('hours').invalid && getSingleItemOfPracticeHour(practiceHourIndex, indexRow, indexSingleRow)?.get('hours').touched"
+                                            placeholder="Horas"
+                                            style="height: 26px; font-size: small;" type="text"
+                                            mask="separator"
+                                            thousandSeparator=","
+                                            [allowNegativeNumbers]="false"
+                                            formControlName="hours"
+                                            autocomplete="off">
+                                        </div>
+                                      </div>
+                                      <div class="input-container" style="height: 60px;">
+                                        <div class="h-100 d-flex align-items-center">
+                                          <p class="mb-0 w-100">{{ ((getSingleItemOfPracticeHour(practiceHourIndex, indexRow, indexSingleRow).value | practiceHours)/48) | number: '.2':'en-US' }}</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </ng-container>
+                        </ng-container>
+                      </div>
+
+                      <div class="border-left-1 border-top-1 border-right-1"
+                           style="width: 58px; display: flex; align-items: center; justify-content: center;">
+                        <div>
+                          <span>{{ ((getRowsOfPracticeHour(practiceHourIndex).value | practiceHoursPerUnit)) | number: '':'en-US' }}</span>
+                        </div>
+                      </div>
+                    </ng-container>
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-2 mb-5 mat-elevation-z1">
+          <div class="">
+            <div>
+              <h5 class="text-center mt-3" style="font-weight: 500; font-size: 13px;">ASIGNATURAS DISPONIBLES</h5>
+            </div>
+            <ul class="course-list" style="max-height: 560px; min-height: auto; overflow: auto;">
+              <li style="cursor: not-allowed;" *ngIf="!careerSubjects.length" class="border-bottom-1">No Hay Asignaturas Disponibles</li>
+              <li class="border-bottom-1 text-uppercase"
+                  style="line-height: 13px"
+                  [dndDraggable]="{ subject, indexItem }"
+                  *ngFor="let subject of careerSubjects; trackBy: trackBySubjectId; let indexItem = index">
+                {{ subject.courseName }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+    <mat-tab label="Resumen">
+      <div class="row mt-4 p-1">
+        <div class="col-12">
+          <div class="custom-scroll">
+            <div [style.width]="(periods.length * 183) + 357 + 'px'" class="curriculum-container">
+              <div class="curriculum-resume">
+                <div class="curriculum-resume-header border-left-1 border-top-1 h-100">
+                  <div>
+                    <span>COMPONENTE POR PAO</span>
+                  </div>
+                </div>
+
+                <div class="period-header h-100" *ngFor="let period of periods; trackBy: trackByPeriod; let periodIndex = index">
+                  <div class="border-left-1 border-top-1">
+                    <div class="period-name-header">
+                      <div class="period-name">
+                        <span>{{ period.name }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="period-hours-header border-left-1 border-top-1 border-right-1 h-100">
+                  <div>
+                    <span>TOTAL</span>
+                  </div>
+                </div>
+              </div>
+
+              <!--BODY-->
+              <div>
+                <div class="curriculum-resume-body border-bottom-1" *ngFor="let item of resumeItems">
+                  <div class="curriculum-resume-header-body border-left-1 h-100">
+                    <div>
+                      <span>{{ item.item }}</span>
+                    </div>
+                  </div>
+
+                  <div class="hours-header h-100" *ngFor="let period of periods; let indexSingleRow = index; trackBy: trackByPeriod;">
+                    <div class="border-left-1">
+                      <div class="hours">
+                        <div class="name">
+                          <span>{{ unitsAsFormArray.value | totalHours : item.hourType: indexSingleRow + 1 }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="period-hours-header border-left-1 border-right-1 h-100">
+                    <div>
+                      <span>{{ unitsAsFormArray.value | totalHours : item.hourType }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="curriculum-resume-body border-bottom-1" *ngFor="let practiceHour of practiceHoursFormArray.controls; let practiceHourIndex = index;">
+                  <div class="curriculum-resume-header-body border-left-1 h-100">
+                    <div>
+                      <span>Horas de prácticas pre profesionales</span>
+                    </div>
+                  </div>
+
+                  <div class="hours-header h-100" *ngFor="let period of periods; let indexSingleRow = index; trackBy: trackByPeriod;">
+                    <div class="border-left-1">
+                      <div class="hours">
+                        <div class="name">
+                          <span>{{ practiceHoursFormArray.value | totalPracticeHours : indexSingleRow + 1 }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="period-hours-header border-left-1 border-right-1 h-100">
+                    <div>
+                      <span>{{ practiceHoursFormArray.value | totalPracticeHours }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-4 p-1">
+        <div class="col-8">
+          <div class="table-responsive" style="font-size: 11px; text-align: center;">
+            <table class="table">
+              <thead style="background-color: #004899; color: white;">
+              <tr>
+                <th><div class="trow">UNIDADES DE ORGANIZACIÓN CURRICULAR</div></th>
+                <th *ngFor="let item of $any(organizationUnits | filterUnits: false)" ><div class="trow">{{item.orgUnitDesc}}</div></th>
+                <td><div class="trow">TOTAL</div></td>
+              </tr>
+              </thead>
+              <tbody style="color: black;">
+                <tr>
+                  <td><div class="trow">ASIGNATURAS</div></td>
+                  <td *ngFor="let item of (organizationUnits | filterUnits: false)"><div class="trow">{{ form.value.units | subjectsByUnit: item }}</div></td>
+                  <td><div class="trow">{{ form.value.units | subjectsByUnit }}</div></td>
+                </tr>
+                <tr>
+                  <td><div class="trow">HORAS</div></td>
+                  <td *ngFor="let item of (organizationUnits | filterUnits: false)"><div class="trow">{{ form.value.units | totalHoursPerUnitByOrganizationUnit: item }}</div></td>
+                  <td><div class="trow">{{ form.value.units | totalHoursPerUnitByOrganizationUnit }}</div></td>
+                </tr>
+                <tr>
+                  <td><div class="trow">PORCENTAJES DE HORAS</div></td>
+                  <td *ngFor="let item of (organizationUnits | filterUnits: false)">
+                    <div class="trow">{{ ((form.value.units | totalHoursPerUnitByOrganizationUnit: item) / (form.value.units | totalHoursPerUnitByOrganizationUnit)) | percent: '1.': 'en-US' }}</div>
+                  </td>
+                  <td><div class="trow">100%</div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>
+

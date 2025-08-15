@@ -1,0 +1,50 @@
+<div class="row animated fadeIn fast" *ngIf="cargando">
+    <div class="col-md-12">
+        <div class="alert alert-info text-center">
+            <h4 class="alert-heading">Cargando</h4>
+            <i class="fa fa-spin fa-refresh fa-3x"></i>
+            <p class="mb-0">Por favor esperar...</p>
+        </div>
+    </div>
+</div>
+<form [formGroup]="addressForm"
+        autocomplete="off">
+    <div *ngIf="!cargando" style="display: flex;">
+        <div class="col-md-4">
+            <mat-form-field class="width" appearance="outline">
+                <mat-label>Provincia</mat-label>
+                <mat-select formControlName="provinceAddress">
+                    <mat-option value="">Seleccione Provincia</mat-option>
+                    <mat-option *ngFor="let province of provinces" [value]="province.provinceID"> {{province.provinceName}}</mat-option>
+                </mat-select>
+                <mat-error *ngIf="addressForm.hasError('required', 'provinceAddress')">
+                    Provincia es <strong>requerido</strong>
+                </mat-error>
+            </mat-form-field>
+        </div>
+        <div class="col-md-4">
+            <mat-form-field class="width" appearance="outline" *ngIf="cantonsByProvince.length > 0">
+                <mat-label>Cantón</mat-label>
+                <mat-select formControlName="cantonAddress">
+                    <mat-option value="">Seleccione Canton</mat-option>
+                    <mat-option *ngFor="let canton of cantonsByProvince" [value]="canton.cantonID">{{canton.cantonName}}</mat-option>
+                </mat-select>
+                <mat-error *ngIf="addressForm.hasError('required', 'cantonAddress')">
+                    Canton es <strong>requerido</strong>
+                </mat-error>
+            </mat-form-field>
+        </div>
+        <div class="col-md-4">
+            <mat-form-field class="width" appearance="outline" *ngIf="parishByCantons.length > 0">
+                <mat-label>Parroquia</mat-label>
+                <mat-select formControlName="parishAddress">
+                    <mat-option value="">Seleccione Parroquia</mat-option>
+                    <mat-option *ngFor="let parish of parishByCantons" [value]="parish.parishID">{{parish.parishName}}</mat-option>
+                </mat-select>
+                <mat-error *ngIf="addressForm.hasError('required', 'parishAddress')">
+                    Parroquia es <strong>requerido</strong>
+                </mat-error>
+            </mat-form-field>
+        </div>
+    </div>
+</form>

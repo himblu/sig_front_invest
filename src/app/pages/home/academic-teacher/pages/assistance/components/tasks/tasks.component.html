@@ -1,0 +1,251 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="!charging">
+  <div class="row pl-3 pr-3">
+    <div class="col-4">
+      <section [formGroup]="filtersForm">
+        <mat-form-field appearance="outline">
+          <mat-label>Parcial</mat-label>
+          <mat-select formControlName="componentID" placeholder="Filtrar por Parcial" (selectionChange)="getSettingTasks()">
+            <mat-option *ngFor="let partial of partialList" [value]="partial.componentID">{{partial.evaluationName}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </section>
+    </div>
+    <div class="col-md-8" style="text-align: right;">
+      <button *ngIf="studentsList?.length > 0" type="button" mat-raised-button class="styleButton_sml" style="width: 162px;" data-toggle="modal" data-target="#tasksModal" (click)="openModal(0)">Nueva tarea</button>
+      <button *ngIf="studentsList?.length === 0" type="button" mat-raised-button class="styleButton_sml" style="width: 162px;" aria-readonly="true" matTooltipPosition="above" matTooltip="No existen estudiantes matriculados">Nueva tarea</button>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <div id="add-contact" class="modal fade in" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+    </div>
+    <table id="demo-foo-addrow"
+           class="table m-t-0 table-hover no-wrap contact-list footable-loaded footable"
+           data-page-size="5">
+      <thead style="background-color: #004899; color: white;">
+      <tr>
+        <th class="footable-sortable">
+          Parcial
+          <span class="footable-sort-indicator"></span>
+        </th>
+        <th class="footable-sortable">
+          Tipo de actividad
+          <span class="footable-sort-indicator"></span>
+        </th>
+        <th class="footable-sortable">
+          Tarea (Detalle)
+          <span class="footable-sort-indicator"></span>
+        </th>
+        <th class="footable-sortable" style="text-align: center;">
+          Acciones
+          <span class="footable-sort-indicator"></span>
+        </th>
+      </tr>
+      </thead>
+      <tbody style="color: black;">
+      <tr class="footable-even" *ngFor="let item of tasksList" style="text-transform: uppercase;">
+        <td>{{item.evaluationName}}</td>
+        <td>{{item.subComponentTypeName}}</td>
+        <td class="wrap">{{item.taskName}}</td>
+        <td style="text-align: center;">
+          <a type="button"
+              matTooltipPosition="above"
+              matTooltip="Editar"
+              style="cursor: pointer; color: green;"><i class="fa fa-pencil" aria-hidden="true" data-toggle="modal" data-target="#tasksModal" (click)="openModal(1, item)"></i>
+          </a>&nbsp;
+          <a type="button"
+              matTooltipPosition="above"
+              matTooltip="Se promedia"
+              *ngIf="item.gradable === 1"
+              (click)="updateGradable(item, 0)"
+              style="cursor: pointer; color: black;"><i class="fa fa-check" aria-hidden="true"></i>
+          </a>
+          <a type="button"
+              matTooltipPosition="above"
+              matTooltip="No se promedia"
+              *ngIf="item.gradable != 1"
+              (click)="updateGradable(item, 1)"
+              style="cursor: pointer; color: red;"><i class="fa fa-times" aria-hidden="true"></i>
+          </a>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <components-button-arrow [actual]="actualTasks" [totalPage]="totalPageTasks" [count]="countTasks" (result)="changePageTasks($event)"></components-button-arrow>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="tasksModal" tabindex="-1" aria-labelledby="tasksModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="height: 40px;">
+        <div class="col-md-5">
+          <h3 class="modal-title" id="tasksModalLabel"><br>{{title}}</h3>
+        </div>
+        <div class="col-md-1">
+          <button type="button" id="btn_close" class="close" data-dismiss="modal" aria-label="Close" (click)="getSettingTasks();">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-body">
+              <form [formGroup]="tasksForm"
+                autocomplete="off"
+                (submit)="onSubmitTasks()">
+                <div class="row">
+                  <div class="col-md-8">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Nombre</mat-label>
+                      <input type="text" matInput formControlName="taskName">
+                      <mat-error>
+                        Campo <strong>requerido</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-4">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Puntuación máxima</mat-label>
+                      <input type="number" [min]="1" [max]="10" matInput formControlName="percentage">
+                      <mat-error>
+                        No <strong>válido</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-12">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Descripción</mat-label>
+                      <textarea type="text" matInput formControlName="taskDesc" style="text-transform: uppercase;"></textarea>
+                      <mat-error>
+                        Campo <strong>requerido</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field class="width" appearance="outline" *ngIf="currentPeriod">
+                      <mat-label>Fecha de inicio</mat-label>
+                      <input type="datetime-local" formControlName="startDate" #startDate matInput [min]="currentPeriod.periodDateStart | date: 'yyyy-MM-dd HH:mm'" [max]="currentPeriod.periodDateEnd | date: 'yyyy-MM-dd HH:mm'" onkeydown="blur();" (click)="startDate.showPicker()" (ngModelChange)="getMinDate(startDate.value)">
+                      <mat-icon style="cursor: pointer;" matSuffix (click)="startDate.showPicker()">calendar_month</mat-icon>
+                      <mat-hint>dd/mm/aaaa</mat-hint>
+                      <mat-error>Fecha requerida</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field class="width" appearance="outline" *ngIf="currentPeriod">
+                      <mat-label>Fecha de entrega</mat-label>
+                      <input type="datetime-local" formControlName="endDate" #endDate matInput [min]="currentPeriod.periodDateStart" [max]="currentPeriod.periodDateEnd | date: 'yyyy-MM-dd HH:mm'" onkeydown="blur();" (click)="endDate.showPicker()">
+                      <mat-icon style="cursor: pointer;" matSuffix (click)="endDate.showPicker()">calendar_month</mat-icon>
+                      <mat-hint>dd/mm/aaaa</mat-hint>
+                      <mat-error>Fecha requerida</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Parcial</mat-label>
+                      <mat-select formControlName="componentID" placeholder="Seleccionar parcial" (selectionChange)="getActivities()">
+                        <mat-option *ngFor="let partial of partialList" [value]="partial.componentID">{{partial.evaluationName}}</mat-option>
+                      </mat-select>
+                      <mat-error>
+                        Campo <strong>requerido</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Tipo de actividad</mat-label>
+                      <mat-select formControlName="subComponentID" placeholder="Seleccionar actividad" (selectionChange)="getSettingsTasksPractice()">
+                        <mat-option *ngFor="let activity of activitiesList" [value]="activity.subComponentID" (onSelectionChange)="getSelectedActivity(activity, $event)">{{activity.subComponentTypeName}}</mat-option>
+                      </mat-select>
+                      <mat-error>
+                        Campo <strong>requerido</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-12" *ngIf="tasksFlag || currentTask?.subComponentTypeName === 'Práctica'">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Tipo de práctica</mat-label>
+                      <mat-select formControlName="titleGap" placeholder="Seleccionar práctica" (selectionChange)="getPractice($event.value);">
+                        <mat-option *ngFor="let item of settingTaskPractice" [value]="item.titleGap">{{item.titleGap}}</mat-option>
+                      </mat-select>
+                      <mat-error>
+                        Campo <strong>requerido</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-4">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Número de intentos</mat-label>
+                      <input type="number" [min]="1" [max]="10" matInput formControlName="attempts">
+                      <mat-error>
+                        No <strong>válido</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-4">
+                    <mat-checkbox formControlName="flgFile" color="primary"><small>Requiere archivo?</small></mat-checkbox>
+                  </div>
+                  <div class="col-md-4">
+                    <mat-button-toggle-group appearance="legacy" name="fontStyle" aria-label="Font Style" formControlName="toggle" style="height:2.5vw;" #toggle>
+                      <mat-button-toggle value='1'><small>Archivo</small></mat-button-toggle>
+                      <mat-button-toggle value='2'><small>URL</small></mat-button-toggle>
+                    </mat-button-toggle-group>
+                  </div>
+                  <div class="col-md-12">
+                    <ng-container *ngIf="!currentTask?.urlFile">
+                      <div *ngIf="tasksForm.get('toggle').value === '1'" style="border: 1px solid rgba(0, 0, 0, 0.315); height: 55px; display: flex;">
+                        <input
+                          style="cursor: pointer;"
+                          class="mt-1 mb-1 ml-1 align-self-center"
+                          #input
+                          (change)="onChangeInput(input.files, input);"
+                          formControlName="urlFile"
+                          type="file" [accept]="('application/pdf, image/*, .doc, .docx, .xlsx, .xls')">
+                      </div>
+                    </ng-container>
+                    <ng-container *ngIf="currentTask?.urlFile">
+                      <div *ngIf="tasksForm.get('toggle').value === '1'" class="w-100" (click)="openFile(currentTask?.urlFile);" style="cursor: pointer;">
+                        <img style="width: 20px;" src="assets/images/file.png" alt="Payment File">
+                        <span style="color: #5090f5;">Ver Archivo</span>
+                      </div>
+                    </ng-container>
+                    <div *ngIf="tasksForm.get('toggle').value === '2'">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Url</mat-label>
+                        <input type="text" matInput formControlName="urlWeb">
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </div><br>
+                <div class="row">
+                  <div class="col-md-3">
+                    <button type="submit" mat-raised-button class="styleButton_sml" style="width: 100px;">
+                      <span *ngIf="!flagOnSubmit">Guardar</span>
+                      <span *ngIf="flagOnSubmit">Actualizar</span>
+                    </button>
+                  </div>
+                  <div class="col-md-3">
+                    <button type="button" mat-raised-button class="styleButton_gray" style="width: 100px;" data-dismiss="modal" #modalClose (click)="getSettingTasks();">Cerrar</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

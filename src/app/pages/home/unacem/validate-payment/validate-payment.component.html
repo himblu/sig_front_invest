@@ -1,0 +1,282 @@
+<div class="animated fadeIn fast">
+  <div class="form-row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header p-2">
+          <div class="form-row">
+            <div class="col-7 pt-1">
+              <i class="fa fa-search mr-1"></i>Validar Pago de Inscripción de Cursos
+            </div>
+            <div class="col-5">
+              <form [formGroup]="selectsForm">
+                <input type="text" formControlName="text" placeholder="FILTRAR RESULTADO POR TEXTO"
+                       class="form-control form-control-sm text-uppercase text-center">
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="card-body p-2">
+          <form [formGroup]="selectsForm">
+            <div class="form-row">
+              <div class="col-12">
+                <div class="form-row">
+                  <div class="col-6">
+                    <div class="form-row">
+                      <div class="col-3">
+                        <button class="btn btn-sm btn-success" [disabled]="!payments.length" (click)="paymentReport()">
+                          <i class="fa fa-cog mr-1"></i>Reporte por Estado .xlsx
+                        </button>
+                      </div>
+                      <div class="col-3">
+                        <label class="custom-label">Seleccionar Período:</label>
+                        <select formControlName="periodSection" (change)="getCourseListByPeriod()"
+                                class="form-control form-control-sm custom-select">
+                          <option [ngValue]="0">--TODOS--</option>
+                          <option *ngFor="let s of sectionPeriods" [ngValue]="s.periodID">{{ s.periodID }}</option>
+                        </select>
+                      </div>
+                      <div class="col-3">
+                        <label class="custom-label">Seleccionar Estado:</label>
+                        <select formControlName="statusFileID" (change)="getCourseListByStatus()"
+                                class="form-control form-control-sm custom-select">
+                          <option [ngValue]="0">--TODOS--</option>
+                          <option *ngFor="let s of statusFiles"
+                                  [ngValue]="s.statusFileID">{{ s.statusFileDesc | uppercase }}
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="form-row justify-content-end">
+                      <div class="col-3 custom-date-container">
+                        <!-- <button class="btn btn-sm btn-success" [disabled]="!selectsForm.value.startDate || !selectsForm.value.endDate" (click)="mainReport()">
+                          <i class="fa fa-cog mr-1"></i>Reporte General .xlsx
+                        </button> -->
+                        <button
+                          [disabled]="!selectsForm.value.startDate || !selectsForm.value.endDate"
+                          class="btn btn-sm btn-success"
+                          mat-raised-button
+                          matTooltipPosition="above"
+                          matTooltip="Reportes"
+                          [matMenuTriggerFor]="menu">
+                          <i class="fa fa-cog mr-1"></i>Reportes
+                        </button>
+                      </div>
+                      <mat-menu #menu="matMenu">
+                        <button
+                          mat-menu-item
+                          matTooltipPosition="above"
+                          matTooltip="Descargar Excel"
+                          [disabled]="!selectsForm.value.startDate || !selectsForm.value.endDate"
+                          (click)="getGeneralReport('academic-reports/general-payment-report','Reporte-General-Pagos');">
+                          <i style="color: green; cursor: pointer;" class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp;
+                          <span>Reporte General de Pagos</span>
+                        </button>
+                        <button
+                          mat-menu-item
+                          matTooltipPosition="above"
+                          matTooltip="Descargar Excel"
+                          [disabled]="!selectsForm.value.startDate || !selectsForm.value.endDate"
+                          (click)="getGeneralReport('academic-reports/general-inscription-report','Reporte-Inscritos');">
+                          <i style="color: green; cursor: pointer;" class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp;
+                          <span>Reporte de Inscritos</span>
+                        </button>
+                      </mat-menu>
+                      <div class="col-3 custom-date-container">
+                        <label class="custom-label">Fecha Inicio:</label>
+                        <input type="date" formControlName="startDate" class="form-control form-control-sm custom-date">
+                      </div>
+                      <div class="col-3 custom-date-container">
+                        <label class="custom-label">Fecha Fin:</label>
+                        <input type="date" formControlName="endDate" [min]="selectsForm.value.startDate"
+                               class="form-control form-control-sm custom-date">
+                      </div>
+                      <div class="col-3">
+                        <button class="btn btn-block btn-sm bg-primary-color"
+                                [disabled]="!selectsForm.value.startDate || !selectsForm.value.endDate"
+                                (click)="report()">
+                          <i class="fa fa-cog mr-1"></i>Comprobantes de Pago
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <ul class="list-group mt-2">
+                  <li class="list-group-item bg-primary-color p-1 font-xs">
+                    <div class="form-row">
+                      <div class="col-1">
+                        Nro Documento
+                      </div>
+                      <div class="col-4 pl-3">
+                        Responsable de Compra
+                      </div>
+                      <div class="col-1 text-center">
+                        Costo
+                      </div>
+                      <div class="col-2 text-center">
+                        F. Pago
+                      </div>
+                      <div class="col-2 text-center">
+                        Estado
+                      </div>
+                      <div class="col-2 text-right">
+                        Acciones
+                      </div>
+                    </div>
+                  </li>
+                  <li class="list-group-item text-secondary text-center" *ngIf="!payments.length">
+                    <i class="fa fa-times fa-2x"></i> <br>
+                    No se tienen resultados para el estado: {{ statusFileSelected.statusFileDesc }}
+                  </li>
+                  <li class="list-group-item p-1 font-sm" *ngFor="let i of payments">
+                    <div class="form-row">
+                      <div class="col-1 pt-1">
+                        {{ i.personDocumentNumber }}
+                      </div>
+                      <div class="col-4 pl-3 pt-1">
+                        {{ i.payerName }}
+                      </div>
+                      <div class="col-1 text-center pt-1">
+                        $ {{ i.totalAmount | number:'1.2-2' }}
+                      </div>
+                      <div class="col-2 text-center pt-1">
+                        <i class="fa fa-calendar mr-1"></i>{{ i.payDay | date:'dd/MM/yyyy' }}
+                      </div>
+                      <div class="col-2 pt-1 text-center">
+                        <i class="fa fa-circle mr-1"
+                           [ngStyle]="{'color': getStatusById(i.itemPerClass[0].statusFileID)?.backgroundColor}">
+                        </i>
+                        {{ getStatusById(i.itemPerClass[0].statusFileID)?.statusFileDesc }}
+                      </div>
+                      <div class="col-2 text-right" [ngClass]="{'pt-1': i.itemPerClass[0].statusFileID === 2}">
+                        <small *ngIf="i.itemPerClass[0].statusFileID === 4">{{ i.observation | uppercase }}</small>
+                        <button *ngIf="i.itemPerClass[0].statusFileID === 2 || i.itemPerClass[0].statusFileID === 3 "
+                                class="btn btn-sm bg-primary-color" (click)="toggleViewDetail(i)">
+                          <i class="fa fa-list-alt mr-1"></i>{{
+                            i.itemPerClass[0].statusFileID === 3 ? 'Detalle' : 'Validar Pago'
+                          }}
+                        </button>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+                <mat-paginator #paginator
+                               [length]="length"
+                               [pageSize]="pageSize"
+                               [pageSizeOptions]="pageSizeOptions"
+                               (page)="getPaymentPaginator($event)">
+                </mat-paginator>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" bsModal #viewModal="bs-modal" [config]="{backdrop: 'static'}" tabindex="-1" role="dialog"
+     aria-labelledby="dialog-static-name">
+  <div class="modal-dialog modal-nm" *ngIf="paymentSelected">
+    <div class="modal-content">
+      <div class="modal-header" *ngIf="!isLoading">
+        <button type="button" class="btn-close close float-right text-danger" aria-label="Close"
+                (click)="toggleViewDetail()">
+          <span aria-hidden="true" class="visually-hidden">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="col-12 text-center" *ngIf="paymentSelected?.paymentType === 1">
+            <img style="cursor: pointer;" [src]="paymentSelected.urlImage" width="200" height="250"
+                 alt="voucher registrado"
+                 (click)="openFile(paymentSelected);" matTooltip="Descagar">
+          </div>
+          <div class="col-12 text-center">
+            <small>Monto</small> <br>
+            <strong class="font-xl text-primary-color">$ {{ paymentSelected.totalAmount | number:'1.2-2' }}</strong>
+            <br>
+            <!-- <small>{{(paymentSelected.payDay || currentDate) | date: 'dd-MM-yyyy'}} - {{paymentSelected.transactionTypeDesc || 'DEPOSITO'}} - {{paymentSelected.financialEntityDesc || 'PICHINCHA'}}</small> -->
+            <ng-container *ngIf="paymentSelected?.paymentType === 1; else tarjeta">
+              <small>
+                {{ (paymentSelected?.payDay || currentDate) | date: 'dd-MM-yyyy' }} -
+                {{ paymentSelected?.transactionTypeDesc || 'DEPÓSITO' }} -
+                {{ paymentSelected?.financialEntityDesc || 'PICHINCHA' }}
+                <br>
+                Comprobante -
+                {{ paymentSelected?.numberOperation || '' }}
+              </small>
+            </ng-container>
+            <ng-template #tarjeta>
+              <small>
+                {{ (paymentSelected?.payDay || currentDate) | date: 'dd-MM-yyyy' }} -
+                DATAFAST -
+                {{ paymentSelected?.numberOperation || 'ID' }}
+              </small>
+            </ng-template>
+          </div>
+          <div class="col-12 mt-3">
+            <ul class="list-group">
+              <li class="list-group-item p-2">
+                <strong class="text-primary-color">Detalle de Pago</strong>
+              </li>
+              <li class="list-group-item p-2" *ngFor="let g of paymentSelected.detailGrouped">
+                <div class="form-row">
+                  <div class="col-10">
+                    <strong class="text-primary-color">Curso:</strong><br>
+                    {{ g.courseName | uppercase }} <br/> <span
+                    class="badge badge-light border-primary-color float-right">x{{ g.detail.length }}</span>
+                  </div>
+                  <!-- <div class="col-2 text-right text-primary-color">$ {{g.totalAmount | number:'1.2-2'}}</div> -->
+                  <div class="col-2 text-right text-primary-color">$ {{ g.unitPrice | number:'1.2-2' }}</div>
+                </div>
+              </li>
+              <li class="list-group-item p-2">
+                <div class="form-row">
+                  <div class="col-8 text-right">
+                    <strong class="text-primary-color">TOTAL</strong>
+                  </div>
+                  <div class="col-4 text-right text-primary-color">$ {{ paymentSelected.totalAmount }}</div>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="col-12" *ngIf="paymentSelected?.paymentType === 1">
+            <label for="observation">Observación</label>
+            <textarea name="observation" rows="3" [(ngModel)]="paymentSelected.observation"
+                      placeholder="ALGUNA OBSERVACIÓN" class="form-control text-uppercase"></textarea>
+          </div>
+
+          <div class="col-12" style="position: relative;" *ngIf="isLoading;">
+            <spinner-loader></spinner-loader>
+          </div>
+          <div class="col-12 mt-3" *ngIf="paymentSelected.pending && !isLoading">
+            <div class="col-12">
+              <div class="form-check">
+                <input type="checkbox" name="sendMail" [disabled]="paymentSelected.isApproved" id="sendMail"
+                       class="form-check-input" [(ngModel)]="paymentSelected.sendEmail" [checked]="true">
+                <label class="form-check-label" for="sendMail"
+                       style="cursor: pointer; margin-top: 0.5rem; margin-left: 0.5rem;">
+                  Notificar por correo al responsable de compra.
+                </label>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="col-6">
+                <button class="btn btn-sm btn-light text-danger" (click)="decide(false)">
+                  <i class="fa fa-check mr-1"></i>Rechazar
+                </button>
+              </div>
+              <div class="col-6 text-right">
+                <button class="btn btn-sm btn-light text-primary-color" (click)="decide(true)">
+                  <i class="fa fa-check mr-1"></i>Validar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

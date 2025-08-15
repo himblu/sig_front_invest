@@ -1,0 +1,105 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<div class="row animated fadeIn fast" *ngIf="!charging">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-body">
+        <section [formGroup]="filtersForm">
+          <div class="row pl-3 pr-3">
+            <div class="col-4">
+              <mat-form-field appearance="outline">
+                <mat-label>Buscar por nombre o cédula</mat-label>
+                <input matInput formControlName="search" autocomplete="off" (keyup)="getUsersRol()">
+                <mat-icon matSuffix>search</mat-icon>
+              </mat-form-field>
+            </div>
+          </div>
+        </section>
+        <div class="table-responsive">
+          <table class="table">
+            <thead style="background-color: #004899; color: white;">
+              <th>Nombre</th>
+              <th>Usuario</th>
+              <th>Rol</th>
+              <th>Grupo</th>
+              <th style="text-align: center;">Acciones</th>
+            </thead>
+            <tr *ngFor="let item of usersRolList; let i = index" style="color: black;">
+              <td>{{item.PersonFullName}}</td>
+              <td>{{item.userName}}</td>
+              <td *ngIf="i !== index || i === index && filtersForm.get('forSave').value === 1">{{item.rolName}}</td>
+              <td *ngIf="i === index && filtersForm.get('forSave').value === 0">
+                <form [formGroup]="rolForm">
+                  <mat-form-field appearance="outline">
+                    <mat-select formControlName="p_rolID" placeholder="Seleccione el rol">
+                      <mat-option *ngFor="let rol of rolesList;" [value]="rol.rolId" (click)="getRolName(rol.RolName)">
+                        {{ rol.RolName }}
+                      </mat-option>
+                    </mat-select>
+                    <mat-error></mat-error>
+                  </mat-form-field>
+                </form>
+              </td>
+              <td *ngIf="i !== index">{{item.groupName}}</td>
+              <td *ngIf="i === index">
+                <form [formGroup]="groupForm">
+                  <mat-form-field appearance="outline">
+                    <mat-select formControlName="groupID" placeholder="Seleccione el grupo">
+                      <mat-option *ngFor="let group of groupsList;" [value]="group.groupID">
+                        {{ group.groupName }}
+                      </mat-option>
+                    </mat-select>
+                    <mat-error></mat-error>
+                  </mat-form-field>
+                </form>
+              </td>
+              <td style="text-align: center;">
+                <a *ngIf="i === index">
+                  <i class="fa fa-floppy-o"
+                  aria-hidden="true"
+                  style="color: black; cursor: pointer;"
+                  matTooltipPosition="above"
+                  matTooltip="Guardar"
+                  (click)="submit()"></i>
+                </a>&nbsp;
+                <a *ngIf="i === index">
+                  <i class="fa fa-ban"
+                  aria-hidden="true"
+                  style="color: red; cursor: pointer;"
+                  matTooltipPosition="above"
+                  matTooltip="Cancelar"
+                  (click)="index=null"></i>
+                </a>
+                <a *ngIf="i !== index">
+                  <i class="fa fa-user-circle-o"
+                  aria-hidden="true"
+                  style="color: green; cursor: pointer;"
+                  matTooltipPosition="above"
+                  matTooltip="Agregar Rol"
+                  (click)="updateRolesInTable(item, 0, i)"></i>
+                </a>&nbsp;
+                <a *ngIf="i !== index">
+                  <i class="fa fa-users"
+                  aria-hidden="true"
+                  style="color: blue; cursor: pointer;"
+                  matTooltipPosition="above"
+                  matTooltip="Agregar Grupo"
+                  (click)="updateRolesInTable(item, 1, i)"></i>
+                </a>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <components-button-arrow [actual]="actualUsersRol" [totalPage]="totalPageUsersRol" [count]="countUsersRol" (result)="changePageUsersRol($event)"></components-button-arrow>
+      </div>
+    </div>
+  </div>
+</div>

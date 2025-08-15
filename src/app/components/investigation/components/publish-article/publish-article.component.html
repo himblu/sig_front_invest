@@ -1,0 +1,213 @@
+<!-- <div class="row animated fadeIn fast"> -->
+    <!-- <div class="col-md-12"> -->
+        <div class="card">
+            <div class="card-body">
+                <form [formGroup]="myForm"
+                    autocomplete="off">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Nombre del Artículo</mat-label>
+                                <input formControlName="articleName" type="text" matInput>
+                                <mat-error *ngIf="isValidField('articleName')">{{getFielError('articleName')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-4">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Revista de Publicación</mat-label>
+                                <input formControlName="magazineName" type="text" matInput>
+                                <mat-error *ngIf="isValidField('magazineName')">{{getFielError('magazineName')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-4">
+                            <mat-form-field class="width" appearance="outline">
+                              <mat-label><small>Fecha de Publicación</small></mat-label>
+                              <input formControlName="articlePublishingDate" matInput [matDatepicker]="datepicker" readonly>
+                              <mat-hint>dd/mm/aaaa</mat-hint>
+                              <mat-error *ngIf="isValidField('articlePublishingDate')">{{getFielError('articlePublishingDate')}}</mat-error>
+                              <mat-datepicker-toggle matIconSuffix [for]="datepicker"></mat-datepicker-toggle>
+                              <mat-datepicker #datepicker>
+                                  <mat-datepicker-actions>
+                                  <button mat-button matDatepickerCancel>Cancelar</button>
+                                  <button mat-raised-button color="primary" matDatepickerApply>Aceptar</button>
+                                  </mat-datepicker-actions>
+                              </mat-datepicker>
+                              <mat-error *ngIf="isValidField('articlePublishingDate')">{{getFielError('articlePublishingDate')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-4">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Participacion en la publicación de artículo</mat-label>
+                                <mat-select formControlName="articlePublishingParticipationID">
+                                    <mat-option value="">Seleccione una opción</mat-option>
+                                    <mat-option [value]="participation.participationArticleID" *ngFor="let participation of articleParticipations"> {{ participation.participationArticleDesc }} </mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="isValidField('articlePublishingParticipationID')">{{getFielError('articlePublishingParticipationID')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="col-md-4">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Estado de publicación del artículo</mat-label>
+                                <mat-select formControlName="articlePublishingStateID" (selectionChange)="articleState($event.value);">
+                                    <mat-option value="">Seleccione una opción</mat-option>
+                                    <mat-option [value]="status.statusArticleID" *ngFor="let status of stateArticle"> {{ status.statusArticleDesc }} </mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="isValidField('articlePublishingStateID')">{{getFielError('articlePublishingStateID')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="col-md-4">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Revista Indexada </mat-label>
+                                <mat-select formControlName="articlePublishingIndexedMagazine">
+                                    <mat-option [value]="1">SÍ</mat-option>
+                                    <mat-option [value]="2">NO</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="col-md-4">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Base de Datos Indexada </mat-label>
+                                <input formControlName="articlePublishingDatabaseName" type="text" matInput>
+                                <mat-error *ngIf="isValidField('articlePublishingDatabaseName')">{{getFielError('articlePublishingDatabaseName')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-4">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>URL de Base de Datos Indexada </mat-label>
+                                <input formControlName="urlWeb" type="text" matInput>
+                                <mat-error *ngIf="isValidField('urlWeb')">{{getFielError('urlWeb')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-10"></div>
+                        <div class="col-md-2" style="text-align: right;">
+                            <button mat-raised-button class="styleButton_sml" style="max-width: 150px; min-width: 100px;" type="submit"  (click)="charge()">Agregar</button>
+                        </div>
+                    </div>
+                </form>
+            <!-- </div> -->
+        </div>
+    </div><br>
+    <form [formGroup]="societyForm">
+        <div *ngFor="let item of dynamicsArr.controls; let i = index">
+            <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <div formArrayName="dynamics">
+                            <!-- <h1 class="text-warning">Publicación de Articulo:{{i + 1}}</h1> -->
+                            <div class="row" [formGroupName]="i">
+                                <div class="col-md-4">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Nombre del Artículo</mat-label>
+                                        <input formControlName="articleName" type="text" matInput (blur)="putArticlePublishing(i);">
+                                        <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-4">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Revista de Publicación</mat-label>
+                                        <input formControlName="magazineName" type="text" matInput (blur)="putArticlePublishing(i);">
+                                        <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-4">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label><small>Fecha de Publicación</small></mat-label>
+                                        <input type="date" formControlName="articlePublishingDate" #articlePublishingDate matInput (click)="articlePublishingDate.showPicker()" (blur)="putArticlePublishing(i);">
+                                        <mat-icon style="cursor: pointer;" matSuffix (click)="articlePublishingDate.showPicker()">calendar_month</mat-icon>
+                                        <mat-hint>dd/mm/aaaa</mat-hint>
+                                        <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-4">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Participación en la publicación de artículo</mat-label>
+                                        <mat-select formControlName="articlePublishingParticipationID" (selectionChange)="putArticlePublishing(i);">
+                                          <mat-option value="">Seleccione una opción</mat-option>
+                                          <mat-option [value]="participation.participationArticleID" *ngFor="let participation of articleParticipations"> {{ participation.participationArticleDesc }} </mat-option>
+                                        </mat-select>
+                                        <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-4">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Estado de publicación del artículo</mat-label>
+                                        <mat-select formControlName="articlePublishingStateID" (selectionChange)="putArticlePublishing(i);">
+                                          <mat-option value="">Seleccione una opción</mat-option>
+                                          <mat-option [value]="status.statusArticleID" *ngFor="let status of stateArticle"> {{ status.statusArticleDesc }} </mat-option>
+                                        </mat-select>
+                                        <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-4">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Revista Indexada</mat-label>
+                                        <mat-select formControlName="articlePublishingIndexedMagazine" (selectionChange)="putArticlePublishing(i);">
+                                            <mat-option [value]="1">SÍ</mat-option>
+                                            <mat-option [value]="2">NO</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Base de Datos Indexada</mat-label>
+                                        <input formControlName="articlePublishingDatabaseName" type="text" matInput (blur)="putArticlePublishing(i);">
+                                        <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-4">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>URL de Base de Datos Indexada</mat-label>
+                                        <input formControlName="urlWeb" type="text" matInput (blur)="putArticlePublishing(i);">
+                                        <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-4">
+                                  <div style="border: 1px solid rgba(0, 0, 0, 0.315); height: 40px; display: flex; border-radius: 4px;">
+                                    <input
+                                      *ngIf="!articlesPublishing[i]?.urlDocument"
+                                      style="cursor: pointer; width: 250px;"
+                                      class="mt-1 mb-1 ml-2 align-self-center"
+                                      #input
+                                      (change)="onChangeInput(input.files, i, input);"
+                                      formControlName="fileArticle"
+                                      type="file"
+                                      accept="application/pdf">
+                                    <div *ngIf="articlesPublishing[i]?.urlDocument" class="w-100" (click)="openFile(articlesPublishing[i].urlDocument);" style="cursor: pointer;">
+                                      <img style="width: 20px;" src="assets/images/file.png" alt="Payment File">
+                                      <span style="color: #5090f5;">Ver Archivo</span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-4">
+                                  <mat-label>Estado</mat-label>
+                                  <mat-checkbox formControlName="statusID" color="primary" (change)="putArticlePublishing(i);"></mat-checkbox>
+                                </div>
+                                <div class="col-md-2">
+                                  <button mat-raised-button class="styleButton_sml" style="max-width: 150px; min-width: 100px;" type="button" (click)="deleteDynamic(i)" *ngIf="!isLoadingInfo">Eliminar</button>
+                              </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><br>
+        </div>
+    </form>
+    <div class="row">
+      <div class="col-12" style="position: relative;" *ngIf="isLoading; else row">
+        <spinner-loader></spinner-loader>
+      </div>
+      <ng-template #row>
+        <div class="col-md-10"></div>
+        <div class="col-2" style="text-align: left;" *ngIf="dynamicsArr.length > 0">
+            <button mat-raised-button
+            matTooltip="Siguiente: Investigación" class="styleButton_sml" style="max-width: 150px; min-width: 100px;" type="button" (click)="saveRecord()" >Guardar</button>
+        </div>
+      </ng-template>
+    </div>
+<!-- </div> -->

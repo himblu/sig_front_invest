@@ -1,0 +1,220 @@
+:host mat-cell {
+	font-size: 90%;
+	line-height: normal;
+}
+
+:host .mat-cell {
+	height: 41px !important;
+	min-height: 41px !important;
+}
+
+.mat-cell-expanded {
+	border: none !important;
+	padding: 0 !important;
+}
+
+:host mat-header-row {
+	height: 44px;
+	min-height: 44px;
+}
+
+:host mat-header-cell {
+	line-height: normal;
+}
+
+:host ::ng-deep .mat-mdc-menu-content {
+	padding: 0 !important;
+}
+
+:host ::ng-deep .mat-mdc-menu-item {
+	font-size: 95%;
+	letter-spacing: 0;
+}
+
+mat-table, mat-paginator {
+	overflow: auto;
+	background: transparent;
+}
+
+mat-header-row {
+	background: #004899;
+	color: white;
+}
+
+::ng-deep .mat-mdc-menu-content {
+	padding: 0 !important;
+}
+
+::ng-deep .mat-mdc-menu-item {
+	min-height: 36px !important;
+}
+
+::ng-deep .mat-drawer-backdrop.mat-drawer-shown {
+	background-color: transparent !important;
+}
+
+:host ::ng-deep .mat-mdc-select-value-text {
+	font-size: 14px;
+	letter-spacing: 0;
+}
+
+:host ::ng-deep div.mat-mdc-select-panel {
+	padding: 0 !important;
+}
+
+:host ::ng-deep .mat-mdc-tab .mdc-tab__text-label {
+	letter-spacing: 0;
+	font-size: 14px;
+}
+
+.item {
+	font-size: 14px;
+	letter-spacing: 0;
+}
+
+.example-detail-row {
+	min-height: 0 !important;
+	/*height: 0 !important;*/
+	border-color: transparent;
+}
+
+.example-detail-row:hover {
+	background-color: unset;
+}
+
+.example-detail-row td {
+	width: 100%;
+	border-bottom-width: 0;
+}
+
+.example-element-row:not(.example-expanded-row):hover {
+	background: #ffffff;
+}
+
+.example-element-row:not(.example-expanded-row) {
+	min-height: 41px !important;
+	height: 41px !important;
+}
+
+/*.example-element-row:not(.example-expanded-row):active {*/
+/*	background: #efefef;*/
+/*	!*height: 150px !important;*!*/
+/*	!*min-height: 150px !important;*!*/
+/*}*/
+
+.example-element-row td {
+	border-bottom-width: 0;
+}
+
+.example-element-detail {
+	overflow: hidden;
+	/*display: flex;*/
+}
+
+table {
+	border: 1px solid #ccc;
+	border-collapse: collapse;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	table-layout: fixed;
+}
+
+table caption {
+	font-size: 1.5em;
+	margin: .5em 0 .75em;
+}
+
+table tr {
+	background-color: #ffffff;
+	border: 1px solid #ddd;
+	padding: .35em;
+}
+
+table th,
+table td {
+	padding: .625em;
+	text-align: center;
+}
+
+table th {
+	font-size: .85em;
+	letter-spacing: .1em;
+	text-transform: capitalize;
+	background-color: #014898;
+	color: white;
+}
+
+:host ::ng-deep .mat-mdc-text-field-wrapper {
+	height: 36px !important;
+}
+
+:host ::ng-deep .mat-mdc-icon-button.mat-mdc-button-base {
+	height: 36px !important;
+	width: 36px !important;
+	padding: 0 !important;
+}
+
+.mat-column-documentNumber {
+	flex: 0 0 10% !important;
+	width: 10% !important;
+	justify-content: start;
+}
+
+.mat-column-names {
+	flex: 0 0 20% !important;
+	width: 20% !important;
+	justify-content: start;
+}
+
+.mat-column-numberPhone {
+	flex: 0 0 10% !important;
+	width: 10% !important;
+	justify-content: start;
+}
+
+.mat-column-careerName {
+	flex: 0 0 20% !important;
+	width: 20% !important;
+	justify-content: start;
+}
+
+.mat-column-studyPlanDesc {
+	flex: 0 0 15% !important;
+	width: 15% !important;
+	justify-content: start;
+}
+
+.mat-column-modalityName {
+	flex: 0 0 15% !important;
+	width: 15% !important;
+	justify-content: start;
+}
+
+.mat-column-dateRequest {
+	flex: 0 0 10% !important;
+	width: 10% !important;
+	justify-content: center;
+}
+
+.mat-column-requestStatusID {
+	flex: 0 0 10% !important;
+	width: 10% !important;
+	justify-content: center;
+}
+
+.mat-column-actions {
+	flex: 0 0 5% !important;
+	width: 5% !important;
+	justify-content: center;
+}
+
+.modal-container {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 1000; /* Asegúrate de que esté encima del resto */
+	padding: 16px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}

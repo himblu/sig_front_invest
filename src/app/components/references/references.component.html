@@ -1,0 +1,114 @@
+
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <form [formGroup]="myForm"
+                    autocomplete="off"
+                    (submit)="charge()">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Referencia</mat-label>
+                                <input formControlName="referenceFullName" type="text" matInput>
+                                <mat-error *ngIf="isValidField('referenceFullName')">{{getFielError('referenceFullName')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-4">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Cargo</mat-label>
+                                <input formControlName="referencePosition" type="text" matInput>
+                                <mat-error *ngIf="isValidField('referencePosition')">{{getFielError('referencePosition')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-4">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Empresa</mat-label>
+                                <input formControlName="referenceCompany" type="text" matInput>
+                                <mat-error *ngIf="isValidField('referenceCompany')">{{getFielError('referenceCompany')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-4">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Teléfono</mat-label>
+                                <input formControlName="referencePhone" type="text" matInput minlength="9" maxlength="13" mask="S*"
+                                [patterns]="phone">
+                                <mat-error *ngIf="isValidField('referencePhone')">{{getFielError('referencePhone')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-10"></div>
+                        <div class="col-md-2" style="text-align: right;">
+                            <button mat-raised-button class="styleButton_sml" style="max-width: 150px; min-width: 100px;" type="submit" >Agregar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div><br>
+    </div>
+    <form [formGroup]="societyForm">
+        <div *ngFor="let item of dynamicsArr.controls; let i = index">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div formArrayName="dynamics">
+                            <div class="row" [formGroupName]="i">
+                                <div class="col-md-4">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Referencia</mat-label>
+                                        <input formControlName="referenceFullName" type="text" matInput (blur)="putReferences(i);">
+                                        <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-4">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Cargo</mat-label>
+                                        <input formControlName="referencePosition" type="text" matInput (blur)="putReferences(i);">
+                                        <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-4">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Empresa</mat-label>
+                                        <input formControlName="referenceCompany" type="text" matInput (blur)="putReferences(i);">
+                                        <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-4">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Teléfono</mat-label>
+                                        <input formControlName="referencePhone" type="text" matInput minlength="9" maxlength="13" mask="S*"
+                                        [patterns]="phone" (blur)="putReferences(i);">
+                                        <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-4">
+                                  <mat-label>Estado</mat-label>
+                                  <mat-checkbox formControlName="statusID" color="primary" (change)="putReferences(i);"></mat-checkbox>
+                                </div>
+                                <div class="col-md-2">
+                                  <button mat-raised-button class="styleButton_sml" style="max-width: 150px; min-width: 100px;" type="button" (click)="deleteDynamic(i)" *ngIf="!isLoadingInfo">Eliminar</button>
+                              </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><br>
+        </div>
+    </form>
+<div class="row">
+  <div class="col-12" style="position: relative;" *ngIf="isLoading; else row">
+    <spinner-loader></spinner-loader>
+  </div>
+  <ng-template #row>
+    <div class="col-8"></div>
+    <div class="col-2" style="text-align: right;" *ngIf="dynamicsArr.length > 0">
+        <button mat-raised-button
+        matTooltip="Anterior: Vinculación" class="styleButton_sml" style="max-width: 150px; min-width: 100px;" type="button" matStepperPrevious >Regresar</button>
+    </div>
+    <div class="col-2" style="text-align: left;" *ngIf="dynamicsArr.length > 0">
+        <button mat-raised-button
+        class="styleButton_sml" style="max-width: 150px; min-width: 100px;" type="button" (click)="saveRecord()" >Guardar</button>
+    </div>
+  </ng-template>
+</div>

@@ -1,0 +1,22 @@
+input[type="date"]
+{
+  font-size: 12px;
+}
+
+input[type="text"]
+{
+  font-size: 12px;
+}
+
+.target {
+	background: rgb(230, 255, 255);
+}
+
+.single-line {
+	width: 150px;
+	max-width: 200px;
+	min-width: 150px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}

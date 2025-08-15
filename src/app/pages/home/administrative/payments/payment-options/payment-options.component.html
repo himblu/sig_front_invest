@@ -1,0 +1,133 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<div class="animated fadeIn fast" *ngIf="!charging">
+  <div class="container-fluid">
+    <div class="row text-center">
+      <div class="col">
+        <h2 class="text-center mt-3">OPCIONES DE PAGO</h2>
+      </div>
+    </div>
+
+    <section [formGroup]="filtersForm">
+      <div class="row pl-2 pr-2">
+        <div class="col-4">
+          <mat-form-field appearance="outline">
+            <mat-label>Periodo Académico</mat-label>
+            <mat-select (selectionChange)="getPaymentOptions();" formControlName="period"
+              placeholder="Filtrar por Periodo Académico">
+              <mat-option value="">Todos</mat-option>
+              <mat-option *ngFor="let period of listPeriod; trackBy: trackByPeriodId;" [value]="period.periodID">
+                {{ period.periodName }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col-6">
+          <mat-form-field appearance="outline">
+            <mat-label>Buscar por opción de pago, tipo de matrícula...</mat-label>
+            <input matInput formControlName="search" autocomplete="off">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+        </div>
+        <div class="col-md-2">
+          <button type="submit" class="styleButton" mat-raised-button color="primary"
+            (click)="openDialog();">
+            <i class="fa fa-plus-circle"></i>
+            Agregar
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <div class="row">
+      <div class="col">
+
+        <spinner-loader [absolute]="true" *ngIf="loadingPaymentOptions">
+        </spinner-loader>
+
+        <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+
+          <ng-container matColumnDef="number">
+            <th mat-header-cell *matHeaderCellDef> No. </th>
+            <td mat-cell *matCellDef="let element; let i = index;"> {{i+1}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="detail">
+            <th mat-header-cell *matHeaderCellDef> Opción de pago (Detalle) </th>
+            <td mat-cell *matCellDef="let element"> {{element.paymentOptionDesc}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="enrollment">
+            <th mat-header-cell *matHeaderCellDef> Matrícula </th>
+            <td mat-cell *matCellDef="let element"> {{element.amountEnroll}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="tariff">
+            <th mat-header-cell *matHeaderCellDef> Arancel </th>
+            <td mat-cell *matCellDef="let element"> {{element.tariff}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="numberPayments">
+            <th mat-header-cell *matHeaderCellDef> No Cuotas </th>
+            <td mat-cell *matCellDef="let element"> {{element.dues}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="finalCost">
+            <th mat-header-cell *matHeaderCellDef> Costo final de nivel </th>
+            <td mat-cell *matCellDef="let element; let i = index;"> {{ truncateDecimals((+element.tariff) +
+              (+element.amountEnroll)) }} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="enrollmentType">
+            <th mat-header-cell *matHeaderCellDef> Tipo de matrícula </th>
+            <td mat-cell *matCellDef="let element"> {{element.enrollTypeDesc}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef> Estado </th>
+            <td mat-cell *matCellDef="let element"> {{element.state}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="action">
+            <th mat-header-cell *matHeaderCellDef> Acciones </th>
+            <td mat-cell *matCellDef="let element">
+              <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #menu="matMenu">
+                <button mat-menu-item (click)="isUpdating= true; openDialog(element);">
+                  <span>
+                    <i style="color: green;" class="fa fa-pencil" aria-hidden="true">&nbsp;</i> Editar
+                  </span>
+                </button>
+                <button mat-menu-item *ngIf="!element.statusID" (click)="fillModal(element); updatePayment(1)">
+                  <span><i style="color: red" class="fa fa-toggle-off" aria-hidden="true">&nbsp;</i> Activar</span>
+                </button>
+                <button mat-menu-item *ngIf="element.statusID" (click)="fillModal(element); updatePayment(0)">
+                  <span><i style="color: blue" class="fa fa-toggle-on" aria-hidden="true">&nbsp;</i> Inactivar</span>
+                </button>
+              </mat-menu>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns" [style.background-color]="color" style="color: white;">
+          </tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" style="text-transform: uppercase;"></tr>
+        </table>
+        <mat-paginator #paginator [length]="length" [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions"
+          (page)="pageEvent = getPaymentOptionsPaginator($event)">
+        </mat-paginator>
+      </div>
+    </div>
+  </div>
+
+</div>

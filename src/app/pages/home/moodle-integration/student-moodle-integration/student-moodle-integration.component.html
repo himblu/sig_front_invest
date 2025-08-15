@@ -1,0 +1,91 @@
+<div class="animated fadeIn fast">
+  <div class="form-row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="form-row">
+            <div class="col-12">
+              <div class="card">
+                <div class="card-header">
+                  <strong><i class="fa fa-user mr-1"></i>Información del Postulante en Moodle</strong>
+                </div>
+                <div class="card-body">
+                  <div class="form-row">
+                    <div class="col-9">
+                      <div class="form-row">
+                        <div class="col-5">
+                          <strong class="font-xs text-primary-color">Nombre Completo</strong><br>
+                          {{postulant.fullName}}
+                        </div>
+                        <div class="col-3">
+                          <strong class="font-xs text-primary-color">Nombre de Usuario</strong><br>
+                          {{postulant.userName}}
+                        </div>
+                        <div class="col-4">
+                          <strong class="font-xs text-primary-color">Correo Electrónico</strong><br>
+                          {{postulant.emailDesc | lowercase}}
+                        </div>
+                        <div class="col-4">
+                          <strong class="font-xs text-primary-color">Modalidad</strong><br>
+                          {{postulant.modalityName}}
+                        </div>
+                        <div class="col-4">
+                          <strong class="font-xs text-primary-color">Escuela</strong><br>
+                          {{postulant.schoolName}}
+                        </div>
+                        <div class="col-4">
+                          <strong class="font-xs text-primary-color">Carrera</strong><br>
+                          {{postulant.careerName}}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-3 text-center pt-4">
+                      <strong class="font-xxl">{{postulant.avg}}</strong> <br>
+                      <span><i class="fa fa-circle mr-1" [ngClass]="{'text-success': postulant.statusID === 1}"></i>{{postulant.statusID === 1 ? 'Activo' : 'Inactivo'}}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 text-center text-secondary" *ngIf="postulant.courses && !postulant.courses.length">
+              <i class="fa fa-times"></i><br>
+              No se tiene cursos matriculados en Moodle.
+            </div>
+            <div class="col-12 mt-3" *ngIf="postulant.courses && postulant.courses.length">
+              <ul class="list-group">
+                <li class="list-group-item list-group-item-secondary text-primary-color">
+                  <div class="form-row">
+                    <div class="col-5">
+                      <strong>Detalle del Curso</strong>
+                    </div>
+                    <div class="col-2 text-center">
+                      <strong>Nota</strong>
+                    </div>
+                    <div class="col-5">
+                      <strong>Comentario</strong>
+                    </div>
+                  </div>
+                </li>
+                <li class="list-group-item" *ngFor="let c of postulant.courses">
+                  <div class="form-row">
+                    <div class="col-5">
+                      <small>
+                        {{c.courseDesc | uppercase}}
+                      </small>
+                    </div>
+                    <div class="col-2 text-center text-primary-color">
+                      {{c.score}}
+                    </div>
+                    <div class="col-5">
+                      {{(c.commentary || '-') | uppercase}}
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

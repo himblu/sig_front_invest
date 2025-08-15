@@ -1,0 +1,14 @@
+.fixedElement {
+  position: fixed;
+  overflow: auto;
+  z-index: 999;
+}
+
+.single-line {
+	width: 175px;
+	max-width: 175px;
+	min-width: 25px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}

@@ -1,0 +1,97 @@
+<div class="row animated fadeIn fast" *ngIf="isLoading; else body;">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+<ng-template #body>
+  <div class="animated fadeIn fast">
+    <div class="form-row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-primary-color">
+            <div class="form-row">
+              <div class="col-9">
+                <i class="fa fa-cog mr-1"></i>
+                Lista Negra
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row pl-2 pr-2" [formGroup]="filtersForm">
+              <div class="col-4">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Búsqueda</mat-label>
+                  <input type="text" matInput formControlName="filter">
+                  <mat-error><small>Campo requerido</small></mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-8" style="text-align: right;">
+                <button class="btn btn-sm bg-primary-color" matTooltip="Agregar nuevo"
+                  (click)="openDialog();">
+                  <i class="fa fa-plus mr-1"></i>
+                  Agregar
+                </button>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <div class="table-responsive">
+                  <table class="table">
+                    <thead style="background-color: #004899; color: white;">
+                      <tr>
+                        <th>Tipo documento</th>
+                        <th>Nro documento</th>
+                        <th>Nombres</th>
+                        <th>Estado</th>
+                        <th style="text-align: center;">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody style="color: black;">
+                      <tr *ngFor="let item of blackList">
+                        <td>{{item.typeDocId === 1 ? 'CÉDULA' : 'PASAPORTE'}}</td>
+                        <td>{{item.personDocumentNumber}}</td>
+                        <td>{{item.personFullName}}</td>
+                        <td>{{item.state}}</td>
+                        <td style="text-align: center;">
+                          <a type="button"
+                            class="mr-2"
+                            matTooltipPosition="above"
+                            matTooltip="Editar"
+                            style="cursor: pointer; color: green;"
+                            (click)="openDialog(item);">
+                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                          </a>
+                          <a type="button"
+                            matTooltipPosition="above"
+                            matTooltip="{{!item.statusID ? 'Activar' : 'Inactivar'}}"
+                            style="cursor: pointer;"
+                            [ngStyle]="{'color': !item.statusID ? 'red' : 'blue'}"
+                            (click)="updatePersonStatus(item);">
+                            <i class="fa" aria-hidden="true"
+                              [ngClass]="{'fa-toggle-off': !item.statusID, 'fa-toggle-on': item.statusID}">
+                            </i>
+                          </a>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <mat-paginator
+                  #paginator
+                  [length]="length"
+                  [pageSize]="pageSize"
+                  [pageSizeOptions]="pageSizeOptions"
+                  (page)="pageEvent = getPaginator($event)">
+                </mat-paginator>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

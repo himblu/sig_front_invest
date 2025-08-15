@@ -1,0 +1,296 @@
+<div class="animated fadeIn fast">
+  <div class="container-fluid">
+    <section [formGroup]="filtersForm">
+      <div class="row pr-2">
+        <ng-container *ngIf="currentRol !== rol.BONDINGDIRECTOR else period;">
+          <div class="col-3">
+            <mat-form-field appearance="outline">
+              <mat-label>Periodo Académico</mat-label>
+              <mat-select
+                formControlName="period"
+                placeholder="Filtrar por Periodo Académico"
+              >
+                <mat-option [value]="0">TODOS</mat-option>
+                <mat-option
+                  *ngFor="let period of periods; trackBy: trackByPeriodId"
+                  [value]="period.periodID"
+                >
+                  {{ period.periodName }}
+                </mat-option>
+              </mat-select>
+              <mat-error>Campo requerido</mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-3" style="text-align: center;">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Escuela</mat-label>
+              <mat-select formControlName="schoolID" placeholder="Seleccione una escuela" (selectionChange)="getCareers($event.value)">
+                <mat-option *ngFor="let school of schools" [value]="school.schoolID">
+                  {{school.schoolName}}</mat-option>
+              </mat-select>
+              <mat-error>Seleccione una escuela</mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-3" style="text-align: center;">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Carrera</mat-label>
+              <mat-select formControlName="careerID" placeholder="Seleccione una carrera" (selectionChange)="getStudyPlan($event.value); getModalities($event.value);">
+                <mat-option *ngFor="let career of careers" [value]="career.careerID">
+                  {{career.careerName}}</mat-option>
+              </mat-select>
+              <mat-error>Seleccione una carrera</mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-3" style="text-align: center;">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Malla curricular</mat-label>
+              <mat-select formControlName="studyPlanID" placeholder="Seleccione una malla" (selectionChange)="filtersForm.get('modalityID').patchValue('');">
+                <mat-option *ngFor="let study of studyPlan" [value]="study.studyPlanID">
+                  {{study.studyPlanDesc}}</mat-option>
+              </mat-select>
+              <mat-error>Seleccione una malla</mat-error>
+              <mat-error></mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-3" style="text-align: center;">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Modalidad</mat-label>
+              <mat-select formControlName="modalityID" placeholder="Seleccione una modalidad" (selectionChange)="getProjectPracticas();">
+                <mat-option *ngFor="let modality of modalities" [value]="modality.modalityID">
+                  {{modality.modalityName}}</mat-option>
+              </mat-select>
+              <mat-error>Seleccione una modalidad</mat-error>
+              <mat-error></mat-error>
+            </mat-form-field>
+          </div>
+        </ng-container>
+        <ng-template #period>
+          <div class="col-3">
+            <mat-form-field appearance="outline">
+              <mat-label>Periodo Académico</mat-label>
+              <mat-select
+                formControlName="period"
+                placeholder="Filtrar por Periodo Académico"
+                (selectionChange)="getProjectPracticas();"
+              >
+                <mat-option [value]="0">TODOS</mat-option>
+                <mat-option
+                  *ngFor="let period of periods; trackBy: trackByPeriodId"
+                  [value]="period.periodID"
+                >
+                  {{ period.periodName }}
+                </mat-option>
+              </mat-select>
+              <mat-error>Campo requerido</mat-error>
+            </mat-form-field>
+          </div>
+        </ng-template>
+        <div class="col-3" style="text-align: center;">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Estado</mat-label>
+            <mat-select formControlName="stateID" placeholder="Seleccione un estado" (selectionChange)="getProjectPracticas();">
+              <mat-option [value]="0">TODOS</mat-option>
+              <mat-option [value]="1">APROBADO</mat-option>
+              <mat-option [value]="2">REPROBADO</mat-option>
+            </mat-select>
+            <mat-error>Seleccione una modalidad</mat-error>
+            <mat-error></mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-4">
+          <mat-form-field appearance="outline">
+            <mat-label>Buscar por Estudiante, Nro de Documento...</mat-label>
+            <input matInput formControlName="search" autocomplete="off" />
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+        </div>
+        <ng-container *ngIf="currentRol === rol.BONDINGDIRECTOR; else noDirector">
+          <div class="col-2">
+            <button 
+              [disabled]="isDisabledReportDirector"
+              type="button" 
+              mat-raised-button
+              (click)="getGeneralReportSumary('project-practicas-courses/proyectLinkage-grade-report')">
+              <i style="color: green;" class="fa fa-file-excel-o" aria-hidden="true"></i>
+              &nbsp;Descargar Excel
+            </button>
+          </div>
+        </ng-container>
+        <ng-template #noDirector>
+          <div class="col-2">
+            <button
+              [disabled]="isDisabledReport"
+              type="button" mat-raised-button
+              (click)="getGeneralReportSumary('project-practicas-courses/proyectLinkage-grade-report')">
+              <i style="color: green;" class="fa fa-file-excel-o" aria-hidden="true"></i>
+              &nbsp;Descargar Excel
+            </button>
+          </div>
+        </ng-template>
+
+        <div style="position: relative; width: 100%">
+          <spinner-loader
+            [absolute]="true"
+            *ngIf="loadingProjectPracticas"
+          ></spinner-loader>
+          <mat-table
+            [dataSource]="dataSource"
+            matSort
+            (matSortChange)="getProjectPracticas($event)"
+          >
+            <!-- studentName -->
+            <ng-container matColumnDef="studentName">
+              <mat-header-cell *matHeaderCellDef>Estudiante</mat-header-cell>
+              <mat-cell *matCellDef="let row; let i = index">
+                <small>{{ row.studentName }}</small>
+              </mat-cell>
+            </ng-container>
+
+            <!-- documentNumber -->
+            <ng-container matColumnDef="documentNumber">
+              <mat-header-cell *matHeaderCellDef>
+                Número de documento
+              </mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                <small>{{ row.documentNumber }}</small>
+              </mat-cell>
+            </ng-container>
+
+            <!-- nameProject -->
+            <ng-container matColumnDef="nameProject">
+              <mat-header-cell *matHeaderCellDef>Proyecto</mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                <small>{{ truncateText(row.nameProject, 40) }}</small>
+              </mat-cell>
+            </ng-container>
+
+            <!-- careerName -->
+            <ng-container matColumnDef="careerName">
+              <mat-header-cell *matHeaderCellDef>Carrera</mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                <small>{{ row.careerName }}</small>
+              </mat-cell>
+            </ng-container>
+
+            <!-- modalityPracticeDesc -->
+            <ng-container matColumnDef="modalityName">
+              <mat-header-cell *matHeaderCellDef>Modalidad</mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                <small>{{ row.modalityName }}</small>
+              </mat-cell>
+            </ng-container>
+
+            <!-- parallelCode-->
+            <ng-container matColumnDef="parallelCode">
+              <mat-header-cell *matHeaderCellDef>Paralelo</mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                <small>{{ row.parallelCode ?? "N/A" }}</small>
+              </mat-cell>
+            </ng-container>
+
+            <!-- cycleDesc -->
+            <ng-container matColumnDef="cycleDesc">
+              <mat-header-cell *matHeaderCellDef>Nivel/Periodo</mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                <small>{{ row.cycleDesc }}</small>
+              </mat-cell>
+            </ng-container>
+
+            <!-- tutorName -->
+            <ng-container matColumnDef="tutorName">
+              <mat-header-cell *matHeaderCellDef>Tutor</mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                <small>{{ row.tutorName }}</small>
+              </mat-cell>
+            </ng-container>
+
+            <!-- grade -->
+            <ng-container matColumnDef="grade">
+              <mat-header-cell *matHeaderCellDef>Nota</mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                <small>{{ row.grade ?? "N/A" }}</small>
+              </mat-cell>
+            </ng-container>
+
+            <!-- gradeState -->
+            <ng-container matColumnDef="gradeState">
+              <mat-header-cell *matHeaderCellDef>Estado</mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                <small>{{ row.gradeState ?? "N/A" }}</small>
+              </mat-cell>
+            </ng-container>
+
+            <!-- gradeState -->
+            <ng-container matColumnDef="actions">
+              <mat-header-cell *matHeaderCellDef>Documentos</mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                <button
+                  mat-icon-button
+                  [matMenuTriggerFor]="menu"
+                  aria-label="Menu con documentos"
+                >
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #menu="matMenu">
+                  <p
+                    style="font-size: smaller; padding: 10px"
+                    *ngIf="checkIfAllArrayContainsNullProperties(row.files)"
+                  >
+                    El estudiante no ha ingresado ningún documento
+                  </p>
+                  <div
+                    *ngIf="!checkIfAllArrayContainsNullProperties(row.files)"
+                    mat-menu-item
+                  >
+                    <div
+                      *ngFor="let file of row.files"
+                      style="display: flex; gap: 5px; align-items: center"
+                    >
+                      <mat-icon *ngIf="file.urlFile" style="font-size: 30px">
+                        description
+                      </mat-icon>
+                      <a class="link" target="_blank" (click)="openFile(file.urlFile);">{{
+                        file.fileTypeName
+                      }}</a>
+                    </div>
+                  </div>
+                </mat-menu>
+              </mat-cell>
+            </ng-container>
+
+            <!-- noData -->
+            <ng-container matColumnDef="noData">
+              <mat-footer-cell *matFooterCellDef>
+                <p *ngIf="!projectPracticasByModalityPractice.length">
+                  No hay resultados que coincidan con los términos de búsqueda
+                </p>
+              </mat-footer-cell>
+            </ng-container>
+
+            <mat-header-row
+              *matHeaderRowDef="displayedColumns"
+            ></mat-header-row>
+            <mat-row
+              matRipple
+              *matRowDef="let row; columns: displayedColumns"
+              class="mat-row"
+            ></mat-row>
+            <mat-footer-row
+              *matFooterRowDef="['noData']"
+              [ngClass]="{ hide: !projectPracticasByModalityPractice.length }"
+            ></mat-footer-row>
+          </mat-table>
+
+          <mat-paginator
+            #paginator
+            [length]="length"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="pageSizeOptions"
+            (page)="pageEvent = getProjectPracticasFromPaginator($event)"
+          >
+          </mat-paginator>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

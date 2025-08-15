@@ -1,0 +1,155 @@
+<div class="card">
+  <div class="animated fadeIn fast">
+      <div class="container-fluid">
+          <div class="row text-center">
+              <div class="col">
+                  <h2 class="text-center mt-3">CREAR OPCION DE PAGO</h2>
+              </div>
+          </div>
+          <form [formGroup]="formPayment">
+              <div class="row">
+                  <div class="col-md-4">
+                      <mat-form-field class="width" appearance="outline">
+                          <mat-label>Condicion (detalle)</mat-label>
+                          <input formControlName="paymentOptionDesc" type="text" matInput>
+                          <mat-error *ngIf="isValidField('paymentOptionDesc')">{{getFielError('paymentOptionDesc')}}</mat-error>
+                      </mat-form-field>
+                  </div>
+                  <div class="col-md-4">
+                      <mat-form-field class="width" appearance="outline">
+                          <mat-label>Periodo</mat-label>
+                          <mat-select (selectionChange)="changePeriod($event)" formControlName="periodID">
+                              <mat-option>- Seleccione uno -</mat-option>
+                              <mat-option *ngFor="let period of listPeriod" [value]="period.periodID">
+                                  {{period.periodName}}
+                              </mat-option>
+                          </mat-select>
+                          <mat-error *ngIf="isValidField('periodID')">{{getFielError('periodID')}}</mat-error>
+                      </mat-form-field>
+                  </div>
+                  <div class="col-md-4">
+                      <mat-form-field class="width" appearance="outline">
+                          <mat-label>Tipo de matricula</mat-label>
+                          <mat-select formControlName="enrollTypeID">
+                              <mat-option>- Seleccione uno -</mat-option>
+                              <mat-option *ngFor="let enrollmentType of listEnrollmentType"
+                                  [value]="enrollmentType.enrollTypeID">
+                                  {{enrollmentType.enrollTypeDesc}}
+                              </mat-option>
+                          </mat-select>
+                          <mat-error *ngIf="isValidField('enrollTypeID')">{{getFielError('enrollTypeID')}}</mat-error>
+                      </mat-form-field>
+                  </div>
+                  <div class="col-md-4">
+                      <mat-form-field class="width" appearance="outline">
+                          <mat-label>Fecha Inicio</mat-label>
+                          <input readonly formControlName="startDate" matInput [matDatepicker]="pickerEnd">
+                          <mat-hint>dd/mm/aaaa</mat-hint>
+                          <mat-datepicker-toggle matIconSuffix [for]="pickerEnd"></mat-datepicker-toggle>
+                          <mat-datepicker #pickerEnd></mat-datepicker>
+                      </mat-form-field>
+                  </div>
+                  <div class="col-md-4">
+                      <mat-form-field class="width" appearance="outline">
+                          <mat-label>Fecha Fin</mat-label>
+                          <input readonly formControlName="endDate" matInput [matDatepicker]="picker">
+                          <mat-hint>dd/mm/aaaa</mat-hint>
+                          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                          <mat-datepicker #picker></mat-datepicker>
+                      </mat-form-field>
+                  </div>
+                  <div class="col-md-4">
+                      <mat-form-field class="width" appearance="outline">
+                          <mat-label>No Cuotas</mat-label>
+                          <input (blur)="filledArrayQuota()" formControlName="quotaNumber" type="number" matInput>
+                          <mat-error *ngIf="isValidField('quotaNumber')">{{getFielError('quotaNumber')}}</mat-error>
+                      </mat-form-field>
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-md-2 text-right">
+                      <mat-label>Valor Matricula</mat-label>
+                  </div>
+                  <div class="col-md-2">
+                      <mat-form-field class="width" appearance="outline">
+                          <input type="number" (blur)="blurCalcAmount($event)" matInput formControlName="amountEnroll">
+                          <mat-error *ngIf="isValidField('amountEnroll')">{{getFielError('amountEnroll')}}</mat-error>
+                      </mat-form-field>
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-md-2 text-right">
+                      <mat-label>Valor Arancel</mat-label>
+                  </div>
+                  <div class="col-md-2">
+                      <mat-form-field class="width" appearance="outline">
+                          <input (blur)="blurCalcAmount($event)" type="number" matInput formControlName="tariff">
+                          <mat-error *ngIf="isValidField('tariff')">{{getFielError('tariff')}}</mat-error>
+                      </mat-form-field>
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-md-2 text-right">
+                      <mat-label>Valor Descuento</mat-label>
+                  </div>
+                  <div class="col-md-2">
+                      <mat-form-field class="width" appearance="outline">
+                          <input type="number" (blur)="blurCalcAmount($event)" matInput formControlName="discount">
+                          <mat-error *ngIf="isValidField('discount')">{{getFielError('discount')}}</mat-error>
+                      </mat-form-field>
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-md-2 text-right">
+                      <mat-label>Costo Final del Nivel</mat-label>
+                  </div>
+                  <div class="col-md-2">
+                      <mat-form-field class="width" appearance="outline">
+                          <input type="number" matInput formControlName="totalAmount">
+                          <mat-error *ngIf="isValidField('totalAmount')">{{getFielError('totalAmount')}}</mat-error>
+                      </mat-form-field>
+                  </div>
+              </div>
+          </form>
+          <div *ngIf="formPayment.get('quotaNumber')?.value >0">
+              <form [formGroup]="quotaNumbers">
+                  <div formArrayName="quota">
+                  <ng-container *ngFor="let fee of quotaNumbersForm.controls; let i = index">
+
+                          <div class="row" [formGroupName]="i">
+                              <div class="col-md-2 text-right">
+                                  <mat-label>Valor Cuota {{i+1}}</mat-label>
+                              </div>
+                              <div class="col-md-2">
+                                  <mat-form-field class="width" appearance="outline">
+                                      <input name="amount" type="number" matInput formControlName="amount">
+                                  </mat-form-field>
+                              </div>
+                              <div class="col-md-2 text-right">
+                                  <mat-label>Fecha de vencimiento</mat-label>
+                              </div>
+                              <div class="col-md-2">
+                                  <mat-form-field class="width" appearance="outline">
+                                      <input type="text" readonly="true" matInput formControlName="expirationDate">
+                                  </mat-form-field>
+                              </div>
+                          </div>
+                  </ng-container>
+
+              </div>
+              </form>
+          </div>
+          <div class="row mb-4">
+              <div class="col-md-9"></div>
+              <div class="col">
+                  <button type="submit" class="styleButton" mat-raised-button color="primary"
+                      (click)="saveOptionPayment()">
+                      <i class="fa fa-floppy-o"></i>
+                      GUARDAR
+                  </button>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+

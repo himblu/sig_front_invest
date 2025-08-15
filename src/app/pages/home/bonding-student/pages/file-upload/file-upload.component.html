@@ -1,0 +1,93 @@
+<div class="row animated fadeIn fast" *ngIf="charging; else body">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+<ng-template #body>
+  <div class="card">
+    <div class="card-body">
+      <div class="row pl-2 pr-2" [formGroup]="filtersForm">
+        <div class="col-4">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Periodo Académico</mat-label>
+            <mat-select formControlName="periodID" (selectionChange)="getCoursesLinkage();">
+              <mat-option *ngFor="let item of periods" [value]="item.periodID">{{item.periodName}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-4">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Nivel</mat-label>
+            <mat-select formControlName="cycleID" (selectionChange)="getCoursesLinkage();">
+              <mat-option *ngFor="let item of cycles" [value]="item.cycleID">{{item.cycleDesc}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-4">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Buscador</mat-label>
+            <input type="text" matInput formControlName="filter" (input)="getCoursesLinkage(false);">
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="row pl-2 pr-2" [formGroup]="filesForm">
+        <div class="col-12" style="text-align: center;" *ngIf="!coursesLinkages?.length"><h3>No existen registros</h3></div>
+        <div class="col-12" *ngFor="let course of coursesLinkages; let i=index;" formArrayName="data">
+          <div class="table-responsive" [formGroupName]="i">
+            <table class="table">
+              <thead style="background-color: #004899; color: white;">
+                <tr>
+                  <th>Vinculación</th>
+                  <th style="text-align: center;">Formatos</th>
+                  <th>Estado</th>
+                  <th style="text-align: center;">Archivos</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="background-color: #eeeeee; color: black;">
+                  <td>{{course.modalityPracticeDesc}}</td>
+                  <td colspan="4">{{course.courses}}</td>
+                </tr>
+                <ng-container *ngFor="let item of course.files | filterBySequence; let index=index;" [formGroupName]="index">
+                  <tr>
+                    <td>{{item.fileType}}</td>
+                    <td style="text-align: center;">
+                      <a style="cursor: pointer;"
+                        (click)="openFile(item.templateFileUrl);"
+                        matTooltip="Plantilla">
+                        <i style="color: #004899;" class="fa fa-link" aria-hidden="true"></i>
+                      </a>
+                    </td>
+                    <td matTooltip="{{item.observation}}">
+                      {{item.statusFileDesc}}
+                    </td>
+                    <td style="text-align: center;">
+                      <ng-container *ngIf="item.urlFile && item.statusFileID !== file_state.REJECTED; else rejected;">
+                        <a style="cursor: pointer; color: #004899;"
+                          (click)="openRelativeFile(item);"
+                          matTooltip="Visualizar archivo">
+                          <i class="fa fa-file" aria-hidden="true"></i>
+                        </a>
+                      </ng-container>
+                      <ng-template #rejected>
+                        <input type="file"
+                          #input
+                          style="cursor: pointer;"
+                          autocomplete="off"
+                          (change)="onChangeInput(input.files, input, i, index);">
+                      </ng-template>
+                    </td>
+                  </tr>
+                </ng-container>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

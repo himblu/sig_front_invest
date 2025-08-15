@@ -1,0 +1,77 @@
+<div style="display: flex; justify-content: space-between; align-items: center; background: transparent;" class="p-2">
+  <span style="color: #014898;">{{data.currentMessage.documentManagementSubject}}</span>
+  <mat-icon style="cursor: pointer; color: red;" [matDialogClose]="false" class="red-icon" matRipple>close</mat-icon>
+</div>
+
+<mat-dialog-content>
+  <div *ngIf="isLoading; else form;">
+    <spinner-loader></spinner-loader>
+  </div>
+
+  <ng-template #form>
+    <div class="card">
+      <div class="card-body">
+        <div class="row" [formGroup]="forwardForm">
+          <div class="col-6">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Para</mat-label>
+              <mat-select formControlName="typeRolID" (selectionChange)="users= [];">
+                <mat-option *ngFor="let item of types" [value]="item.typeRolID">{{ item.typeRolDesc }}</mat-option>
+              </mat-select>
+              <mat-error>Campo requerido!</mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-6">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Seleccionar usuarios</mat-label>
+              <input type="text"
+                matInput
+                #search
+                (input)="getUsersByTypeRolID(search.value)"
+                [matAutocomplete]="auto"
+                [readonly]="forwardForm.get('typeRolID').value === null">
+                <mat-autocomplete #auto="matAutocomplete">
+                  <mat-option *ngFor="let item of users" [value]="item.userID">
+                    <div (click)="optionClicked($event, item)">
+                      <mat-checkbox color="primary" [checked]="item.selected" (change)="toggleSelection(item)" (click)="$event.stopPropagation()">
+                        {{item.personFullName}}
+                      </mat-checkbox>
+                    </div>
+                  </mat-option>
+                </mat-autocomplete>
+            </mat-form-field>
+          </div>
+          <div class="col-6">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Nro de receptores</mat-label>
+            <input type="text" matInput readonly="true" [value]="sendingNumber">
+          </mat-form-field>
+        </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <div class="d-flex no-block w-100 justify-content-between">
+    <div class="pl-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="warn"
+        [mat-dialog-close]="false">
+        Cerrar
+      </button>
+    </div>
+    <div class="pr-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="primary"
+        (click)="onSubmit();">
+        Enviar
+      </button>
+    </div>
+  </div>
+</mat-dialog-actions>

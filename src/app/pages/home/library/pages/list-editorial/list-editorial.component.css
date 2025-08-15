@@ -1,0 +1,23 @@
+:host mat-cell {
+	font-size: 90%;
+	line-height: normal;
+}
+
+:host .mat-mdc-row {
+	height: 41px;
+	min-height: 41px;
+}
+
+:host mat-header-row {
+	height: 44px;
+	min-height: 44px;
+}
+
+:host mat-header-cell {
+	line-height: normal;
+}
+
+mat-header-row {
+	background: #004899;
+	color: white;
+}

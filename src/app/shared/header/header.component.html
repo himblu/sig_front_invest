@@ -1,0 +1,131 @@
+<!-- ============================================================== -->
+<!-- Topbar header - style you can find in pages.scss -->
+<!-- ============================================================== -->
+<header class="topbar">
+    <nav class="navbar top-navbar navbar-expand-md navbar-light">
+        <!-- ============================================================== -->
+        <!-- Logo -->
+        <!-- ============================================================== -->
+        <div class="navbar-header">
+            <a class="navbar-brand imagenes" [href]="'/'">
+                <!-- Logo icon --><b>
+                    <!--You can put here icon as well // <i class="wi wi-sunset"></i> //-->
+                    <!-- Dark Logo icon -->
+                    <!-- <img src="../../../assets/images/ITCA_color.png" alt="homepage" /> -->
+                    <!-- Light Logo icon -->
+                    <!-- <img src="../../../assets/images/ITCA_color.png" alt=""> -->
+                    <img src="../../../assets/images/azul.svg" style="width: 50px; "alt="homepage" class="dark-logo" />
+                </b>
+                <!--End Logo icon -->
+                <!-- Logo text --><span>
+                    <img src="../../../assets/images/Atlas_logo_ITCA.png" style="width: 120px; margin-left: 10px;" alt="homepage" class="dark-logo"/>
+                </span>
+            </a>
+        </div>
+        <!-- ============================================================== -->
+        <!-- End Logo -->
+        <!-- ============================================================== -->
+        <div class="navbar-collapse">
+            <!-- ============================================================== -->
+            <!-- toggle and nav items -->
+            <!-- ============================================================== -->
+            <ul class="navbar-nav mr-auto">
+                <!-- This is  -->
+                <li class="nav-item"> <a class="nav-link nav-toggler hidden-md-up waves-effect waves-dark" href="javascript:void(0)"><strong><i style="color: beige;" class="ti-menu"></i></strong></a> </li>
+                <li class="nav-item"> <a class="nav-link sidebartoggler hidden-sm-down waves-effect waves-dark" href="javascript:void(0)"><strong><i style="color: beige;" class="ti-menu"></i></strong></a> </li>
+                <li class="nav-item hidden-sm-down"></li>
+            </ul>
+            <!-- ============================================================== -->
+            <!-- User profile and search -->
+            <!-- ============================================================== -->
+            <ul class="navbar-nav my-lg-0">
+                <!-- ============================================================== -->
+                <!-- Profile -->
+                <!-- ============================================================== -->
+                <li class="nav-item dropdown">
+                    <ng-container>
+                      <a [routerLink]="['/ventas/carrito-de-compras/', shoppingCart.cartID]"
+                      style="font-size: xx-large; text-align: center; vertical-align: middle;"
+                      matTooltip="Carrito de Compras" class="mr-4">
+                        <i class="fa fa-shopping-cart" aria-hidden="true" style="color: white;"></i>
+                        <span class="badge badge-danger font-sm" style="position: absolute; left: 20px; top: 35px;">{{shoppingCart.pendingSales}}</span>
+                      </a>
+                    </ng-container>
+                    <a href="/administracion/campus"
+                    *ngIf="currentUser.rolName === ROL.ADMIN || rol === ROL.ADMIN"
+                    style="font-size: xx-large; text-align: center; vertical-align: middle;"
+                    matTooltip="Administración">
+                      <i class="fa fa-home" aria-hidden="true" style="color: white;"></i>
+                    </a>
+                    <!-- <a class="nav-link waves-effect waves-dark hand" (click)="generateUserQRCode()" aria-expanded="false">
+                        <img width="40" height="40" src="../../../assets/images/qrcode.png" alt="Generación de QR del Usuario" style="border-radius: 50%; filter: invert(1);">
+                    </a> -->
+                    <a class="nav-link dropdown-toggle waves-effect waves-dark" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <!--<img src="../../../assets/images/avatar.jpg" alt="user" class="profile-pic" />-->
+                        <img *ngIf="personImage" width="40" height="40" src="{{personImage}}" alt="Imagen de perfil del estudiante" style="border-radius: 50%">
+                        <img *ngIf="!personImage" width="40" height="40" src="../../../assets/images/avatar.jpg" alt="Imagen de perfil del estudiante" style="border-radius: 50%">
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right animated flipInY">
+                        <ul class="dropdown-user">
+                            <li>
+                                <div class="dw-user-box">
+                                    <!-- <div class="u-img"><img [src]="image | images:0" alt="user"></div> -->
+                                    <div class="u-img">
+                                      <!--<img src="../../../assets/images/avatar.jpg" alt="user">-->
+                                      <img *ngIf="personImage" height="75" src="{{personImage}}" alt="Imagen de perfil del estudiante" style="border-radius: 50%">
+                                      <img *ngIf="!personImage" src="../../../assets/images/avatar.jpg" alt="user">
+                                    </div>
+                                    <div class="u-text">
+                                        <h4>{{name | slice:0:15}}{{ (name.length > 15) ? '...': '' }}</h4>
+                                        <p class="text-muted">{{email | slice:0:20}}{{ (name.length > 20) ? '': '...' }}</p>
+                                        <p class="text-muted">{{rol | uppercase}}</p>
+                                        <p class="text-muted">{{careerName | uppercase}}</p>
+                                        <!-- <a href="pages-profile.html" class="btn btn-rounded btn-danger btn-sm">View Profile</a> -->
+                                    </div>
+                                </div>
+                            </li>
+                            <li role="separator" class="divider"></li>
+                            <!-- <li><a href="#"><i class="ti-user"></i> My Profile</a></li>
+                            <li><a href="#"><i class="ti-wallet"></i> My Balance</a></li>
+                            <li><a href="#"><i class="ti-email"></i> Inbox</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#"><i class="ti-settings"></i> Account Setting</a></li>
+                            <li role="separator" class="divider"></li> -->
+                            <li><a style="cursor: pointer;" *ngIf="profiles.length > 1" (click)="toSelectProfile()"><i class="fa fa-users mr-1"></i>+1 Perfiles</a></li>
+                            <li><a style="cursor: pointer;" [routerLink]="['/configuracion/usuario']"><i class="fa fa-cog mr-1"></i>Configuración</a></li>
+                            <li><a style="cursor: pointer;" (click)="logout()"><i class="fa fa-power-off mr-1"></i>Salir</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</header>
+<!-- ============================================================== -->
+<!-- End Topbar header -->
+<!-- ============================================================== -->
+<div bsModal #QRModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name2">
+    <div class="modal-dialog modal-nm">
+      <div class="modal-content" *ngIf="QRUser">
+        <div class="modal-header">
+            <span class="modal-title pull-left">
+                <strong>QR del Usuario</strong> <br>
+                <small>Utilizalo para ingresar a alguno de nuestros servicios informáticos.</small>
+            </span>
+          <!-- <h4 id="dialog-sizes-name2" class="modal-title pull-left">
+            QR del Usuario
+          </h4> -->
+          <button type="button" class="btn btn-light pull-right text-danger" aria-label="Close" (click)="closeQRModal()">
+            <span aria-hidden="true" ><i class="fa fa-times"></i></span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="col-12 text-center">
+                <img src="{{QRUser}}" alt="QR Generado de Usuario" width="100%">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

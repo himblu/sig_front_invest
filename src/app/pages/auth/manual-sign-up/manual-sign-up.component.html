@@ -1,0 +1,149 @@
+<section id="wrapper" class="login-register login-sidebar" style="background-image:url(../../../../assets/images/registroManual3.png);">
+
+    <div class="row">
+        <div class="col-12">
+            <div >
+                <div >
+
+                    <div class="row" style="margin-top: 120px;">
+                        <div class="col-md-2"></div>
+                        <div class="col-md-8">
+                            <div class="row animated fadeIn fast" *ngIf="cargando">
+                                <div class="col-md-12">
+                                    <div class="alert alert-info text-center">
+                                        <h4 class="alert-heading">Cargando</h4>
+                                        <i class="fa fa-spin fa-refresh fa-3x"></i>
+                                        <p class="mb-0">Por favor esperar...</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <form autocomplete="off"
+                            [formGroup]="personForm"
+                            (ngSubmit)="onSubmit()"
+                            *ngIf="!cargando">
+                                <div style="-webkit-box-shadow: 2px 11px 30px -2px rgba(7,60,117,1);
+                                -moz-box-shadow: 2px 11px 30px -2px rgba(7,60,117,1);
+                                box-shadow: 2px 11px 30px -2px rgba(7,60,117,1);
+                                border-radius: 20px;">
+                                <div class="card-header" style="background-color: #ffffff73; border-radius: 20px 20px 0px 0px;">
+                                    <h2 style="color: #014898; margin-top: 10px; margin-bottom: 0px;"   ><strong>INFORMACIÓN PERSONAL</strong></h2>
+                                </div>
+                                <div class="card-body" style="background-color: #ffffffbb;">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <mat-form-field class="width" appearance="outline">
+                                                <mat-label>Documento</mat-label>
+                                                <mat-select formControlName="tipoDocumento">
+                                                    <mat-option [value]=1>Pasaporte</mat-option>
+                                                    <mat-option [value]=2>Carnet Refugiado</mat-option>
+                                                </mat-select>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <mat-form-field class="width" appearance="outline">
+                                                <mat-label>Identificación</mat-label>
+                                                <input formControlName="cedula" matInput #identificacion maxlength="30">
+                                                <mat-hint align="end">{{identificacion.value.length}} / 30</mat-hint>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <mat-form-field class="width" appearance="outline">
+                                                <mat-label>Nacionalidad</mat-label>
+                                                <mat-select formControlName="nacionalidad">
+                                                    <mat-option value="1">Venezolana</mat-option>
+                                                </mat-select>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <mat-form-field color="accent" appearance="outline" class="width">
+                                                <mat-label>Fecha de Nacimiento</mat-label>
+                                                <input matInput [matDatepicker]="fechaNacimiento" formControlName="fechaNacimiento">
+                                                <mat-hint>DD/MM/AAAA</mat-hint>
+                                                <mat-datepicker-toggle matIconSuffix [for]="fechaNacimiento"></mat-datepicker-toggle>
+                                                <mat-datepicker #fechaNacimiento color="primary"></mat-datepicker>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <mat-form-field class="width" appearance="outline">
+                                                <mat-label>Estado Civil</mat-label>
+                                                <mat-select formControlName="estadoCivil">
+                                                    <mat-option value="1">Venezolana</mat-option>
+                                                </mat-select>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <mat-form-field class="width" appearance="outline">
+                                                <mat-label>Género</mat-label>
+                                                <mat-select formControlName="genero">
+                                                    <mat-option value="1">Hombre</mat-option>
+                                                </mat-select>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-5">
+                                            <mat-form-field class="width" appearance="outline">
+                                                <mat-label>Nombres y Apellidos</mat-label>
+                                                <input matInput formControlName="nombre">
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <mat-form-field class="width" appearance="outline">
+                                                <mat-label>Email</mat-label>
+                                                <input type="email"
+                                                        matInput [formControl]="emailFormControl"
+                                                        [errorStateMatcher]="matcher"
+                                                        placeholder="Ex. pat@xxxx.com">
+                                                <mat-error *ngIf="emailFormControl.hasError('email') && !emailFormControl.hasError('required')">
+                                                    Por favor ingrese un email valido
+                                                </mat-error>
+                                                <mat-error *ngIf="emailFormControl.hasError('required')">
+                                                    El email <strong>es requerido</strong>
+                                                </mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <mat-form-field class="width" appearance="outline">
+                                                <mat-label>Número Celular</mat-label>
+                                                <input type="tel"
+                                                        matInput [formControl]="celularFormControl"
+                                                        [errorStateMatcher]="matcher"
+                                                        placeholder="Ex. 0999999999">
+                                                <mat-hint>Solo números!</mat-hint>
+                                                <mat-error *ngIf="celularFormControl.hasError('tel') && !celularFormControl.hasError('required')">
+                                                    Ingrese un número de celular válido
+                                                </mat-error>
+                                                <mat-error *ngIf="celularFormControl.hasError('required')">
+                                                    El Número celular <strong>es requerido</strong>
+                                                </mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="checkbox checkbox-primary pull-left p-t-0">
+                                                <input id="checkbox-signup" type="checkbox" [formControl]="acceptFormControl" class="filled-in chk-col-light-blue">
+                                                <label for="checkbox-signup" class="color" style="color: black;"> Acepta <a  href="../../../assets/Doc/Terminos y Condiciones.pdf" target="_blank">Terminos y Condiciones </a> </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer" style="background-color: #ffffff73; border-radius: 0px 0px 20px 20px;">
+                                    <div class="col-md-12 d-flex justify-content-center">
+                                        <button type="submit" mat-raised-button style="padding: 25px;  border-radius: 20px; border: 2px solid #ffffff; width: 20rem; background-color: #014898; color: white;">REGISTRARSE</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                    <div class="col-md-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+

@@ -1,0 +1,523 @@
+<div class="row animated fadeIn fast" *ngIf="loading">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<ng-container *ngIf="!loading">
+  <mat-horizontal-stepper [linear]="isLinear" #stepper>
+    <mat-step>
+      <ng-template matStepLabel>Datos Informativos del proyecto:</ng-template>
+      <form [formGroup]="firstFormGroup">
+        <div class="card" style="background-color: rgb(221, 238, 243);">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3">
+                <div style="text-align: center;">
+                <h3>Nombre del proyecto General:</h3>
+                </div>
+              </div>
+              <div class="col-9">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Nombre del proyecto</mat-label>
+                  <input type="text" matInput formControlName="nameProyect" readonly="true">
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-3">
+                <div style="text-align: center;">
+                <h3>Nombre del proyecto:</h3>
+                </div>
+              </div>
+              <div class="col-9">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Nombre del Proyecto Específico</mat-label>
+                  <input type="text" matInput formControlName="p_projectPracInformativeDesc">
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-3">
+                <div style="text-align: center;">
+                <h3>Asignatura rectora:</h3>
+                </div>
+              </div>
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Nivel a fin</mat-label>
+                  <mat-select formControlName="p_cycleID" (selectionChange)="getListStudent(); getCareerAgreement();">
+                    <mat-option *ngFor="let item of CycleDetail;" [value]="item.cycleID">
+                      {{item.cycleName}}
+                    </mat-option>
+                  </mat-select>
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Asignatura rectora de la práctica</mat-label>
+                  <mat-select [multiple]="true" formControlName="coursesOfPractice" (selectionChange)="getProjectHours();">
+                    <mat-option *ngFor="let item of careerAgreements" [value]="item">{{item.courseNamePractice}}</mat-option>
+                  </mat-select>
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Horas de proyecto por cumplir</mat-label>
+                  <input type="number" matInput readonly="true" formControlName="p_projectPracticeHours">
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-3">
+                <div style="text-align: center;">
+                <h3>Localización:</h3>
+                </div>
+              </div>
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Provincia</mat-label>
+                  <mat-select formControlName="p_provinceID" (selectionChange)="getCantons();">
+                      <mat-option *ngFor="let item of provinces" [value]="item.provinceID">{{item.provinceName}}</mat-option>
+                  </mat-select>
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Cantón</mat-label>
+                  <mat-select formControlName="p_cantonID" (selectionChange)="getParishesByCanton();">
+                      <mat-option *ngFor="let item of cantons" [value]="item.cantonID">{{item.cantonName}}</mat-option>
+                  </mat-select>
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Parroquias</mat-label>
+                  <mat-select formControlName="p_parishID">
+                      <mat-option *ngFor="let item of parishes" [value]="item.parishID">{{item.parishName}}</mat-option>
+                  </mat-select>
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-3">
+                <div style="text-align: center;">
+                <h3>Monto presupuestado:</h3>
+                </div>
+              </div>
+              <div class="col-2-5">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Presupuestado</mat-label>
+                  <input type="text" matInput formControlName="p_budgeted" onKeypress="if (event.keyCode < 46 || event.keyCode > 57) event.returnValue = false;">
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-2-5">
+                <mat-form-field class="width" appearance="outline" onKeypress="if (event.keyCode < 46 || event.keyCode > 57) event.returnValue = false;">
+                  <mat-label>Aporte ITCA (%)</mat-label>
+                  <input type="text" matInput formControlName="p_aportITCA" (input)="patchTotal();">
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-2-5">
+                <mat-form-field class="width" appearance="outline" onKeypress="if (event.keyCode < 46 || event.keyCode > 57) event.returnValue = false;">
+                  <mat-label>Otros aportes(%)</mat-label>
+                  <input type="text" matInput formControlName="p_otherAports" (input)="patchTotal();">
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-1-5">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Total(%)</mat-label>
+                  <input type="number" readonly="true" matInput formControlName="total" [min]="0" [max]="100">
+                  <mat-error>
+                    Máximo 100%
+                  </mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-3">
+                <div style="text-align: center;">
+                <h3>Plazo de ejecución:</h3>
+                </div>
+              </div>
+              <div class="col-4-5">
+                <mat-form-field>
+                  <mat-label>Fecha de inicio</mat-label>
+                  <input type="date" formControlName="initdateEstimated" #initdateEstimated matInput (click)="initdateEstimated.showPicker()">
+                  <mat-icon style="cursor: pointer;" matSuffix (click)="initdateEstimated.showPicker()">calendar_month</mat-icon>
+                  <mat-hint>dd/mm/aaaa</mat-hint>
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-4-5">
+                <mat-form-field>
+                  <mat-label>Fecha de finalización</mat-label>
+                  <input type="date" formControlName="enddateEstimated" #enddateEstimated matInput (click)="enddateEstimated.showPicker()">
+                  <mat-icon style="cursor: pointer;" matSuffix (click)="enddateEstimated.showPicker()">calendar_month</mat-icon>
+                  <mat-hint>dd/mm/aaaa</mat-hint>
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <ng-container [formGroup]="secondFormGroup">
+                <div class="col-3">
+                  <div style="text-align: center;">
+                  <h3>Docentes participantes:</h3>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <mat-form-field>
+                    <mat-label>Docentes</mat-label>
+                    <mat-select formControlName="teachersList" [multiple]="true" (selectionChange)="getTeachersHours();">
+                      <mat-option *ngFor="let item of teachersList" [value]="item.teacherID">{{item.namesTeacher}}</mat-option>
+                    </mat-select>
+                    <mat-error>
+                      Campo <strong>requerido</strong>
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-3">
+                  <mat-form-field class="width" appearance="outline">
+                    <mat-label>Número de docentes</mat-label>
+                    <input type="text" matInput readonly="true" formControlName="teachersNumber">
+                    <mat-error>
+                      Campo <strong>requerido</strong>
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+                <!-- <div class="col-3">
+                  <div style="text-align: center;">
+                  <h3>Estudiantes particiantes:</h3>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <mat-form-field>
+                    <mat-label>Estudiantes</mat-label>
+                    <mat-select formControlName="studentsList" multiple (selectionChange)="getStudentsHours();">
+                      <div #studentsListDiv style="text-align: center;"  matTooltipPosition="above" matTooltip="Seleccionar todos">
+                        <label style="cursor: pointer;" (click)="selectAllStudents(studentsListDiv);">Seleccionar todos</label>
+                      </div>
+                      <mat-optgroup *ngFor="let parallel of studentsList" [label]="'Paralelo: '+parallel.parallelCode">
+                        <div #parallelsListDiv style="text-align: center;"  matTooltipPosition="above" matTooltip="Seleccionar estudiantes paralelo {{parallel.parallelCode}}">
+                          <label style="cursor: pointer;" (click)="selectStudentByParallel(parallel, parallelsListDiv);">Seleccionar estudiantes paralelo {{parallel.parallelCode}}</label>
+                        </div>
+                        <mat-option *ngFor="let item of parallel.students" [value]="item.studentID">
+                          {{item.namesStudents}}
+                        </mat-option>
+                      </mat-optgroup>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div class="col-3">
+                  <mat-form-field class="width" appearance="outline">
+                    <mat-label>Número de estudiantes</mat-label>
+                    <input type="text" matInput readonly="true" formControlName="studentsNumber">
+                    <mat-error>
+                      Campo <strong>requerido</strong>
+                    </mat-error>
+                  </mat-form-field>
+                </div> -->
+                <div class="col-3">
+                  <div style="text-align: center;">
+                  <h3>Estudiantes particiantes:</h3>
+                  </div>
+                </div>
+                <div class="col-9">
+                  <ng-container *ngIf="!studentsList?.length; else students;">
+                    <h3>No se han registrado estudiantes para el nivel seleccionado.</h3>
+                  </ng-container>
+                  <ng-template #students>
+                    <table class="table">
+                      <thead style="background-color: #e6e6e6; color: black;">
+                        <tr>
+                          <td>Paralelo</td>
+                          <td>Estudiantes</td>
+                          <td>Tutor</td>
+                        </tr>
+                      </thead>
+                      <tbody #tbody>
+                        <tr *ngFor="let parallel of getSecondGroupArray('studentsList').controls; let i=index;">
+                          <td>{{parallel.value.parallel.parallelCode}}</td>
+                          <td formArrayName="studentsList">
+                            <div style="height: 30px;" [formGroupName]="i">
+                              <mat-form-field>
+                                <mat-select formControlName="studentID" multiple #select>
+                                  <div #parallelsListDiv style="text-align: center; background-color: #004899; color: white;"
+                                    matTooltipPosition="above" matTooltip="Seleccionar estudiantes paralelo {{parallel.value.parallel.parallelCode}}">
+                                    <label style="cursor: pointer;" (click)="selectStudentByParallel(parallel.value.parallel, i, parallelsListDiv);">
+                                      Seleccionar estudiantes paralelo {{parallel.value.parallel.parallelCode}}
+                                    </label>
+                                  </div>
+                                  <mat-option #option [value]="undefined" (onSelectionChange)="disableStudentsList($event, i, select, option);">NINGUNO</mat-option>
+                                  <mat-option *ngFor="let item of parallel.value.parallel.students" [value]="item.studentID">
+                                    {{item.namesStudents}}
+                                  </mat-option>
+                                </mat-select>
+                              </mat-form-field>
+                            </div>
+                          </td>
+                          <td formArrayName="tutorsList">
+                            <div style="height: 30px;" [formGroupName]="i">
+                              <mat-form-field>
+                                <mat-select [multiple]="false" formControlName="teacherID">
+                                  <mat-option *ngFor="let item of teachersList" [value]="item.teacherID"
+                                    (onSelectionChange)="setTeacherID($event, i, item.teacherID);">
+                                    {{item.namesTeacher}}
+                                  </mat-option>
+                                </mat-select>
+                              </mat-form-field>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </ng-template>
+                </div>
+              </ng-container>
+            </div>
+            <div class="row">
+              <div class="col-10" style="text-align: right;"></div>
+              <div class="col-2">
+                <button type="button" mat-raised-button class="styleButton_sml" matStepperNext>Siguiente</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </mat-step>
+    <mat-step>
+      <ng-template matStepLabel>Justificación:</ng-template>
+      <form [formGroup]="firstFormGroup">
+        <div class="card" style="background-color: rgb(221, 238, 243);">
+          <div class="card-body">
+            <div class="row pl-2 pr-2">
+              <div class="col-12">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Justificación</mat-label>
+                  <textarea type="text" matInput formControlName="p_justification" #justification (input)="wordLimit(justification, hint, 250)"
+                  placeholder="Máximo 250 palabras"></textarea>
+                  <mat-hint><label #hint><small>Palabras: 0</small></label></mat-hint>
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-12">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Descripción de la atención a grupos vulnerables</mat-label>
+                  <textarea type="text" matInput formControlName="p_vulnerableGroups" #vulnerableGroups (input)="wordLimit(vulnerableGroups, hintVG, 50)"
+                  placeholder="Máximo 50 palabras"></textarea>
+                  <mat-hint><label #hintVG><small>Palabras: 0</small></label></mat-hint>
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-12">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Descripción de la atención en contextos vulnerables</mat-label>
+                  <textarea type="text" matInput formControlName="p_vulnerableContexts" #vulnerableContexts (input)="wordLimit(vulnerableContexts, hintVC, 50)"
+                  placeholder="Máximo 50 palabras"></textarea>
+                  <mat-hint><label #hintVC><small>Palabras: 0</small></label></mat-hint>
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-9"></div>
+              <div class="col-1">
+                <button type="button" mat-raised-button class="styleButton_sml" matStepperPrevious>Atrás</button>
+              </div>
+              <div class="col-2">
+                <button type="button" mat-raised-button class="styleButton_sml" matStepperNext>Siguiente</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </mat-step>
+    <mat-step>
+      <ng-template matStepLabel>Objetivos:</ng-template>
+      <ng-container>
+        <div class="card" style="background-color: rgb(221, 238, 243);">
+          <div class="card-body">
+            <div class="row pl-2 pr-2">
+              <div class="col-12" [formGroup]="firstFormGroup">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Objetivo General</mat-label>
+                  <textarea type="text" matInput formControlName="p_generalObjective" #generalObjective (input)="wordLimit(generalObjective, hintObj, 50)"
+                  placeholder="Máximo 50 palabras"></textarea>
+                  <mat-hint><label #hintObj><small>Palabras: 0</small></label></mat-hint>
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <ng-container [formGroup]="objetivesFormGroup">
+                <ng-container formArrayName="objetives">
+                  <ng-container  *ngFor="let item of getObjetivesRow().controls; let i=index;" [formGroupName]="i">
+                    <div class="col-11">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Objetivos Específicos</mat-label>
+                        <textarea type="text" matInput formControlName="p_specificDescription" #specificDescription (input)="wordLimit(specificDescription, hint, 50)"
+                        placeholder="Máximo 50 palabras"></textarea>
+                        <mat-hint><label #hint><small>Palabras: 0</small></label></mat-hint>
+                        <mat-error>
+                          Campo <strong>requerido</strong>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-1">
+                      <a *ngIf="i === 0" style="cursor: pointer;" matTooltipPosition="above" matTooltip="Agregar" (click)="addObjetivesRow();">
+                        <i style="color: blue;" class="fa fa-plus-circle" aria-hidden="true"></i>
+                      </a>
+                      <a *ngIf="i > 2" style="cursor: pointer;" matTooltipPosition="above" matTooltip="Eliminar" (click)="deleteObjetivesRow(i);">
+                        <i style="color: red;" class="fa fa-minus-circle" aria-hidden="true"></i>
+                      </a>
+                    </div>
+                  </ng-container>
+                </ng-container>
+              </ng-container>
+            </div>
+            <div class="row">
+              <div class="col-9"></div>
+              <div class="col-1">
+                <button type="button" mat-raised-button class="styleButton_sml" matStepperPrevious>Atrás</button>
+              </div>
+              <div class="col-2">
+                <button type="button" mat-raised-button class="styleButton_sml" matStepperNext>Siguiente</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </mat-step>
+    <mat-step>
+      <ng-template matStepLabel>Metodologia e impactos del proyecto:</ng-template>
+      <ng-container>
+        <div class="card" style="background-color: rgb(221, 238, 243);">
+          <div class="card-body">
+            <div class="row pl-2 pr-2">
+              <div class="col-12" [formGroup]="firstFormGroup">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Metodologia</mat-label>
+                  <textarea type="text" matInput required formControlName="p_metedologies" #metedologies (input)="wordLimit(metedologies, hintMet, 250)"
+                  placeholder="Máximo 250 palabras"></textarea>
+                  <mat-hint><label #hintMet><small>Palabras: 0</small></label></mat-hint>
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-12" [formGroup]="projectTypesFormGroup">
+                <table class="table" style="border: solid 1px #004899;">
+                  <thead style="background-color: #004899; color: white;">
+                    <tr>
+                      <th class="footable-sortable">
+                        Tipo de impactos
+                        <span class="footable-sort-indicator"></span>
+                      </th>
+                      <th class="footable-sortable">
+                        Medición
+                        <span class="footable-sort-indicator"></span>
+                      </th>
+                      <th class="footable-sortable">
+                        <a style="cursor: pointer;" matTooltipPosition="above" matTooltip="Agregar" (click)="addTypesRow();">
+                          <i style="color: white;" class="fa fa-plus-circle" aria-hidden="true"></i>
+                        </a>
+                        <span class="footable-sort-indicator"></span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody style="color: black;" formArrayName="types">
+                    <tr *ngFor=" let item of getTypesRow().controls; let i=index;" [formGroupName]="i">
+                      <td>
+                        <div style="max-height: 25px;">
+                          <mat-form-field class="width" appearance="outline">
+                            <mat-label>Tipo de impactos</mat-label>
+                            <mat-select formControlName="projectTypeImpactID" (selectionChange)="impactsSelection($event.value, i);">
+                              <mat-option *ngFor="let item of projectTypes" [value]="item.projectTypeImpactID">{{item.projectTypeName}}</mat-option>
+                            </mat-select>
+                            <mat-error></mat-error>
+                          </mat-form-field>
+                        </div>
+                      </td>
+                      <td>
+                        <div style="max-height: 25px;">
+                          <mat-form-field class="width" appearance="outline">
+                            <mat-label>Medición</mat-label>
+                            <mat-select formControlName="measurementID">
+                                <mat-option *ngFor="let item of projectTypeMeasurement" [value]="item.measurementID">{{item.measurementName}}</mat-option>
+                            </mat-select>
+                            <mat-error></mat-error>
+                          </mat-form-field>
+                        </div>
+                      </td>
+                      <td>
+                        <a *ngIf="getTypesRow().length > 1" style="cursor: pointer;" matTooltipPosition="above" matTooltip="Eliminar" (click)="deleteTypesRow(i);">
+                          <i style="color: red;" class="fa fa-minus-circle" aria-hidden="true"></i>
+                        </a>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-9"></div>
+              <div class="col-1">
+                <button type="button" mat-raised-button class="styleButton_sml" matStepperPrevious>Atrás</button>
+              </div>
+              <div class="col-2">
+                <button type="button" mat-raised-button class="styleButton_sml" (click)="onSubmit();">Guardar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </mat-step>
+  </mat-horizontal-stepper>
+</ng-container>

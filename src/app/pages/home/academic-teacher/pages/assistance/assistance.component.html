@@ -1,0 +1,84 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+<div *ngIf="!charging">
+  <div class="card" *ngIf="subject">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-1"></div>
+        <div class="col-10"><h4 style="color: #004899;">{{subject.courseName}}</h4></div>
+      </div>
+      <div class="row pl-3 pr-3">
+        <div class="col-md-1"></div>
+        <div class="col-md-5">
+          <div class="row">
+            <div class="col-12">
+              <strong>Periodo Académico:</strong> {{subject.periodName}}
+            </div>
+            <div class="col-12">
+              <strong>Escuela:</strong> {{subject.schoolName}}
+            </div>
+            <div class="col-12">
+              <strong>Carrera:</strong> {{subject.careerName}}
+            </div>
+            <div class="col-12">
+              <strong>Modalidad:</strong> {{subject.modalityName}}
+            </div>
+          </div>
+        </div>
+        <div class="col-md-1"></div>
+        <div class="col-md-5">
+          <div class="row">
+            <div class="col-12">
+              <strong>Nivel de Formación:</strong> {{subject.degree}}
+            </div>
+            <div class="col-12">
+              <strong>Periodo (Nivel):</strong> {{subject.cycleDesc}}
+            </div>
+            <div class="col-12">
+              <strong>Paralelo:</strong> {{subject.parallelCode}}
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+<br>
+<div *ngIf="!charging">
+  <div class="card">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-12">
+          <mat-tab-group>
+            <mat-tab label="ASISTENCIA">
+              <ng-template matTabContent>
+                <component-take-assistance [subject]="subject"></component-take-assistance>
+              </ng-template>
+            </mat-tab>
+            <mat-tab label="TAREAS">
+              <ng-template matTabContent><br>
+                <component-tasks [subject]="subject"></component-tasks>
+              </ng-template>
+            </mat-tab>
+            <mat-tab label="LIBRO DE CALIFICACIONES" [disabled]="!subject?.flgAcademic">
+              <ng-template matTabContent><br>
+                <component-grades [subject]="subject"></component-grades>
+              </ng-template>
+            </mat-tab>
+            <mat-tab label="CALIFICACIONES" [disabled]="!subject?.flgGrade">
+              <ng-template matTabContent><br>
+                <component-notes [subject]="subject"></component-notes>
+              </ng-template>
+            </mat-tab>
+          </mat-tab-group>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

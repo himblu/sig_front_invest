@@ -1,0 +1,310 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<div class="row animated fadeIn fast" *ngIf="!charging">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="row pl-4 pr-4">
+          <div class="col-md-4">
+            <button type="button" mat-raised-button class="styleButton_sml" style="width: 125px;" data-toggle="modal" data-target="#moduleModal">Módulos
+              <i class="fa fa-plus-circle" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div><br>
+        <div class="row pl-4 pr-4">
+          <div class="col-3">
+            <div class="table-responsive" style="height: 375px;">
+              <table class="table">
+                <thead style="background-color: #004899; color: white;">
+                  <th colspan="2">Módulo</th>
+                </thead>
+                <tr *ngFor="let module of modules; let i=index;">
+                  <td [ngClass]="{'target': isParentClicked === i}" (click)="loadParentMenu(module, i)" style="cursor: pointer;">{{module.moduleName}}</td>
+                  <td><i class="fa fa-plus-circle" aria-hidden="true" style="color: blue; cursor: pointer;"
+                    matTooltipPosition="above" matTooltip="Agregar menú" data-toggle="modal" data-target="#menuModal" (click)="openModal(0, module)"></i>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+          <div class="col-1"*ngIf="showMenu" style="text-align: center; font-size: 35px; color: black;">
+            <p><i class="fa fa-arrow-right" aria-hidden="true"></i></p>
+          </div>
+          <div class="col-3" *ngIf="showMenu">
+            <div class="table-responsive" style="height: 375px;">
+              <table class="table">
+                <thead style="background-color: #004899; color: white;">
+                  <th colspan="3">Menú</th>
+                </thead>
+                <tr *ngFor="let parent of parents; let i=index;">
+                  <td [ngClass]="{'target': isChildClicked === i}" (click)="loadChildMenu(parent, i)" style="cursor: pointer;">{{parent.menuName}}</td>
+                  <td><i class="fa fa-plus-circle" aria-hidden="true" style="color: blue; cursor: pointer;"
+                    matTooltipPosition="above" matTooltip="Agregar submenú" data-toggle="modal" data-target="#menuModal" (click)="openModal(1, parent)"></i>
+                  </td>
+                  <!--<td><i class="fa fa-user" aria-hidden="true" style="color: green;"
+                    matTooltipPosition="above" matTooltip="Asignar menú a usuario" data-toggle="modal" data-target="#userModal" (click)="usersForm.get('menuID').patchValue(parent.menuID)"></i>
+                  </td>-->
+                </tr>
+              </table>
+            </div>
+          </div>
+          <div class="col-1" *ngIf="showSubmenu" style="text-align: center; font-size: 35px; color: black;">
+            <p><i class="fa fa-arrow-right" aria-hidden="true"></i></p>
+          </div>
+          <div class="col-3" *ngIf="showSubmenu">
+            <div class="table-responsive" style="height: 375px;">
+              <table class="table">
+                <thead style="background-color: #004899; color: white;">
+                  <th colspan="2">Submenú</th>
+                </thead>
+                <tr *ngFor="let child of childs">
+                  <td>{{child.menuName}}</td>
+                  <td><i class="fa fa-user" aria-hidden="true" style="color: green; cursor: pointer;"
+                    matTooltipPosition="above" matTooltip="Asignar submenú a usuario" data-toggle="modal" data-target="#userModal" (click)="usersForm.get('menuID').patchValue(child.menuID)"></i>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- moduleModal -->
+<div class="modal fade" id="moduleModal" tabindex="-1" aria-labelledby="moduleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="height: 40px;">
+        <div class="col-md-4">
+          <h3 class="modal-title" id="moduleModalLabel"><br>Nuevo módulo</h3>
+        </div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-body">
+              <div class="col-md-12">
+                <form [formGroup]="moduleForm"
+                      (submit)="saveModule()"
+                      autocomplete="off">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Nombre Módulo</mat-label>
+                        <input type="text" matInput formControlName="moduleName">
+                        <mat-error>
+                          Nombre es <strong>requerido</strong>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-md-6">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Unidades de negocio</mat-label>
+                        <mat-select formControlName="moduleAppID">
+                          <mat-option [value]="companies.ITCA">ITCA</mat-option>
+                          <mat-option [value]="companies.GOLDEN">Golden</mat-option>
+                        </mat-select>
+                        <mat-hint>Campo requerido!</mat-hint>
+                        <mat-error>
+                          Unidades es <strong>requerido</strong>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-md-12">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Descripción Módulo</mat-label>
+                        <textarea type="text" matInput formControlName="moduleDesc" style="text-transform: uppercase;"></textarea>
+                        <mat-error>
+                          Descripción es <strong>requerido</strong>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-3">
+                      <button type="submit" mat-raised-button class="styleButton_sml" style="width: 100px;">
+                        Guardar
+                      </button>
+                    </div>&nbsp;&nbsp;&nbsp;
+                    <div class="col-md-6">
+                      <button type="button" mat-raised-button class="styleButton_gray" style="width: 100px;" data-dismiss="modal" #modalClose>Cerrar</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- menuModal -->
+<div class="modal fade" id="menuModal" tabindex="-1" aria-labelledby="menuModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="height: 40px;">
+        <div class="col-md-4">
+          <h3 class="modal-title" id="menuModalLabel"><br>{{title}}</h3>
+        </div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-body">
+              <div class="col-md-12">
+                <form [formGroup]="menuForm"
+                      (submit)="saveMenu()"
+                      autocomplete="off">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Nombre Menú</mat-label>
+                        <input type="text" matInput formControlName="menuName">
+                        <mat-error>
+                          Nombre es <strong>requerido</strong>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-md-6" *ngIf="!flagOnSubmit ">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Icono Menú</mat-label>
+                        <input type="text" matInput formControlName="menuIcon">
+                        <mat-error>
+                          Icono es <strong>requerido</strong>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-md-6" *ngIf="flagOnSubmit">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Url Menú</mat-label>
+                        <input type="text" matInput formControlName="menuUrl">
+                        <mat-error>
+                          Url es <strong>requerido</strong>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-md-6" *ngIf="flagOnSubmit">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Orden Menú</mat-label>
+                        <input type="number" matInput formControlName="menuOrder">
+                        <mat-error>
+                          Orden es <strong>requerido</strong>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-3">
+                      <button type="submit" mat-raised-button class="styleButton_sml" style="width: 100px;">
+                        Guardar
+                      </button>
+                    </div>&nbsp;&nbsp;&nbsp;
+                    <div class="col-md-6">
+                      <button type="button" mat-raised-button class="styleButton_gray" style="width: 100px;" data-dismiss="modal" #modalMenuClose>Cerrar</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- userModal -->
+<div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="height: 40px;">
+        <div class="col-md-4">
+          <h3 class="modal-title" id="userModalLabel"><br>Asignar</h3>
+        </div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-body">
+              <div class="col-md-12">
+                <form [formGroup]="usersForm"
+                      (submit)="onSubmitUsers()"
+                      autocomplete="off">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Buscador</mat-label>
+                        <input type="text" matInput formControlName="search" (input)="searchUsers()">
+                      </mat-form-field>
+                    </div>
+                    <div class="col-md-6">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>No. Documento</mat-label>
+                        <input readonly="true" type="text" matInput formControlName="PersonDocumentNumber" style="text-transform: uppercase;">
+                        <mat-error>
+                          Campo es <strong>requerido</strong>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-md-12">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Nombres</mat-label>
+                        <mat-select formControlName="userID">
+                          <mat-option *ngFor="let item of users" [value]="item.userId" (onSelectionChange)="patchUser(item, $event);">
+                            {{item.PersonFullName}} - {{item.rolName}}
+                          </mat-option>
+                        </mat-select>
+                        <mat-error>
+                          Campo es <strong>requerido</strong>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-3">
+                      <button type="submit" mat-raised-button class="styleButton_sml" style="width: 100px;">
+                        Guardar
+                      </button>
+                    </div>&nbsp;&nbsp;&nbsp;
+                    <div class="col-md-6">
+                      <button type="button"
+                      mat-raised-button
+                      class="styleButton_gray"
+                      style="width: 100px;"
+                      data-dismiss="modal"
+                      #userModalClose
+                      (click)="iniUsersForm(); users= [];">
+                        Cerrar
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

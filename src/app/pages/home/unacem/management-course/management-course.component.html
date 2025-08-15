@@ -1,0 +1,224 @@
+<div class="animated fadeIn fast">
+	<div class="form-row">
+		<div class="col-12">
+			<div class="card">
+				<div class="card-body p-1">
+					<div class="form-row">
+						<div class="col-3" *ngIf="body.show">
+							<div class="card">
+								<div class="card-body p-1">
+									<div class="form-row">
+										<div class="col-12">
+											<label for="forText">Buscar por Texto</label>
+											<input type="text" name="forText" [(ngModel)]="body.filter.text" class="form-control form-control-sm text-uppercase">
+										</div>
+										<div class="col-12">
+											<label for="recordNumber">Número de Registros</label>
+											<select name="recordNumber" [(ngModel)]="body.pagination.recordNumber" class="form-control form-control-sm">
+												<option [ngValue]="undefined">--TODOS--</option>
+												<option *ngFor="let r of recordNumbers" [ngValue]="r">{{r}}</option>
+											</select>
+										</div>
+										<div class="col-12 mt-3 text-right">
+											<button class="btn btn-sm bg-primary-color" (click)="getQuantityOfCourses()">
+												<i class="fa fa-cog mr-1"></i>Buscar
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="" [ngClass]="{'col-9': body.show, 'col-12': !body.show}">
+							<div class="card">
+								<div class="card-body p-1">
+									<div class="form-row">
+										<div class="col-6 mb-2">
+											<!-- <button class="btn btn-sm btn-light mr-2" (click)="toggleFilters()">
+												<i class="fa mr-1 text-primary-color"
+													[ngClass]="{'fa-chevron-right': !body.show, 'fa-chevron-left': body.show}"></i>Filtros
+                          <span class="ml-1 fa fa-asterisk text-primary-color" *ngIf="body.filter.text"></span>
+											</button> -->
+											{{courses.length}} registros
+										</div>
+										<div class="col-5 mb-2 text-right">
+											<button class="btn btn-sm bg-primary-color" (click)="toggleCourseModal()">
+												<i class="fa fa-plus mr-1"></i>Nuevo Curso
+											</button>
+										</div>
+                    <div class="col-1 mb-2 text-right">
+                      <a
+                        class="btn btn-sm"
+                        style="background-color: rgb(84, 158, 77); color: white;"
+                        matTooltipPosition="above"
+                        matTooltip="Descargar"
+                        target="_blank"
+                        href="https://acortar.link/Kxks6B">
+                        <span style="letter-spacing: 0; font-size: 12px;"><small>Manual Usuario</small></span>
+                      </a>
+                    </div>
+										<ng-container *ngIf="body.searching">
+											<div class="col-12">
+												<div class="spinner-grow text-primary" role="status">
+													<span class="sr-only">Loading...</span>
+												</div>
+												<div class="spinner-grow text-secondary" role="status">
+													<span class="sr-only">Loading...</span>
+												</div>
+												<div class="spinner-grow text-success" role="status">
+													<span class="sr-only">Loading...</span>
+												</div> <br>
+												Buscando cursos
+											</div>
+										</ng-container>
+										<ng-container *ngIf="!body.searching">
+											<div class="col-12 text-center text-secondary" *ngIf="!courses.length">
+												<i class="fa fa-times fa-2x"></i> <br>
+												No se encontraron cursos registrados
+											</div>
+											<div class="col-12" *ngIf="courses.length">
+												<ul class="list-group">
+													<li class="list-group-item p-1">
+														<div class="form-row">
+															<div class="col-4">
+																<!-- <button class="btn btn-sm mr-2" [ngClass]="{'btn-success': body.selectAll, 'btn-light': !body.selectAll}" (click)="selectAll()">
+																	<i class="fa mr-1" [ngClass]="{'fa-square-o': !body.selectAll, 'fa-check-square': body.selectAll}"></i>Todos
+																</button> -->
+																<button class="btn btn-sm bg-primary-color" (click)="getReport()">
+																	<i class="fa fa-download mr-1"></i>
+																	Exportar
+																</button>
+															</div>
+															<div class="col-4">
+																<input type="text" name="byTexdt" placeholder="BUSCAR POR TEXTO" [(ngModel)]="body.byText" class="form-control text-uppercase">
+															</div>
+															<div class="col-4 text-right">
+																<!-- <div class="form-row">
+																	<div class="col-4"></div>
+																	<div class="col-4">
+																		<select name="recordNuber" [(ngModel)]="body.pagination.recordNumber" class="form-control form-control-sm" (change)="getQuantityOfCourses()">
+																			<option *ngFor="let n of recordNumbers" [ngValue]="n">{{n}}</option>
+																		</select>
+																	</div>
+																	<div class="col-4 pt-1">
+																		de {{body.pagination.totalRecords}} registros
+																	</div>
+																</div> -->
+															</div>
+														</div>
+													</li>
+													<li class="list-group-item bg-primary-color p-1">
+														<div class="form-row">
+															<div class="col-7">
+																Nombre del Curso
+															</div>
+															<div class="col-2">
+																Estado
+															</div>
+															<div class="col-1 text-right">
+																Creación
+															</div>
+															<div class="col-2 text-right">
+																Acciones
+															</div>
+														</div>
+													</li>
+													<div style="max-height: 400px !important; overflow: auto;">
+														<li class="list-group-item p-1 font-sm" *ngFor="let i of courses | filter:body.byText">
+															<div class="form-row">
+																<div class="col-6">
+																	<!-- <button class="btn btn-sm mr-1" [ngClass]="{'btn-success': i.selected, 'btn-light': !i.selected}" (click)="toggleSelectCourse(i)">
+																		<i class="fa" [ngClass]="{'fa-square-o': !i.selected, 'fa-check-square': i.selected}"></i>
+																	</button> -->
+																	{{i.courseName | uppercase}}
+																</div>
+																<div class="col-2">
+																	<small>
+																		<i class="fa fa-circle mr-1" [ngClass]="{'text-success': i.statusID === 1, 'text-danger': i.statusID === 0}"></i>{{i.stateName}}
+																	</small>
+																</div>
+																<div class="col-2 text-right">
+																	<small>
+																		<i class="fa fa-calendar mr-1"></i>{{i.dateCreated | date: 'dd/MM HH:mm a'}}
+																	</small>
+																</div>
+																<div class="col-2 text-right">
+																	<button class="btn btn-light btn-sm text-primary-color rounded-circle mr-2" (click)="toggleCourseModal(i)">
+																		<i class="fa fa-edit"></i>
+																	</button>
+																	<button class="btn btn-sm rounded-circle" [ngClass]="{'btn-danger': i.statusID === 1, 'bg-primary-color': i.statusID === 0 }" (click)="deleteCourse(i)">
+																		<i class="fa" [ngClass]="{'fa-trash': i.statusID === 1, 'fa-arrow-up': i.statusID === 0 }"></i>
+																	</button>
+																</div>
+															</div>
+														</li>
+													</div>
+												</ul>
+											</div>
+										</ng-container>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" bsModal #courseModal="bs-modal" [config]="{backdrop: 'static'}" tabindex="-1" role="dialog"
+	aria-labelledby="dialog-static-name">
+	<div class="modal-dialog modal-nm">
+		<div class="modal-content">
+			<div class="modal-body">
+        <form #courseForm="ngForm">
+          <div class="form-row">
+            <div class="col-9 pt-1">
+              {{newCourse.editing ? 'Editando' : 'Nuevo'}}&nbsp;Curso
+            </div>
+            <div class="col-3 text-right" (click)="toggleCourseModal()">
+              <button class="btn btn-sm text-danger"><i class="fa fa-times"></i></button>
+            </div>
+            <div class="col-12 text-center">
+              <br>
+            </div>
+            <div class="col-12">
+              <div class="form-group">
+                <label for="name">Nombre</label>
+                <input type="text" name="courseName" [(ngModel)]="newCourse.courseName" class="form-control text-uppercase" required>
+              </div>
+              <div class="form-group">
+                <label for="description">Descripción</label>
+                <textarea name="courseDesc" rows="3" [(ngModel)]="newCourse.courseDesc" class="form-control text-uppercase"></textarea>
+              </div>
+							<div class="form-group">
+                <label for="urlContent">URL de Temario</label>
+                <textarea name="urlContent" rows="3" [(ngModel)]="newCourse.urlContent" class="form-control"></textarea>
+              </div>
+							<div class="form-group">
+                <label for="urlImage">URL de Portada de Curso</label>
+                <textarea name="urlImage" rows="3" [(ngModel)]="newCourse.urlImage" class="form-control"></textarea>
+              </div>
+              <!-- <div class="form-group" *ngIf="newCourse.editing">
+                <label for="statusID">Estado</label>
+                <select name="statusID" [(ngModel)]="newCourse.statusID" class="form-control" required>
+                  <option [ngValue]="undefined">--SELECCIONE--</option>
+                  <option *ngFor="let s of statuses" [ngValue]="s.statusID">{{s.statusName | uppercase}}</option>
+                </select>
+              </div> -->
+            </div>
+            <div class="col-12">
+              <div class="form-row">
+                <div class="col-12 text-right">
+                  <button class="btn btn-sm btn-light text-primary-color" [disabled]="courseForm.invalid" (click)="saveChanges()">
+                    <i class="fa fa-check mr-1"></i>Guardar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+			</div>
+		</div>
+	</div>
+</div>

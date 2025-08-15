@@ -1,0 +1,202 @@
+<div class="row animated fadeIn fast" *ngIf="cargando">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+<div class="row pl-3 pr-3">
+  <div class="col-4">
+    <section [formGroup]="filtersForm">
+      <mat-form-field appearance="outline">
+        <mat-label>Parcial</mat-label>
+        <mat-select formControlName="partial" placeholder="Filtrar por Parcial">
+          <mat-option value="1">Parcial 1</mat-option>
+          <mat-option value="2">Parcial 2</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </section>
+  </div>
+  <div class="col-md-4" style="text-align: right;">
+    <button type="button" mat-raised-button class="styleButton_sml" style="width: 162px;" data-toggle="modal" data-target="#unitsModal">Nueva unidad</button>
+  </div>
+  <div class="col-md-4" style="text-align: left;">
+    <button type="button" mat-raised-button class="styleButton_sml" style="width: 162px;" data-toggle="modal" data-target="#partialsModal" (click)="openModal(0)">Nueva actividad</button>
+  </div>
+</div>
+
+<div class="table-responsive">
+  <table id="demo-foo-addrow"
+         class="table m-t-0 table-hover no-wrap contact-list footable-loaded footable"
+         data-page-size="5">
+    <thead style="background-color: #004899; color: white;">
+    <tr>
+      <th class="footable-sortable">
+        Descripción
+        <span class="footable-sort-indicator"></span>
+      </th>
+      <th class="footable-sortable">
+        Porcentaje
+        <span class="footable-sort-indicator"></span>
+      </th>
+      <th class="footable-sortable" style="text-align: center;">
+        Acciones
+        <span class="footable-sort-indicator"></span>
+      </th>
+    </tr>
+    </thead>
+    <tbody style="color: black;">
+    <tr class="footable-even" style="text-transform: uppercase;">
+      <td>Lecturas</td>
+      <td>20%</td>
+      <td style="text-align: center;">
+        <a type="button"
+            matTooltipPosition="above"
+            matTooltip="Editar"
+            style="cursor: pointer; color: green;"><i class="fa fa-pencil" aria-hidden="true" data-toggle="modal" data-target="#partialsModal" (click)="openModal(1)"></i>
+        </a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+<components-button-arrow [actual]="actualPartials" [totalPage]="totalPagePartials" [count]="countPartials" (result)="changePagePartials($event)"></components-button-arrow>
+
+<!-- partialsModal -->
+<div class="modal fade" id="partialsModal" tabindex="-1" aria-labelledby="partialsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="height: 40px;">
+        <div class="col-md-5">
+          <h3 class="modal-title" id="partialsModalLabel"><br>{{title}}</h3>
+        </div>
+        <div class="col-md-1">
+          <button type="button" id="btn_close" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-body">
+              <form [formGroup]="partialsForm"
+                autocomplete="off"
+                (submit)="onSubmitPartials()">
+                <div class="row">
+                  <div class="col-md-4" style="text-align: center;">
+                    <h4>Descripción: </h4>
+                  </div>
+                  <div class="col-md-8">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Descripción</mat-label>
+                      <textarea type="text" matInput formControlName="description"></textarea>
+                      <mat-error>
+                        Campo <strong>requerido</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4" style="text-align: center;">
+                    <h3>Porcentaje: </h3>
+                  </div>
+                  <div class="col-md-4">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Porcentaje</mat-label>
+                      <input type="number" matInput formControlName="percentage">
+                      <mat-icon matSuffix>percent</mat-icon>
+                      <mat-error>
+                        Campo <strong>requerido</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-3">
+                    <button type="submit" mat-raised-button class="styleButton_sml" style="width: 100px;">
+                      Guardar
+                    </button>
+                  </div>
+                  <div class="col-md-3">
+                    <button type="button" mat-raised-button class="styleButton_gray" style="width: 100px;" data-dismiss="modal" #modalClose>Cerrar</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- unitsModal -->
+<div class="modal fade" id="unitsModal" tabindex="-1" role="dialog" aria-labelledby="unitsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="height: 40px;">
+        <div class="col-md-5">
+          <h3 class="modal-title" id="partialsModalLabel"><br>Nueva unidad</h3>
+        </div>
+        <div class="col-md-1">
+          <button type="button" id="btn_close" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-body">
+              <form [formGroup]="unitsForm"
+                autocomplete="off"
+                (submit)="onSubmitUnits()">
+                <div class="row">
+                  <div class="col-md-4" style="text-align: center;">
+                    <h4>Unidad: </h4>
+                  </div>
+                  <div class="col-md-7">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Unidad</mat-label>
+                      <input type="text" matInput formControlName="name">
+                      <mat-error>
+                        Campo <strong>requerido</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4" style="text-align: center;">
+                    <h3>Descripción: </h3>
+                  </div>
+                  <div class="col-md-7">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Descripción</mat-label>
+                      <textarea type="text" matInput formControlName="description"></textarea>
+                      <mat-error>
+                        Campo <strong>requerido</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-3">
+                    <button type="submit" mat-raised-button class="styleButton_sml" style="width: 100px;">
+                      Guardar
+                    </button>
+                  </div>
+                  <div class="col-md-3">
+                    <button type="button" mat-raised-button class="styleButton_gray" style="width: 100px;" data-dismiss="modal" #modalClose>Cerrar</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

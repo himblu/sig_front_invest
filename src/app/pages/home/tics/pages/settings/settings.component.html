@@ -1,0 +1,37 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<mat-tab-group *ngIf="!charging">
+  <mat-tab label="Usuarios">
+    <ng-template matTabContent>
+      <component-users></component-users>
+    </ng-template>
+  </mat-tab>
+  <mat-tab label="Módulos">
+    <ng-template matTabContent>
+      <component-modules></component-modules>
+    </ng-template>
+  </mat-tab>
+  <mat-tab label="Roles de usuario">
+    <ng-template matTabContent>
+      <component-user-roles></component-user-roles>
+    </ng-template>
+  </mat-tab>
+  <!--<mat-tab label="Menús">
+    <ng-template matTabContent>
+      <component-menu-settings></component-menu-settings>
+    </ng-template>
+  </mat-tab>-->
+  <mat-tab label="Administrativos externos">
+    <ng-template matTabContent>
+      <component-external-admin></component-external-admin>
+    </ng-template>
+  </mat-tab>
+</mat-tab-group>

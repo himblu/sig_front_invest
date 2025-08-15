@@ -1,0 +1,177 @@
+
+<div style="display: flex; justify-content: end; align-items: center; background: transparent;" class="p-2">
+  <mat-icon *ngIf="!loading" style="cursor: pointer; color: red;" [matDialogClose]="false" class="red-icon" matRipple>close</mat-icon>
+</div>
+
+<mat-dialog-content>
+
+  <div *ngIf="loading; else table">
+    <spinner-loader></spinner-loader>
+  </div>
+
+  <ng-template #table>
+    <div [formGroup]="form">
+      <h3 class="text-center mb-4" style="font-weight: 500; color: #014898;">VALIDACIÓN DE PAGOS</h3>
+      <div class="mb-4 row no-gutters p-3" style="border: 1px solid #cccccc; border-radius: 3px;">
+        <div class="col-8 row no-gutters">
+          <div class="col-4 pl-2">
+            <h5 style="font-weight: bold; letter-spacing: 1px; margin-bottom: 0">NOMBRE:</h5>
+            <p style="font-size: 12px;">{{ data.paymentForEnrolledStudent.student }}</p>
+          </div>
+          <div class="col-4 pl-2">
+            <h5 style="font-weight: bold; letter-spacing: 1px; margin-bottom: 0">CARRERA:</h5>
+            <p style="font-size: 12px;">{{ data.paymentForEnrolledStudent.career }}</p>
+          </div>
+          <div class="col-4 pl-2">
+            <h5 style="font-weight: bold; letter-spacing: 1px; margin-bottom: 0">NIVEL:</h5>
+            <p style="font-size: 12px;">{{ data.paymentForEnrolledStudent.levelDesc }}</p>
+          </div>
+          <div class="col-4 pl-2">
+            <h5 style="font-weight: bold; letter-spacing: 1px; margin-bottom: 0">IDENTIFICACIÓN:</h5>
+            <p style="font-size: 12px;">{{ data.paymentForEnrolledStudent.documentNumber }}</p>
+          </div>
+          <div class="col-4 pl-2">
+            <h5 style="font-weight: bold; letter-spacing: 1px; margin-bottom: 0">CELULAR:</h5>
+            <p style="font-size: 12px;">{{ data.paymentForEnrolledStudent.cellPhone }}</p>
+          </div>
+          <!-- <div class="col-4 pl-2">
+            <h5 style="font-weight: bold; letter-spacing: 1px; margin-bottom: 0">OPCIÓN DE PAGO:</h5>
+            <p style="font-size: 12px;">{{ data.paymentForEnrolledStudent.paymentOptionDesc }}</p>
+          </div> -->
+          <div class="col-12">
+            <mat-checkbox color="primary" formControlName="sendEmail">Notificar por correo al estudiante el cambio de estado</mat-checkbox>
+          </div>
+        </div>
+        <div class="col-4" style="text-align: right;">
+          <div class="d-flex justify-content-center">
+            <img *ngIf="image" width="100" height="100" src="{{image}}" alt="Imagen de perfil del estudiante">
+            <img *ngIf="!image" width="100" height="100" [ngSrc]="'assets/images/avatar.jpg'" alt="Imagen de perfil del estudiante">
+          </div>
+        </div>
+        <div class="col-12" *ngIf="hasAssignScholarship">
+          <div class="alert alert-info">
+            <div class="row">
+              <div class="col-12 mb-3">
+                <i class="fa fa-info mr-1"></i>Esta sección muestra la información financiera que fue afectada por la Asignación de Becas.
+              </div>
+              <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12" *ngFor="let q of quotaDetails">
+                <div class="card mb-2">
+                  <div class="card-header bg-primary-color p-2">
+                    <i class="fa fa-hashtag mr-1"></i>{{q.conceptsPaymentDesc}}
+                  </div>
+                  <div class="card-body p-2">
+                    <small>Monto a Pagar</small> <br>
+                    <i class="fa fa-hashtag mr-1"></i>{{q.quotaAmount | number:'1.2-2'}}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div *ngFor="let payment of paymentOptions">
+        <h3>{{payment.paymentOptionDesc}}</h3>
+        <table class="w-100">
+          <tbody>
+          <tr>
+            <th>DETALLE</th>
+            <th>ARCHIVO</th>
+            <th>FECHA PAGO</th>
+            <th>COMPROBANTE</th>
+            <th>INSTITUCIÓN</th>
+            <th>TRANSACCIÓN</th>
+            <th>OBSERVACIÓN</th>
+            <th>ESTADO</th>
+          </tr>
+          <tr *ngIf="!validationDocuments.length">
+            <td colspan="8">EL ESTUDIANTE NO HA CARGADO ARCHIVOS</td>
+          </tr>
+          <tr *ngFor="let item of documentsFormArray.controls; let index = index;" formArrayName="documents">
+
+            <ng-container *ngIf="item.value.paymentOptionDesc === payment.paymentOptionDesc" [formGroupName]="item.value.index">
+              <td>
+                {{ item.value.fileTypeName }}
+              </td>
+              <ng-template #state>
+                <td>{{ item.value.paymentOptionDesc }}</td>
+              </ng-template>
+              <td>
+                <div class="w-100" (click)="openFile(item.value.urlFile);" style="cursor: pointer;">
+                  <img style="width: 20px;" src="assets/images/file.png" alt="Payment File">
+                  <span style="color: #5090f5;">Ver Archivo</span>
+                </div>
+              </td>
+              <td>
+                {{ item.value.payDay | date: 'dd/MM/yy' }}
+              </td>
+              <td>
+                {{ item.value.voucherNumber }}
+              </td>
+              <td>
+                <select
+                  [ngClass]="{ 'invalid': documentsFormArray.get(item.value.index.toString())?.hasError('required', 'financialEntityID')
+                 && getDocumentFormGroup(item.value.index).get('financialEntityID')?.touched }"
+                  formControlName="financialEntityID">
+                  <option *ngFor="let entity of financialEntities;" [ngValue]="entity.financialEntityID">
+                    {{ entity.financialEntityDesc }}
+                  </option>
+                </select>
+              </td>
+              <td>
+                <select
+                  [ngClass]="{ 'invalid': documentsFormArray.get(item.value.index.toString())?.hasError('required', 'transactionTypeID')
+                 && getDocumentFormGroup(item.value.index).get('transactionTypeID')?.touched }"
+                  formControlName="transactionTypeID">
+                  <option *ngFor="let transaction of transactions;" [ngValue]="transaction.transactionTypeID">
+                    {{ transaction.transactionTypeDesc }}
+                  </option>
+                </select>
+              </td>
+              <td>
+                <input
+                  [ngClass]="{ 'invalid': documentsFormArray.get(item.value.index.toString())?.hasError('required', 'commentary')
+                 && getDocumentFormGroup(item.value.index).get('commentary')?.touched }"
+                  type="text" formControlName="commentary">
+              </td>
+              <td>
+                <select
+                  #select
+                  (change)="setCommentaryAsRequiredField(item.value.index, select.value);"
+                  [ngClass]="{ 'invalid': documentsFormArray.get(item.value.index.toString())?.hasError('required', 'statusFileID')
+                 && getDocumentFormGroup(item.value.index).get('statusFileID')?.touched }"
+                  formControlName="statusFileID">
+                  <option
+                    *ngFor="let state of documentStates;" [ngValue]="state.statusFileID">
+                    {{ state.statusFileDesc }}
+                  </option>
+                </select>
+              </td>
+            </ng-container>
+          </tr>
+          </tbody>
+        </table>
+        <br>
+      </div>
+    </div>
+  </ng-template>
+</mat-dialog-content>
+
+<mat-dialog-actions *ngIf="!loading">
+  <div *ngIf="!loading" class="d-flex no-block w-100 justify-content-between">
+    <div class="pl-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;" color="warn" [mat-dialog-close]="false">
+        Cerrar
+      </button>
+    </div>
+    <div class="pr-3">
+      <button
+        mat-raised-button
+        (click)="sendForm();"
+        style="letter-spacing: 0;" color="primary">
+        Validar Pagos
+      </button>
+    </div>
+  </div>
+</mat-dialog-actions>

@@ -1,0 +1,137 @@
+<div style="display: flex; justify-content: end; align-items: center; background: transparent;" class="p-2">
+  <mat-icon style="cursor: pointer; color: red;" [matDialogClose]="false" class="red-icon" matRipple>close</mat-icon>
+</div>
+
+<mat-dialog-content>
+  <div *ngIf="isLoading; else form;">
+    <spinner-loader></spinner-loader>
+  </div>
+
+  <ng-template #form>
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12" style="text-align: center;">
+            <h2 style="color: #014898;">
+              {{isUpdating ? 'Editar' : 'Crear'}} administrativo externo
+            </h2>
+          </div>
+        </div>
+        <div class="row">
+          <ng-container [formGroup]="externalForm">
+            <div class="col-6">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Tipo de documento</mat-label>
+                <mat-select formControlName="typeDocId" (selectionChange)="externalForm.get('personDocumentNumber').patchValue('');">
+                  <mat-option *ngFor="let item of documentTypes" [value]="item.typeDocId">{{item.typeDocName}}</mat-option>
+                </mat-select>
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-6">
+              <ng-container *ngIf="externalForm.get('typeDocId').value === 3; else document;">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Nro de documento</mat-label>
+                  <input type="text" matInput formControlName="personDocumentNumber" #personDocumentNumber
+                  (input)="userForm.get('p_userPassword').patchValue(personDocumentNumber.value);">
+                  <mat-error>Campo requerido</mat-error>
+                </mat-form-field>
+              </ng-container>
+              <ng-template #document>
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Nro de documento</mat-label>
+                  <input type="text" matInput formControlName="personDocumentNumber" #personDocumentNumber [maxLength]="10"
+                  onKeypress="if (event.keyCode < 47 || event.keyCode > 57) event.returnValue = false;"
+                  (input)="userForm.get('p_userPassword').patchValue(personDocumentNumber.value);">
+                  <mat-error>Campo requerido</mat-error>
+                </mat-form-field>
+              </ng-template>
+            </div>
+            <div class="col-6">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Nombres</mat-label>
+                <input type="text" matInput formControlName="personFirstName">
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-6">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Apellidos</mat-label>
+                <input type="text" matInput formControlName="personLastName">
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-6">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Teléfono</mat-label>
+                <input type="text" matInput formControlName="personPhone" [maxLength]="10"
+                onKeypress="if (event.keyCode < 47 || event.keyCode > 57) event.returnValue = false;">
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-6">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Email</mat-label>
+                <input type="text" matInput formControlName="personEmail" #personEmail
+                (input)="userForm.get('p_recoveryEmail').patchValue(personEmail.value);">
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-6">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Institución</mat-label>
+                <mat-select multiple formControlName="institutionID">
+                  <mat-option *ngFor="let item of institutions" [value]="item.institutionID">{{item.collegeName}}</mat-option>
+                </mat-select>
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+          </ng-container>
+          <ng-container [formGroup]="userForm" *ngIf="!isUpdating">
+            <div class="col-6">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Usuario</mat-label>
+                <input type="text" matInput formControlName="p_userName">
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+          </ng-container>
+          <ng-container [formGroup]="rolForm" *ngIf="!isUpdating">
+            <div class="col-6">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Rol</mat-label>
+                <mat-select formControlName="p_rolID">
+                  <mat-option *ngFor="let item of roles" [value]="item.rolId">{{item.RolName}}</mat-option>
+                </mat-select>
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <div class="d-flex no-block w-100 justify-content-between">
+    <div class="pl-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="warn"
+        [mat-dialog-close]="false">
+        Cerrar
+      </button>
+    </div>
+    <div class="pr-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="primary"
+        (click)="onSubmit();">
+        Guardar
+      </button>
+    </div>
+  </div>
+</mat-dialog-actions>

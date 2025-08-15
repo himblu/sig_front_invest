@@ -1,0 +1,68 @@
+
+<div style="display: flex; justify-content: end; align-items: center; background: transparent;" class="p-2">
+  <mat-icon style="cursor: pointer; color: red;" [matDialogClose]="false" class="red-icon" matRipple>close</mat-icon>
+</div>
+
+<mat-dialog-content>
+  <div *ngIf="isLoading; else form">
+    <spinner-loader></spinner-loader>
+  </div>
+
+  <ng-template #form>
+    <div class="row animated fadeIn fast">
+      <div class="col-md-12">
+        <p>Actualizar Fechas</p>
+        <div class="card">
+          <div class="card-body">
+            <ng-container [formGroup]="updateForm">
+              <div class="row">
+                <div class="col-6">
+                  <mat-form-field>
+                    <!-- <mat-label>Fecha inicio - fin</mat-label>
+                    <mat-date-range-input [rangePicker]="picker">
+                      <input matStartDate formControlName="startDate" (dateChange)="clickedCalendar = true;">
+                      <input matEndDate formControlName="endDate">
+                    </mat-date-range-input>
+                    <mat-hint>MM/DD/YYYY – MM/DD/YYYY</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-date-range-picker #picker></mat-date-range-picker>
+                    <mat-error></mat-error> -->
+                    <mat-label>Fecha inicio</mat-label>
+                    <input type="date" formControlName="startDate" #startDate matInput (click)="startDate.showPicker()">
+                    <mat-icon style="cursor: pointer;" matSuffix (click)="startDate.showPicker()">calendar_month</mat-icon>
+                    <mat-hint>dd/mm/aaaa</mat-hint>
+                    <mat-error></mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-6">
+                  <mat-form-field>
+                    <mat-label>Fecha fin</mat-label>
+                    <input type="date" formControlName="endDate" #endDate matInput (click)="endDate.showPicker()">
+                    <mat-icon style="cursor: pointer;" matSuffix (click)="endDate.showPicker()">calendar_month</mat-icon>
+                    <mat-hint>dd/mm/aaaa</mat-hint>
+                    <mat-error></mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-6">
+                  <mat-label>Estado:</mat-label>
+                  <mat-checkbox color="primary" formControlName="statusID"></mat-checkbox>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12" style="text-align: right;">
+                  <button
+                    mat-raised-button
+                    class="styleButton_sml"
+                    style="max-width: 140px;"
+                    (click)="onSubmit()">
+                    Guardar
+                  </button>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</mat-dialog-content>

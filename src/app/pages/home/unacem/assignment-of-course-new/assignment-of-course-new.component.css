@@ -1,0 +1,29 @@
+/* Contenedor de la tabla */
+.schedule__table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 15px;
+}
+
+/* Estilos para las cabeceras */
+th.mat-header-cell {
+	background-color: #007bff;
+	color: white;
+	font-weight: bold;
+	text-align: center;
+	padding: 12px;
+	border: 1px solid #ccc;
+}
+
+/* Estilos para las celdas */
+td.mat-cell {
+	text-align: center;
+	padding: 12px;
+	border: 1px solid #ccc;
+}
+
+/* Estilos para las celdas resaltadas (horarios activos) */
+.schedule__table-cell--highlight {
+	background-color: red !important;
+	color: white;
+}

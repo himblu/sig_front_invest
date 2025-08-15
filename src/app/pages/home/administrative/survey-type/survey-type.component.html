@@ -1,0 +1,545 @@
+<style>
+  .list-group-item  {
+    border: 1px solid #ccc !important;
+  }
+</style>
+<div class="animated fadeIn fast">
+  <div class="form-row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <div class="form-row">
+            <div class="col-4 pt-1">
+              <i class="fa fa-file mr-1"></i>Tipo de Formulario
+            </div>
+            <div class="col-2 text-right">
+              <button class="btn btn-sm btn-secondary" (click)="toggleQuestionType()">
+                <i class="fa fa-cog mr-1"></i>Tipo de preguntas
+              </button>
+            </div>
+            <div class="col-2">
+              <button class="btn btn-sm btn-secondary" (click)="toggleGroup()">
+                <i class="fa fa-cog mr-1"></i>Grupos
+              </button>
+            </div>
+            <div class="col-2">
+              <a
+                class="btn btn-sm"
+                style="background-color: rgb(84, 158, 77); color: white; width: 100%;"
+                matTooltipPosition="above"
+                matTooltip="Descargar"
+                target="_blank"
+                href="https://acortar.link/FbQ4p4">
+                <span style="letter-spacing: 0; font-size: 12px;"><small>Manual Usuario</small></span>
+              </a>
+            </div>
+            <div class="col-2 text-right">
+              <button class="btn btn-sm btn-primary" (click)="toggleSurveyType()">
+                <i class="fa fa-plus mr-1"></i>Nuevo Tipo de Formulario
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body text-center" *ngIf="!surveyTypes.length">
+          <i class="fa fa-times fa-2x"></i><br>
+          No se encontraron registros.
+        </div>
+        <ul class="list-group" *ngIf="surveyTypes.length">
+          <li class="list-group-item" *ngFor="let s of surveyTypes">
+            <div class="form-row">
+              <div class="col-6">
+                <small>
+                  {{s.name | uppercase}} <br>
+                  <em>{{s.description | uppercase}}</em>
+                </small>
+              </div>
+              <div class="col-2 text-right">
+                <button class="btn btn-sm btn-light text-secondary" *ngIf="categories.length && interests.length" (click)="toggleResult(s)">
+                  {{s.quantityRepresentation}}&nbsp;{{s.quantityRepresentation == 0 || s.quantityRepresentation > 1 ? 'Interpretaciones' : 'Interpretación'}}
+                </button>
+              </div>
+              <div class="col-4 text-right">
+                <button class="btn btn-sm btn-info rounded-circle mr-2" (click)="toggleSurveyType(s)">
+                  <i class="fa fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-primary rounded-circle mr-2" (click)="configSurveyType(s)">
+                  <i class="fa fa-cog"></i>
+                </button>
+                <button class="btn btn-sm btn-danger rounded-circle" (click)="deleteSurveyType(s)">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div bsModal #surveyTypeModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name2">
+  <div class="modal-dialog modal-nm">
+    <div class="modal-content" *ngIf="newSurveyType">
+      <div class="modal-header">
+        <h4 id="dialog-sizes-name2" class="modal-title pull-left">
+          {{newSurveyType.editing ? 'Editando' : 'Nueva'}}&nbsp;Tipo de Absorción
+        </h4>
+        <button type="button" class="btn btn-light pull-right text-danger" aria-label="Close" (click)="toggleSurveyType()">
+          <span aria-hidden="true" ><i class="fa fa-times"></i></span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="surveyTypeForm">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Nombre</mat-label>
+            <input type="text" [max]="5000" formControlName="name" matInput class="text-uppercase">
+          </mat-form-field>
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Descripción</mat-label>
+            <textarea matInput formControlName="description"></textarea>
+          </mat-form-field>
+          <div class="row">
+            <div class="col-md-12 text-center">
+              <button class="btn btn-sm" [ngClass]="{'btn-primary': !newSurveyType.editing, 'btn-success': newSurveyType.editing}" [disabled]="processing" (click)="saveSurveyType()">
+                <i class="fa fa-save mr-1"></i>{{newSurveyType.editing ? 'Guardar Cambios' : 'Crear'}}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div bsModal #groupModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name2">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 id="dialog-sizes-name2" class="modal-title pull-left">
+          Grupo para Tipo de Absorción
+        </h4>
+        <button type="button" class="btn btn-light pull-right text-danger" aria-label="Close" (click)="toggleGroup()">
+          <span aria-hidden="true" ><i class="fa fa-times"></i></span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <tabset>
+          <tab heading="Categorias">
+            <ul class="list-group">
+              <li class="list-group-item" *ngFor="let c of categories">
+                <div class="form-row">
+                  <div class="col-8">
+                    <span class="badge badge-primary mr-2">{{c.abbr | uppercase}}</span>
+                    <small>
+                      {{c.name | uppercase}} <br>
+                      <em>{{c.description | uppercase}}</em>
+                    </small>
+                  </div>
+                  <div class="col-4 text-right">
+                    <button class="btn btn-sm btn-primary rounded-circle mr-2" (click)="toggleCategory(c)">
+                      <i class="fa fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger rounded-circle" (click)="deleteCategory(c)">
+                      <i class="fa fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item" *ngIf="newCategory">
+                <form [formGroup]="categoryForm">
+                  <div class="form-row">
+                    <div class="col-12">
+                      <i class="fa mr-1" [ngClass]="{'fa-edit': newCategory.analysisCategoryID, 'fa-plus': !newCategory.analysisCategoryID}"></i>
+                      {{newCategory.analysisCategoryID ? 'Editar' : 'Nueva'}}&nbsp;Categoria
+                    </div>
+                    <div class="col-9">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Nombre</mat-label>
+                        <input type="text" maxlength="5000" formControlName="name" matInput class="text-uppercase">
+                      </mat-form-field>
+                    </div>
+                    <div class="col-3">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Abreviatura</mat-label>
+                        <input type="text" maxlength="500" formControlName="abbr" matInput class="text-uppercase">
+                      </mat-form-field>
+                    </div>
+                    <div class="col-12">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Descripción</mat-label>
+                        <textarea matInput maxlength="5000" formControlName="description"></textarea>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-12">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Contenido Adicional</mat-label>
+                        <textarea matInput maxlength="5000" formControlName="additionalField"></textarea>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-6">
+                      <button class="btn btn-sm btn-light text-danger" (click)="cancelCategory()">
+                        <i class="fa fa-times mr-1"></i>Cancelar
+                      </button>
+                    </div>
+                    <div class="col-6 text-right">
+                      <button class="btn btn-sm" [ngClass]="{'btn-primary': !newCategory.analysisCategoryID, 'btn-success': newCategory.analysisCategoryID}" (click)="saveCategory()" [disabled]="!categoryForm.valid || processing">
+                        <i class="fa fa-save mr-1"></i>Guardar
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </li>
+              <li class="list-group-item text-center" *ngIf="!newCategory">
+                <button class="btn btn-light btn-sm text-primary" (click)="toggleCategory()">
+                  <i class="fa fa-plus mr-1"></i>Agregar Categoria
+                </button>
+              </li>
+            </ul>
+          </tab>
+          <tab heading="Intereses">
+            <ul class="list-group">
+              <li class="list-group-item" *ngFor="let c of interests">
+                <div class="form-row">
+                  <div class="col-8">
+                    <span class="badge badge-primary mr-2">{{c.abbr | uppercase}}</span>
+                    <small>
+                      {{c.name | uppercase}} <br>
+                      <em>{{c.description | uppercase}}</em>
+                    </small>
+                  </div>
+                  <div class="col-4 text-right">
+                    <button class="btn btn-sm btn-primary rounded-circle mr-2" (click)="toggleInterest(c)">
+                      <i class="fa fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger rounded-circle" (click)="deleteInterest(c)">
+                      <i class="fa fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item" *ngIf="newInterest">
+                <form [formGroup]="interestForm">
+                  <div class="form-row">
+                    <div class="col-12">
+                      <i class="fa mr-1" [ngClass]="{'fa-edit': newInterest.vocationalInterestsID, 'fa-plus': !newInterest.vocationalInterestsID}"></i>
+                      {{newInterest.vocationalInterestsID ? 'Editar' : 'Nueva'}}&nbsp;Interes Vocacional
+                    </div>
+                    <div class="col-9">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Nombre</mat-label>
+                        <input type="text" maxlength="5000" formControlName="name" matInput class="text-uppercase">
+                      </mat-form-field>
+                    </div>
+                    <div class="col-3">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Abreviatura</mat-label>
+                        <input type="text" maxlength="500" formControlName="abbr" matInput class="text-uppercase">
+                      </mat-form-field>
+                    </div>
+                    <div class="col-12">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Descripción</mat-label>
+                        <textarea matInput maxlength="5000" formControlName="description"></textarea>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-6">
+                      <button class="btn btn-sm btn-light text-danger" (click)="cancelInterest()">
+                        <i class="fa fa-times mr-1"></i>Cancelar
+                      </button>
+                    </div>
+                    <div class="col-6 text-right">
+                      <button class="btn btn-sm" [ngClass]="{'btn-primary': !newInterest.vocationalInterestsID, 'btn-success': newInterest.vocationalInterestsID}" (click)="saveInterest()" [disabled]="!interestForm.valid || processing">
+                        <i class="fa fa-save mr-1"></i>Guardar
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </li>
+              <li class="list-group-item text-center" *ngIf="!newInterest">
+                <button class="btn btn-light btn-sm text-primary" (click)="toggleInterest()">
+                  <i class="fa fa-plus mr-1"></i>Agregar Interes
+                </button>
+              </li>
+            </ul>
+          </tab>
+        </tabset>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div bsModal #questionTypeModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name2">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 id="dialog-sizes-name2" class="modal-title pull-left">
+          Tipo de Pregunta
+        </h4>
+        <button type="button" class="btn btn-light pull-right text-danger" aria-label="Close" (click)="toggleQuestionType()">
+          <span aria-hidden="true" ><i class="fa fa-times"></i></span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <tabset>
+          <tab heading="Tipos de Preguntas">
+            <ul class="list-group">
+              <li class="list-group-item p-1" *ngFor="let c of questionTypes">
+                <div class="form-row">
+                  <div class="col-8 pt-1">
+                    <span class="badge badge-primary mr-2">{{c.questionTypeID}}</span>
+                    <small>{{c.name | uppercase}}</small>
+                  </div>
+                  <div class="col-4 text-right">
+                    <button class="btn btn-sm btn-primary rounded-circle mr-2" (click)="toggleNewQuestionType(c)">
+                      <i class="fa fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger rounded-circle" (click)="deleteQuestionType(c)">
+                      <i class="fa fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item" *ngIf="newQuestionType">
+                <form #questionTypeForm="ngForm">
+                  <div class="form-row">
+                    <div class="col-12">
+                      <i class="fa mr-1" [ngClass]="{'fa-edit': newQuestionType.questionTypeID, 'fa-plus': !newQuestionType.questionTypeID}"></i>
+                      {{newQuestionType.questionTypeID ? 'Editar' : 'Nuevo'}}&nbsp;Tipo de Pregunta
+                    </div>
+                    <div class="col-12">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Nombre</mat-label>
+                        <input type="text" name="name" maxlength="5000" [(ngModel)]="newQuestionType.name" matInput class="text-uppercase" required>
+                      </mat-form-field>
+                    </div>
+                    <!-- <div class="col-12 text-center">
+                      button.btn.btn-light.btn-sm.text-primary-color
+                    </div> -->
+                    <div class="col-6">
+                      <button class="btn btn-sm btn-light text-danger" (click)="cancelQuestion()">
+                        <i class="fa fa-times mr-1"></i>Cancelar
+                      </button>
+                    </div>
+                    <div class="col-6 text-right">
+                      <button class="btn btn-sm" [disabled]="questionTypeForm.invalid" [ngClass]="{'btn-primary': !newQuestionType.questionTypeID, 'btn-success': newQuestionType.questionTypeID}" (click)="saveQuestionType()" [disabled]="!questionTypeForm.valid || processing">
+                        <i class="fa fa-save mr-1"></i>Guardar
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </li>
+              <li class="list-group-item text-center" *ngIf="!newQuestionType">
+                <button class="btn btn-light btn-sm text-primary" (click)="toggleNewQuestionType()">
+                  <i class="fa fa-plus mr-1"></i>Agregar Tipo de Pregunta
+                </button>
+              </li>
+            </ul>
+          </tab>
+          <tab heading="Alternativas" *ngIf="questionTypes.length">
+            <ul class="list-group">
+              <li class="list-group-item p-1" *ngFor="let c of questionTypes">
+                <div class="form-row">
+                  <!-- (click)="c.viewDetail = !c.viewDetail" -->
+                  <div class="col-9 pt-1">
+                    <small>
+                      <i class="fa fa-options mr-1"></i>{{c.name | uppercase}}
+                    </small> <br>
+                  </div>
+                  <div class="col-3 text-right">
+                    <button class="btn btn btn-sm btn-light text-primary-color" (click)="toggleDetail(c)">
+                      <i class="fa mr-1" [ngClass]="{'fa-eye': !c.showDetail, 'fa-eye-slash': c.showDetail}"></i>{{c.showDetail ? 'Ocultar' : 'Ver'}}
+                    </button>
+                  </div>
+                  <div class="col-12" *ngIf="c.showDetail">
+                    <hr>
+                  </div>
+                  <div class="col-12" *ngIf="c.showDetail">
+                    <div class="form-row">
+                      <div class="col-12 text-center">
+                        <button class="btn btn-sm btn-primary-color" (click)="toggleAlternative(c)">
+                          <i class="fa fa-plus mr-1"></i>Agregar Alternativa
+                        </button>
+                      </div>
+                      <div class="col-12 mt-3">
+                        <ul class="list-group">
+                          <li class="list-group-item p-1" *ngFor="let a of c.alternatives">
+                            <div class="form-row">
+                              <div class="col-9 pt-1 pl-3">
+                                <small>
+                                  {{a.notation | uppercase}}
+                                </small>
+                              </div>
+                              <div class="col-3 text-right">
+                                <button class="btn btn-sm btn-primary rounded-circle mr-2" (click)="toggleAlternative(c, a)">
+                                  <i class="fa fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger rounded-circle" (click)="deleteAlternative(a)">
+                                  <i class="fa fa-trash"></i>
+                                </button>
+                              </div>
+                            </div>
+                          </li>
+                        </ul>
+                        <!-- <div class="card mb-2" *ngFor="let a of c.alternatives">
+                          <div class="card-body p-1">
+                            <div class="form-row">
+                              <div class="col-9 pt-1 pl-3">
+                                {{a.notation | uppercase}}
+                              </div>
+                              <div class="col-3 text-right">
+                                <button class="btn btn-sm btn-primary rounded-circle mr-2" (click)="toggleAlternative(c, a)">
+                                  <i class="fa fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger rounded-circle" (click)="deleteAlternative(a)">
+                                  <i class="fa fa-trash"></i>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div> -->
+                        <div class="card" *ngIf="c.newAlternative">
+                          <div class="card-body p-1">
+                            <form #alternativeForm="ngForm">
+                              <div class="form-row p-2">
+                                <div class="col-12">
+                                  <i class="fa mr-1" [ngClass]="{'fa-edit': c.newAlternative.alternativeID, 'fa-plus': !c.newAlternative.alternativeID}"></i>
+                                  {{c.newAlternative.alternativeID ? 'Editar' : 'Nueva'}}&nbsp;Alternativa
+                                </div>
+                                <div class="col-9">
+                                  <label>Alternativa</label>
+                                  <input type="text" name="notation" maxlength="5000" [(ngModel)]="c.newAlternative.notation" class="form-control text-uppercase">
+                                </div>
+                                <div class="col-3">
+                                  <label>Valor</label>
+                                  <input type="text" name="value" maxlength="500" [(ngModel)]="c.newAlternative.value" class="form-control text-uppercase">
+                                </div>
+                                <div class="col-6 mt-3">
+                                  <button class="btn btn-sm btn-light text-danger" (click)="toggleAlternative(c)">
+                                    <i class="fa fa-times mr-1"></i>Cancelar
+                                  </button>
+                                </div>
+                                <div class="col-6 text-right mt-3">
+                                  <button class="btn btn-sm" [ngClass]="{'btn-primary': !c.newAlternative.alternativeID, 'btn-success': c.newAlternative.alternativeID}" (click)="saveAlternative(c)" [disabled]="!alternativeForm.valid || processing">
+                                    <i class="fa fa-save mr-1"></i>Guardar
+                                  </button>
+                                </div>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </li>
+            </ul>
+          </tab>
+        </tabset>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div bsModal #representationModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name2">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 id="dialog-sizes-name2" class="modal-title pull-left">
+          Interpretación de Grupos
+        </h4>
+        <button type="button" class="btn btn-light pull-right text-danger" aria-label="Close" (click)="toggleResult()">
+          <span aria-hidden="true" ><i class="fa fa-times"></i></span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <ul class="list-group">
+          <li class="list-group-item" *ngFor="let c of groupRepresentations">
+            <div class="form-row">
+              <div class="col-6">
+                <span class="badge badge-primary mr-2">{{c.abbr | uppercase}}</span>
+                <small>
+                  {{c.name | uppercase}} <br>
+                  <em>{{c.description | uppercase}}</em>
+                </small>
+              </div>
+              <div class="col-3 pt-1">
+                <small>
+                  <span class="badge badge-primary">{{c.analysisCategoryName | uppercase}}</span> <br>
+                  <span class="badge badge-success">{{c.vocationalInterestsName | uppercase}}</span>
+                </small>
+              </div>
+              <div class="col-3 text-right">
+                <button class="btn btn-sm btn-primary rounded-circle mr-2" (click)="toggleRepresentation(c)">
+                  <i class="fa fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-danger rounded-circle" (click)="deleteRepresentation(c)">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </li>
+          <li class="list-group-item" *ngIf="newRepresentation">
+            <form [formGroup]="representationForm">
+              <div class="form-row">
+                <div class="col-12">
+                  <i class="fa mr-1" [ngClass]="{'fa-edit': newRepresentation.groupRepresentationID, 'fa-plus': !newRepresentation.groupRepresentationID}"></i>
+                  {{newRepresentation.groupRepresentationID ? 'Editar' : 'Nueva'}}&nbsp;Interpretación
+                </div>
+                <div class="col-4">
+                  <mat-form-field class="width" appearance="outline">
+                    <mat-label>Categoria</mat-label>
+                    <mat-select formControlName="analysisCategoryID">
+                        <mat-option *ngFor="let p of categories" [value]="p.analysisCategoryID">{{p.name | uppercase}}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div class="col-4">
+                  <mat-form-field class="width" appearance="outline">
+                    <mat-label>Interes</mat-label>
+                    <mat-select formControlName="vocationalInterestsID">
+                        <mat-option *ngFor="let p of interests" [value]="p.vocationalInterestsID">{{p.name | uppercase}}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div class="col-4">
+                  <mat-form-field class="width" appearance="outline">
+                    <mat-label>Preguntas Respondidas</mat-label>
+                    <input type="number" min="0" formControlName="quantityQuestionAnswereds" matInput class="text-uppercase">
+                  </mat-form-field>
+                </div>
+                <div class="col-12">
+                  <mat-form-field class="width" appearance="outline">
+                    <mat-label>Interpretación</mat-label>
+                    <input type="text" formControlName="name" matInput class="text-uppercase">
+                  </mat-form-field>
+                </div>
+                <div class="col-12">
+                  <mat-form-field class="width" appearance="outline">
+                    <mat-label>Descripción de Interpretación</mat-label>
+                    <textarea matInput maxlength="5000" formControlName="description" class="text-uppercase"></textarea>
+                  </mat-form-field>
+                </div>
+                <div class="col-6">
+                  <button class="btn btn-sm btn-light text-danger" (click)="cancelRepresentation()">
+                    <i class="fa fa-times mr-1"></i>Cancelar
+                  </button>
+                </div>
+                <div class="col-6 text-right">
+                  <button class="btn btn-sm" [ngClass]="{'btn-primary': !newRepresentation.groupRepresentationID, 'btn-success': newRepresentation.groupRepresentationID}" (click)="saveRepresentation()" [disabled]="!categoryForm.valid || processing">
+                    <i class="fa fa-save mr-1"></i>Guardar
+                  </button>
+                </div>
+              </div>
+            </form>
+          </li>
+          <li class="list-group-item text-center" *ngIf="!newRepresentation">
+            <button class="btn btn-light btn-sm text-primary" (click)="toggleRepresentation()">
+              <i class="fa fa-plus mr-1"></i>Agregar Interpretación
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

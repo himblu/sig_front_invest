@@ -1,0 +1,278 @@
+<style>
+  .list-group-item  {
+    border: 1px solid #ccc;
+  }
+
+  .border-primary-color {
+    border: 2px solid #014898 !important;
+  }
+  .customClass {
+    background-color: #ccc;
+    font-size: 12px;
+    width: 300px !important;
+  }
+
+  .tooltip-arrow,
+  .red-tooltip + .tooltip > .tooltip-inner {background-color: #f00;}
+ /* {
+    background-color: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(2px);
+  } */
+</style>
+<div class="animated fadeIn">
+  <div class="form-row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <span *ngIf="userLoged === 7 || userLoged === 8">
+            <i class="fa fa-filter mr-1"></i>Validación de Documentos de Postulante
+          </span>
+          <span *ngIf="userLoged === 9">
+            <i class="fa fa-filter mr-1"></i>Validación de Pagos del Postulante
+          </span>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="filterForm">
+            <div class="row">
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Periodo</mat-label>
+                  <mat-select formControlName="admissionPeriodID" (selectionChange)="resetSearch()">
+                    <mat-option *ngFor="let i of periods" [value]="i.admissionPeriodID">{{i.admissionPeriodName}}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-6">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Buscar por Postulante</mat-label>
+                  <input type="text" matInput formControlName="text">
+                </mat-form-field>
+              </div>
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Estado</mat-label>
+                  <mat-select formControlName="statusFileID" (selectionChange)="resetSearch()">
+                    <mat-option *ngFor="let i of fileStatuses" [value]="i.statusFileID">{{i.statusFileDesc | uppercase}}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-4"></div>
+              <div class="col-4 text-center mb-3">
+                <button class="btn btn-sm btn-danger" *ngIf="searched" (click)="resetSearch()">
+                  <i class="fa fa-repeat mr-1"></i>Reiniciar busqueda
+                </button>
+                <button class="btn btn-sm bg-primary-color" [disabled]="searching || !filterForm.controls['admissionPeriodID'].value" *ngIf="!searched" (click)="searchPostulants()">
+                  <i class="fa fa-search mr-1"></i>Buscar postulantes
+                </button>
+              </div>
+              <div class="col-4"></div>
+              <div class="col-8">
+                <div class="btn-group mr-3" dropdown *ngIf="postulants.length && searched">
+                  <button type="button" class="btn btn-light text-primary btn-sm btn-pill">{{report.typeName || 'Descargar Reporte de:'}}</button>
+                  <button id="button-split" type="button" dropdownToggle class="btn btn-light text-primary btn-sm dropdown-toggle dropdown-toggle-split"
+                          aria-controls="dropdown-split">
+                    <span class="caret"></span>
+                    <span class="sr-only visually-hidden">Split button!</span>
+                  </button>
+                  <ul id="dropdown-split" *dropdownMenu class="dropdown-menu"
+                      role="menu" aria-labelledby="button-split">
+                    <li role="menuitem" (click)="selectReportType(r)" *ngFor="let r of reportTypes"><a class="dropdown-item">{{r.name | uppercase}}</a></li>
+                    <li role="menuitem" (click)="generatePostulantReport('api/postulant/registered-leveling-report');"><a class="dropdown-item">REPORTE USUARIOS INSCRITOS</a></li>
+                  </ul>
+                </div>
+                <div class="btn-group mr-3" dropdown *ngIf="postulants.length && searched && report.filter">
+                  <button type="button" class="btn btn-light text-primary btn-sm btn-pill">{{report.statusFileDesc || 'Seleccione:'}}</button>
+                  <button id="button-split" type="button" dropdownToggle class="btn btn-light text-primary btn-sm dropdown-toggle dropdown-toggle-split"
+                          aria-controls="dropdown-split">
+                    <span class="caret"></span>
+                    <span class="sr-only visually-hidden">Split button!</span>
+                  </button>
+                  <ul id="dropdown-split" *dropdownMenu class="dropdown-menu"
+                      role="menu" aria-labelledby="button-split">
+                    <li role="menuitem" (click)="selectStatusFile(r)" *ngFor="let r of fileStatuses"><a class="dropdown-item">{{r.statusFileDesc | uppercase}}</a></li>
+                  </ul>
+                </div>
+                <div class="btn-group mr-3" dropdown *ngIf="postulants.length && searched && report.type">
+                  <button type="button" class="btn btn-light text-primary btn-sm btn-pill">{{report.fileTypeName || 'Tipo de Archivo:'}}</button>
+                  <button id="button-split" type="button" dropdownToggle class="btn btn-light text-primary btn-sm dropdown-toggle dropdown-toggle-split"
+                          aria-controls="dropdown-split">
+                    <span class="caret"></span>
+                    <span class="sr-only visually-hidden">Split button!</span>
+                  </button>
+                  <ul id="dropdown-split" *dropdownMenu class="dropdown-menu"
+                      role="menu" aria-labelledby="button-split">
+                    <li role="menuitem" (click)="selectFileType(r)" *ngFor="let r of fileTypes"><a class="dropdown-item">{{r.name | uppercase}}</a></li>
+                  </ul>
+                </div>
+                <button class="btn bg-primary-color btn-pill btn-sm mr-3" [disabled]="!report.typeName || !report.fileTypeName || report.generating" (click)="generateReport()" *ngIf="postulants.length && searched">
+                  <i class="fa mr-1" [ngClass]="{'fa-spin fa-spinner': report.generating, 'fa-download': !report.generating}"></i>
+                  {{report.generating ? 'Generando' : 'Generar'}}
+                </button>
+                <button class="btn btn-sm btn-light text-success" *ngIf="postulants.length && searched && userLoged === 9" (click)="generateMainReportFinancial()">
+                  <i class="fa fa-list-alt mr-1"></i>Descargar General de Financiero
+                </button>
+              </div>
+              <div class="col-4">
+                <form [formGroup]="paginatorForm" *ngIf="postulants.length && searched">
+                  <div class="input-group input-group-sm">
+                    <span class="input-group-text pt-1 pr-2">
+                      Items por hoja
+                    </span>
+                    <select name="recordNumber" style="border-radius: 5px;" (change)="getPostulants();" formControlName="recordNumber" class="form-control form-control-sm col-4 text-center">
+                      <option *ngFor="let r of recordNumbers" [value]="r">{{r}}</option>
+                    </select>
+                    <span class="input-group-text pl-2 pt-1 pr-2">
+                      {{(paginatorForm.get('currentPage').value - 1) * paginatorForm.get('recordNumber').value + 1}} - {{paginatorForm.get('currentPage').value * paginatorForm.get('recordNumber').value}} de {{paginatorForm.get('totalRecords').value}}
+                    </span>
+                    <button class="btn btn-sm btn-light" *ngIf="paginatorForm.get('currentPage').value !== 1" (click)="goToPage(paginatorForm.get('currentPage').value - 1)">
+                      <i class="fa fa-arrow-left"></i>
+                    </button>
+                    <button class="btn btn-sm btn-light" *ngIf="paginatorForm.get('totalRecords').value > paginatorForm.get('currentPage').value * paginatorForm.get('recordNumber').value" (click)="goToPage(paginatorForm.get('currentPage').value + 1)">
+                      <i class="fa fa-arrow-right"></i>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="card-body text-center" *ngIf="searching">
+          <i class="fa fa-spin fa-spinner fa-3x text-primary-color"></i> <br>
+          Buscando registros.
+        </div>
+        <div class="card-body text-center" *ngIf="!postulants.length && !searched && !searching">
+          <i class="fa fa-search fa-2x"></i> <br>
+          Busca postulantes con esos filtros.
+        </div>
+        <ul class="list-group list-group-flush" *ngIf="searched">
+          <li class="list-group-item text-center" *ngIf="!postulants.length">
+            <i class="fa fa-times fa-2x"></i> <br>
+            No se tienen registros para esos filtros.
+          </li>
+          <ng-container *ngIf="postulants.length">
+            <li class="list-group-item bg-primary-color text-white p-1">
+              <div class="form-row" style="font-weight: 500;">
+                <div class="col-1">
+                  <small><strong>Documento</strong></small>
+                </div>
+                <div class="col-3">
+                  <small><strong>Estudiante</strong></small>
+                </div>
+                <div class="col-1">
+                  <small><strong>Modalidad</strong></small>
+                </div>
+                <div class="col-2">
+                  <small><strong>Escuela</strong></small>
+                </div>
+                <div class="col-2">
+                  <small><strong>Carrera</strong></small>
+                </div>
+                <div class="col-1">
+                  <small><strong>Fecha de Inscripción</strong></small>
+                </div>
+                <div class="col-1 text-center">
+                  <small><strong>Estado</strong></small>
+                </div>
+                <div class="col-1 text-right">
+                  <br>
+                </div>
+              </div>
+            </li>
+            <li class="list-group-item p-1 mb-1" [ngClass]="{'border-primary-color shadow': p.choiced == true}" (mouseover)="p.choiced = true" (mouseleave)="p.choiced = false" *ngFor="let p of postulants">
+              <div class="form-row">
+                <div class="col-1">
+                  <small>{{p.personDocumentNumber}}</small>
+                </div>
+                <div class="col-3">
+                  <small>{{p.personFullName | uppercase}}</small>
+                </div>
+                <div class="col-1">
+                  <small>{{p.modalityDesc}}</small>
+                </div>
+                <div class="col-2">
+                  <small>{{p.schoolDesc}}</small>
+                </div>
+                <div class="col-2">
+                  <small>{{p.careerDesc}}</small>
+                </div>
+                <div class="col-1">
+                  <small>{{p.dateCreated | date:'dd/MM/yyyy'}}</small>
+                </div>
+                <div class="col-1 text-center">
+                  <span [style.color]="p.currentState.stateColor" containerClass="customClass" [tooltip]="userLoged === 7 || userLoged === 1 || userLoged === 21 ? statusTemplate : null" class="pl-2 pr-2 text-white" style="border-radius: 5px !important;" [style.backgroundColor]="p.currentState.backgroundColor">
+                    <small>{{p.currentState.statusFileDesc || 'Sin archivos'}}</small>
+                  </span>
+                  <ng-template #statusTemplate class="text-secondary" style="background-color: #ccc !important;">
+                    <div style="background-color: #ffffff !important;  color: #000000; width: 200px !important; text-align: left;">
+                      <small *ngFor="let t of p.tooltip">
+                        {{t.area}} - <span [style.color]="t.stateColor" class="pl-2 pr-2" style="border-radius: 5px !important; color: #fff !important;" [style.backgroundColor]="t.stateBackground">
+                          {{t.stateName}}</span> <br>
+                      </small>
+                    </div>
+                  </ng-template>
+                </div>
+                <div class="col-1 text-right">
+                  <span [matMenuTriggerFor]="menu" class="hand" *ngIf="p.currentStateID !== 1 && userLoged !== 1 && userLoged !== 21">
+                    <i class="fa fa-check-circle mr-1"></i><small>Validar</small>
+                  </span>
+                  <mat-menu #menu="matMenu">
+                    <button mat-menu-item *ngIf="userLoged === 7 || userLoged === 8" (click)="showDocumentsOfPostulant(p)">
+                      <mat-icon class="blue-icon">topic</mat-icon>
+                      <span class="item">Documentos</span>
+                    </button>
+                    <button mat-menu-item *ngIf="userLoged === 9" (click)="showDocumentsOfPostulant(p)">
+                      <mat-icon class="blue-icon">money</mat-icon>
+                      <span class="item">Pagos</span>
+                    </button>
+                  </mat-menu>
+                </div>
+              </div>
+            </li>
+          </ng-container>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div bsModal #filterModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name2">
+  <div class="modal-dialog modal-nm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 id="dialog-sizes-name2" class="modal-title pull-left">
+          <strong class="text-primary-color">
+            Filtros del Reporte
+          </strong>
+        </h4>
+        <button type="button" class="btn btn-light btn-sm pull-right text-danger" aria-label="Close" (click)="closeFilterModal()">
+          <span aria-hidden="true" ><i class="fa fa-times"></i></span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <ng-container *ngIf="report.type === 'student-by-voucher-files'">
+            <div class="col-6">
+              <label for="startDate">Fecha de Inicio</label>
+              <input type="date" [min]="creationDateITCA" [max]="currentDate" name="report.startDate" [(ngModel)]="report.startDate" class="form-control form-control-sm" required>
+            </div>
+            <div class="col-6">
+              <label for="endDate">Fecha de Fin</label>
+              <input type="date" name="report.endDate" [max]="currentDate" [disabled]="!report.startDate" [(ngModel)]="report.endDate" class="form-control form-control-sm" required>
+            </div>
+          </ng-container>
+          <div class="col-12" *ngIf="report.type === 'student-by-career'">
+            <select name="careerID" [(ngModel)]="report.careerID" class="form-control form-control-sm">
+              <option [ngValue]="undefined">--TODOS--</option>
+              <option *ngFor="let c of careers" [ngValue]="c.careerID">{{c.careerName | uppercase}}</option>
+            </select>
+          </div>
+          <div class="col-12 mt-3 text-center">
+            <button class="btn btn-sm bg-primary-color" (click)="generateReportWithCareer()">
+              <i class="fa fa-cog mr-1"></i>Generar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

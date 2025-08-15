@@ -1,0 +1,269 @@
+<div class="row animated fadeIn fast">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <form [formGroup]="myForm"
+                    autocomplete="off"
+                    (submit)="charge()">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Experiencia</mat-label>
+                                <mat-select formControlName="type">
+                                    <mat-option value="">Seleccione una opción</mat-option>
+                                    <mat-option [value]="jobs.jobExperienceTypeID" *ngFor="let jobs of jobExperience; let index = index">{{jobs.jobExperienceTypeName}}</mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="isValidField('type')">{{getFielError('type')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-3">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Institución</mat-label>
+                                <input formControlName="institution" type="text" matInput>
+                                <mat-error *ngIf="isValidField('institution')">{{getFielError('institution')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-3">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Dirección del trabajo</mat-label>
+                                <input formControlName="workAddress" type="text" matInput>
+                                <mat-error *ngIf="isValidField('workAddress')">{{getFielError('workAddress')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-3">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Cargo que desempeño</mat-label>
+                                <input formControlName="responsibility" type="text" matInput>
+                                <mat-error *ngIf="isValidField('responsibility')">{{getFielError('responsibility')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-3">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label><small>Fecha Inicio</small></mat-label>
+                                  <input formControlName="dateAdmission" matInput [matDatepicker]="datepickerInit" readonly>
+                                  <mat-hint>dd/mm/aaaa</mat-hint>
+                                  <mat-datepicker-toggle matIconSuffix [for]="datepickerInit"></mat-datepicker-toggle>
+                                  <mat-datepicker #datepickerInit>
+                                      <mat-datepicker-actions>
+                                      <button mat-button matDatepickerCancel>Cancel</button>
+                                      <button mat-raised-button color="primary" matDatepickerApply>Aceptar</button>
+                                      </mat-datepicker-actions>
+                                </mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-3">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label><small>Fecha Fin</small></mat-label>
+                                    <input formControlName="departureDate" matInput [matDatepicker]="datepickerEnd" readonly>
+                                    <mat-hint>dd/mm/aaaa</mat-hint>
+                                    <mat-datepicker-toggle matIconSuffix [for]="datepickerEnd"></mat-datepicker-toggle>
+                                    <mat-datepicker #datepickerEnd>
+                                        <mat-datepicker-actions>
+                                        <button mat-button matDatepickerCancel>Cancel</button>
+                                        <button mat-raised-button color="primary" matDatepickerApply>Aceptar</button>
+                                        </mat-datepicker-actions>
+                                </mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-3">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Teléfono de contacto</mat-label>
+                                <input formControlName="workPhone"
+                                       type="text"
+                                       matInput
+                                       mask="S*"
+                                       minlength="9"
+                                       maxlength="13"
+                                       [patterns]="phone">
+                                <mat-error *ngIf="isValidField('workPhone')">{{getFielError('workPhone')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-3">
+                          <mat-form-field class="width" appearance="outline">
+                              <mat-label>Nombre de referencia laboral</mat-label>
+                              <input formControlName="workName" type="text" matInput>
+                              <mat-error *ngIf="isValidField('workName')">{{getFielError('workName')}}</mat-error>
+                          </mat-form-field>
+                      </div>
+                      <div class="col-md-3">
+                        <mat-form-field class="width" appearance="outline">
+                            <mat-label>País donde trabajó</mat-label>
+                            <mat-select formControlName="countryID">
+                                <mat-option value="">Seleccione una opción</mat-option>
+                                <mat-option *ngFor="let item of countryList" [value]="item.countryID">{{item.countryName}}</mat-option>
+                            </mat-select>
+
+                        </mat-form-field>
+                      </div>
+
+                      <div class="col-md-3">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Trabaja actualmente?</mat-label>
+                                <mat-select formControlName="currentWork">
+                                    <mat-option [value]="0">NO</mat-option>
+                                    <mat-option [value]="1">SÍ</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                      </div>
+                        <div class="col-md-4"></div>
+                        <div class="col-md-2" style="text-align: right;">
+                            <button mat-raised-button class="styleButton_sml" style="max-width: 150px; min-width: 100px;" type="submit">Agregar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div><br>
+    </div>
+    <form [formGroup]="workForm"
+          (submit)="saveRecord()">
+        <div *ngFor="let item of dynamicsArr.controls; let i = index">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div formArrayName="dynamics">
+                            <!-- <h1 class="text-warning">Experiencia Laboral N°:{{i + 1}}</h1> -->
+                            <div class="row" [formGroupName]="i">
+                                <div class="col-md-3">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Experiencia</mat-label>
+                                        <mat-select formControlName="type" (selectionChange)="putWorkExperience(i);">
+                                          <mat-option value="">Seleccione una opción</mat-option>
+                                          <mat-option [value]="jobs.jobExperienceTypeID" *ngFor="let jobs of jobExperience; let index = index">{{jobs.jobExperienceTypeName}}</mat-option>
+                                        </mat-select>
+                                        <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Institución</mat-label>
+                                        <input formControlName="institution" type="text" matInput (blur)="putWorkExperience(i);">
+                                        <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Dirección de trabajo</mat-label>
+                                        <input formControlName="workAddress" type="text" matInput (blur)="putWorkExperience(i);">
+                                        <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Cargo que desempeño</mat-label>
+                                        <input formControlName="responsibility" type="text" matInput (blur)="putWorkExperience(i);">
+                                        <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label><small>Fecha Inicio</small></mat-label>
+                                            <input type="date" formControlName="dateAdmission" #dateAdmission matInput (click)="dateAdmission.showPicker()" (blur)="putWorkExperience(i);">
+                                            <mat-icon style="cursor: pointer;" matSuffix (click)="dateAdmission.showPicker()">calendar_month</mat-icon>
+                                            <mat-hint>dd/mm/aaaa</mat-hint>
+                                            <mat-error *ngIf="isValidField('dateAdmission')">{{getFielError('dateAdmission')}}</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label><small>Fecha Fin</small></mat-label>
+                                            <input type="date" formControlName="departureDate" #departureDate matInput (click)="departureDate.showPicker()" (blur)="putWorkExperience(i);">
+                                            <mat-icon style="cursor: pointer;" matSuffix (click)="departureDate.showPicker()">calendar_month</mat-icon>
+                                            <mat-hint>dd/mm/aaaa</mat-hint>
+                                            <mat-error *ngIf="isValidField('departureDate')">{{getFielError('departureDate')}}</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Teléfono de contacto</mat-label>
+                                        <input formControlName="workPhone"
+                                          type="text"
+                                          matInput
+                                          mask="S*"
+                                          minlength="9"
+                                          maxlength="13"
+                                          [patterns]="phone"
+                                          (blur)="putWorkExperience(i);">
+                                        <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                  <mat-form-field class="width" appearance="outline">
+                                      <mat-label>Nombre de referencia laboral</mat-label>
+                                      <input formControlName="workName" type="text" matInput (blur)="putWorkExperience(i);">
+                                      <mat-error *ngIf="isValidField('workName')">{{getFielError('workName')}}</mat-error>
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                  <mat-form-field class="width" appearance="outline">
+                                      <mat-label>País donde trabajó</mat-label>
+                                      <mat-select formControlName="countryID" (selectionChange)="putWorkExperience(i);">
+                                          <mat-option value="">Seleccione una opción</mat-option>
+                                          <mat-option *ngFor="let item of countryList" [value]="item.countryID">{{item.countryName}}</mat-option>
+                                      </mat-select>
+                                      <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                  </mat-form-field>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Trabaja actualmente?</mat-label>
+                                        <mat-select formControlName="currentWork" (selectionChange)="putWorkExperience(i);">
+                                            <mat-option value="">Seleccione una opción</mat-option>
+                                            <mat-option [value]="0">NO</mat-option>
+                                            <mat-option [value]="1">SÍ</mat-option>
+                                        </mat-select>
+                                        <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                  <div style="border: 1px solid rgba(0, 0, 0, 0.315); height: 40px; display: flex; border-radius: 4px;">
+                                    <ng-container>
+                                      <input
+                                      *ngIf="!jobExperienceList[i]?.urlDocument"
+                                      style="cursor: pointer; width: 250px;"
+                                      class="mt-1 mb-1 ml-2 align-self-center"
+                                      #input
+                                      (change)="onChangeInput(input.files, i, input);"
+                                      formControlName="fileTraining" type="file" accept="application/pdf">
+                                    </ng-container>
+                                    <ng-container>
+                                      <div *ngIf="jobExperienceList[i]?.urlDocument" class="w-100" (click)="openFile(jobExperienceList[i].urlDocument);" style="cursor: pointer;">
+                                        <img style="width: 20px;" src="assets/images/file.png" alt="Payment File">
+                                        <span style="color: #5090f5;">Ver Archivo</span>
+                                      </div>
+                                    </ng-container>
+                                  </div>
+                              </div>
+                              <div class="col-3">
+                                <mat-label>Estado</mat-label>
+                                <mat-checkbox formControlName="statusID" color="primary" (change)="putWorkExperience(i);"></mat-checkbox>
+                              </div>
+                              <div class="col-md-1"></div>
+                              <div class="col-md-2" style="text-align: right;">
+                                  <button mat-raised-button class="styleButton_sml" style="max-width: 150px; min-width: 100px;" type="button" (click)="deleteDynamic(i)" *ngIf="!isLoadingInfo">Eliminar</button>
+                              </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><br>
+          </div>
+          <div class="row">
+            <div class="col-12" style="position: relative;" *ngIf="isLoading; else row">
+              <spinner-loader></spinner-loader>
+            </div>
+            <ng-template #row>
+              <div class="col-md-8"></div>
+              <div class="col-md-2" style="text-align: right;" *ngIf="dynamicsArr.length > 0">
+                  <button mat-raised-button
+                  matTooltip="Anterior: Formación Académica" class="styleButton_sml" style="max-width: 150px; min-width: 100px;" type="button" matStepperPrevious >Regresar</button>
+              </div>
+
+              <div class="col-md-2" style="text-align: left;" *ngIf="dynamicsArr.length > 0">
+                  <button mat-raised-button
+                  matTooltip="Siguiente: Capacitación" class="styleButton_sml" style="max-width: 150px; min-width: 100px;" type="submit" >Guardar</button>
+              </div>
+            </ng-template>
+          </div>
+  </form>
+</div>

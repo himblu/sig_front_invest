@@ -1,0 +1,99 @@
+
+<div class="row">
+    <div class="col text-center">
+        <h2>Distributivo Carreras</h2>
+    </div>
+</div>
+<div class="card">
+    <form [formGroup]="formFilters">
+    <div class="row mt-4">
+        <div class="col"></div>
+        <div class="col-md-2">
+            <mat-form-field class="width" appearance="outline">
+                <mat-label>Periodo Academico</mat-label>
+                <mat-select (selectionChange)="getSchoolsByPeriod($event);" formControlName="periodID">
+                    <mat-option value="">Seleccione una opción</mat-option>
+                    <mat-option [value]="period.periodID"
+                        *ngFor="let period of periods">{{period.periodName}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div class="col-md-2">
+            <mat-form-field class="width" appearance="outline">
+                <mat-label>Escuela</mat-label>
+                <mat-select formControlName="schoolID" (selectionChange)="getStudyPlansBySchoolAndPeriod($event);">
+                  <mat-option *ngFor="let item of schools" [value]="item.schoolID">{{ item.schoolName }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+        </div>
+
+        <div class="col-md-2">
+            <mat-form-field class="width" appearance="outline">
+                <mat-label>Carrera</mat-label>
+                <mat-select
+                  formControlName="careerID" (selectionChange)="getCarrerByPeriodAndSchool($event.value);">
+                  <mat-option *ngFor="let item of careers" [value]="item.careerID">{{item.careerName}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+        </div>
+        <div class="col-md-2">
+            <mat-form-field class="width" appearance="outline">
+                <mat-label>Malla Curricular</mat-label>
+                <mat-select formControlName="studyPlanID">
+                  <mat-option *ngFor="let item of studyPlans"
+                              [value]="item.studyPlanID"> {{ item.studyPlanDesc }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+        </div>
+
+        <div class="col">
+            <button mat-raised-button color="primary" style="background: #014898;" (click)="searchDistributiveByCareers();">BUSCAR</button>
+
+        </div>
+        <div class="col">
+            <button [disabled]="formFilters.invalid" class="text-center" mat-raised-button color="primary" (click)="generateReport();">
+                <mat-icon class="green-icon m-0">description</mat-icon>
+            </button>
+
+        </div>
+    </div>
+</form>
+</div>
+<br>
+<div class="card p-5">
+    <div class="row">
+        <table class="w-100 mat-elevation-z8">
+            <tbody>
+                <tr>
+                    <ng-container *ngFor="let head of distributiveHeader">
+
+                        <th>
+                            {{ head }}
+                        </th>
+
+                    </ng-container>
+                </tr>
+                    <tr *ngFor="let period of listWork">
+                        <td>
+                            <label *ngIf="period.periodOne.flag_courseTeacher === 1">{{ period.periodOne.courseTeacher }}</label>
+                        </td>
+                        <td>
+                            <label *ngIf="period.periodTwo.flag_courseTeacher === 1">{{ period.periodTwo.courseTeacher }}</label>
+                        </td>
+                        <td>
+                            <label *ngIf="period.periodThree.flag_courseTeacher === 1">{{ period.periodThree.courseTeacher }}</label>
+                        </td>
+                        <td>
+                            <label *ngIf="period.periodFour.flag_courseTeacher === 1">{{ period.periodFour.courseTeacher }}</label>
+                        </td>
+                        <td>
+                            <label *ngIf="period.periodFive.flag_courseTeacher === 1">{{ period.periodFive.courseTeacher }}</label>
+                        </td>
+                        <td>
+                          <label *ngIf="period.periodSix.flag_courseTeacher === 1">{{ period.periodSix.courseTeacher }}</label>
+                      </td>
+                    </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,129 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+<div class="row pl-3 pr-3" *ngIf="!charging">
+  <div class="col-3">
+    <section [formGroup]="filtersForm">
+      <mat-form-field appearance="outline">
+        <mat-label>Parcial</mat-label>
+        <mat-select formControlName="componentID" placeholder="Seleccionar parcial" (selectionChange)="getActivities()">
+          <mat-option *ngFor="let partial of partialList" [value]="partial.componentID">{{partial.evaluationName}}</mat-option>
+        </mat-select>
+        <mat-error>Campo requerido</mat-error>
+      </mat-form-field>
+    </section>
+  </div>
+  <div class="col-3">
+    <section [formGroup]="filtersForm">
+      <mat-form-field appearance="outline">
+        <mat-label>Tipo de actividad</mat-label>
+        <mat-select formControlName="subComponentID" placeholder="Seleccionar actividad" (selectionChange)="getTasks()">
+          <mat-option *ngFor="let activity of activitiesList" [value]="activity.subComponentID">{{activity.subComponentTypeName}}</mat-option>
+        </mat-select>
+        <mat-error>Campo requerido</mat-error>
+      </mat-form-field>
+    </section>
+  </div>
+  <div class="col-3">
+    <section [formGroup]="filtersForm">
+      <mat-form-field appearance="outline">
+        <mat-label>Tareas</mat-label>
+        <mat-select formControlName="taskID" placeholder="Seleccionar tarea" (selectionChange)="pageIndex= 1; getStudents()">
+          <mat-option *ngFor="let task of taskList" [value]="task.taskID">{{task.taskName}}</mat-option>
+        </mat-select>
+        <mat-error>Campo requerido</mat-error>
+      </mat-form-field>
+    </section>
+  </div>
+  <div class="col-3" style="text-align: right;">
+    <button type="button" mat-raised-button class="styleButton_sml" style="max-width: 100px;" *ngIf="gradesList" (click)="onSubmitGrades()">Guardar</button>
+  </div>
+</div>
+
+<div *ngIf="!charging">
+  <div class="table-responsive">
+    <form [formGroup]="gradesForm">
+      <table id="demo-foo-addrow" class="table m-t-0 table-hover no-wrap contact-list footable-loaded footable" data-page-size="5">
+        <thead style="background-color: #004899; color: white;">
+        <tr>
+          <th class="footable-sortable">
+            Documento de identidad
+            <span class="footable-sort-indicator"></span>
+          </th>
+          <th class="footable-sortable">
+            Estudiante
+            <span class="footable-sort-indicator"></span>
+          </th>
+          <th class="footable-sortable">
+            Estado
+            <span class="footable-sort-indicator"></span>
+          </th>
+          <th class="footable-sortable">
+            Calificación
+            <span class="footable-sort-indicator"></span>
+          </th>
+          <th class="footable-sortable">
+            Observación
+            <span class="footable-sort-indicator"></span>
+          </th>
+          <th class="footable-sortable" style="text-align: center;">
+            Acciones
+            <span class="footable-sort-indicator"></span>
+          </th>
+        </tr>
+        </thead>
+        <tbody style="color: black;" formArrayName="grades">
+          <tr *ngFor="let item of gradesList; let i=index;" [formGroupName]="i">
+            <td>{{item.documentIdentity}}</td>
+            <td>{{item.student}}</td>
+            <td>
+              <span
+              class="badge"
+              [style.background-color]="item.backgroundColor">
+              {{item.submissionStatusDesc}}
+              </span>
+            </td>
+            <td>
+              <div style="height: 40px;">
+                <mat-form-field style="width: 90px;" appearance="outline">
+                  <input type="number" [min]="0" [max]="10" matInput formControlName="grade">
+                  <mat-error>Requerido!</mat-error>
+                </mat-form-field>
+              </div>
+            </td>
+            <td>
+              <div style="height: 40px;">
+                <mat-form-field class="width" appearance="outline">
+                  <input type="text" matInput formControlName="commentary">
+                </mat-form-field>
+              </div>
+            </td>
+            <td style="text-align: center;">
+              <a type="button"
+                *ngIf="item.urlFile"
+                matTooltipPosition="above"
+                matTooltip="Visualizar archivo"
+                style="cursor: pointer; color: skyblue;"
+                [href]="url+'/'+item.urlFile"
+                target="_blank"><i class="fa fa-file" aria-hidden="true"></i>
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </form>
+  </div>
+  <mat-paginator
+    #paginator
+    [length]="length"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="pageSizeOptions"
+    (page)="pageEvent = changePage($event)">
+  </mat-paginator>
+</div>

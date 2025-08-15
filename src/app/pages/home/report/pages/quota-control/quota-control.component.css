@@ -1,0 +1,128 @@
+:host mat-cell {
+	font-size: 90%;
+	line-height: normal;
+}
+
+:host .mat-mdc-row {
+	height: 41px;
+	min-height: 41px;
+}
+
+:host mat-header-row {
+	height: 44px;
+	min-height: 44px;
+}
+
+:host mat-header-cell {
+	line-height: normal;
+}
+
+mat-header-row {
+	background: #004899;
+	color: white;
+}
+
+.download-label {
+	font-size: 90%;
+	color: black;
+}
+
+::ng-deep .mat-mdc-menu-content {
+	padding: 0 !important;
+}
+
+::ng-deep .mat-mdc-menu-item-text {
+	letter-spacing: 0 !important;
+	font-size: 14px !important;
+	color: black;
+}
+
+.mat-mdc-menu-item {
+	min-height: 41px !important;
+}
+
+mat-header-row {
+	min-height: 40px !important;
+}
+
+.download-button {
+	font-size: 14px;
+	background: transparent;
+	letter-spacing: 0;
+	color: #00000099 !important;
+	font-weight: 400;
+}
+
+mat-calendar {
+	margin-bottom: -9px;
+}
+
+::ng-deep .mat-datepicker-actions {
+	background: white;
+	border-radius: 4px;
+}
+
+::ng-deep .mat-calendar-content {
+	padding: 0 8px 0 8px !important;
+}
+
+::ng-deep .mat-datepicker-content {
+	border-bottom-left-radius: 0 !important;
+	border-bottom-right-radius: 0 !important;
+}
+
+mat-cell {
+	word-wrap: break-word !important;
+	white-space: unset !important;
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	word-break: break-word;
+	-ms-hyphens: auto;
+	-moz-hyphens: auto;
+	-webkit-hyphens: auto;
+	hyphens: auto;
+	font-size: 90%;
+}
+
+.mat-column-PersonDocumentNumber {
+	flex: 0 0 11% !important;
+	width: 11% !important;
+}
+
+.mat-column-numberPhone {
+	flex: 0 0 10% !important;
+	width: 10% !important;
+}
+
+.mat-column-totalAmount {
+	flex: 0 0 8% !important;
+	width: 8% !important;
+}
+
+.mat-column-paidQuotasInfo {
+	flex: 0 0 35% !important;
+	width: 35% !important;
+}
+
+mat-header-cell {
+	justify-content: center;
+}
+
+.btn-paid-quota {
+	background-color: rgb(9, 203, 9);
+	width: 60px;
+	border: 1px solid rgb(9, 203, 9);
+	font-size: 10px;
+	border-radius: 10px;
+	cursor: pointer;
+}
+
+.btn-not-paid-quota {
+	background-color: grey;
+	width: 60px;
+	border: 1px solid grey;
+	font-size: 10px;
+	border-radius: 10px;
+	cursor: not-allowed;
+	color: gainsboro;
+}

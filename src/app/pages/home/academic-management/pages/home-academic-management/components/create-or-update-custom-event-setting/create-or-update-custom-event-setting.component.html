@@ -1,0 +1,59 @@
+<div style="display: flex; justify-content: end; align-items: center; background: #27a8db;" class="p-2 mb-3">
+  <mat-icon style="cursor: pointer;" [matDialogClose]="false" class="white-icon" matRipple>close</mat-icon>
+</div>
+
+<mat-dialog-content>
+  <form [formGroup]="form">
+    <div class="row pt-3">
+      <div class="col-8">
+        <div class="row">
+          <div class="col-12">
+            <mat-form-field appearance="outline">
+              <mat-label>Calendario</mat-label>
+              <mat-select formControlName="eventID">
+                <mat-option *ngFor="let event of customEvents; trackBy: trackByCustomEvent" [value]="event.eventID">
+                  {{ event.eventName }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="form.hasError('required', 'eventID');">Este campo es requerido</mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-12">
+            <mat-form-field appearance="outline">
+              <mat-label>Modalidad</mat-label>
+              <mat-select formControlName="modalityID">
+                <mat-option *ngFor="let modality of modalities; trackBy: trackByModality" [value]="modality.modalityID">
+                  {{ modality.modalityName }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="form.hasError('required', 'modalityID');">Este campo es requerido</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-4">
+        <mat-form-field appearance="outline">
+          <input placeholder="Horas" matInput formControlName="hoursClass" type="number">
+          <mat-label>Horas</mat-label>
+          <mat-error *ngIf="form.hasError('required', 'hoursClass')">Este campo es requerido</mat-error>
+          <mat-error *ngIf="form.hasError('min', 'hoursClass')">El mínimo para este campo es cero</mat-error>
+          <mat-error *ngIf="form.hasError('max', 'hoursClass')">El máximo para este campo es veinticuatro</mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <div>
+  </div>
+  <div>
+    <button mat-raised-button color="primary" (click)="sendForm()">
+      {{ data?.event ? 'Guardar En ' : 'Añadir A ' }} Mi Calendario
+      <!--        <mat-icon class="ml-2">-->
+      <!--          <mat-spinner diameter="20"></mat-spinner>-->
+      <!--        </mat-icon>-->
+    </button>
+  </div>
+</mat-dialog-actions>

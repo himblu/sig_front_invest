@@ -1,0 +1,643 @@
+<style>
+  .list-group-item  {
+    border: 1px solid #ccc !important;
+  }
+</style>
+<div class="animated fadeIn fast">
+  <div class="form-row">
+    <div class="" [ngClass]="{'col-12': !surveySelected, 'col-4': surveySelected}">
+      <div class="card">
+        <div class="card-header">
+          <div class="form-row">
+            <div class="col-9 pt-2">
+              <i class="fa fa-file mr-1"></i>Administración de Formulario
+            </div>
+            <div class="col-3 text-right">
+              <button class="btn btn-sm btn-primary" [disabled]="surveySelected" (click)="toggleSurvey()">
+                <i class="fa fa-plus mr-1"></i>Nuevo
+              </button>
+            </div>
+          </div>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item text-center" *ngIf="!surveys.length">
+            <i class="fa fa-times fa-2x"></i><br>
+            No existen registros
+
+          </li>
+          <ng-container *ngIf="surveys.length">
+            <li class="list-group-item">
+              <form [formGroup]="searchSurveyForm">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Buscar en Formulario</mat-label>
+                  <input type="text" formControlName="text" matInput>
+                </mat-form-field>
+              </form>
+            </li>
+            <li class="list-group-item" *ngFor="let s of surveys">
+              <div class="form-row">
+                <div class="" [ngClass]="{'col-6': surveySelected, 'col-4': !surveySelected}">
+                  <small>{{s.title | uppercase}}</small> <br>
+                  <em><small>{{s.description | uppercase}}</small></em>
+                </div>
+                <div class="col-2 pt-2">
+                  <span class="badge badge-primary">
+                    {{s.orderSurvey || '-'}}
+                  </span>
+                </div>
+                <div class="text-right" [ngClass]="{'col-4': surveySelected, 'col-3': !surveySelected}">
+                  <button class="btn btn-light btn-sm" [disabled]="surveySelected" (click)="toggleInstitutions(s)">
+                    <i class="fa fa-cog mr-1"></i>{{s.quantityInstitutions}}&nbsp;Instituci{{s.quantityInstitutions === 1 ? 'ón' : 'ones'}} Asignada{{s.quantityInstitutions > 1 ? '' : 's'}}
+                  </button>
+                </div>
+                <div class="col-3 text-right" *ngIf="!surveySelected">
+                  <button class="btn btn-sm btn-success rounded-circle mr-2" (click)="toggleSurvey(s)">
+                    <i class="fa fa-edit"></i>
+                  </button>
+                  <button class="btn btn-sm bg-primary-color rounded-circle mr-2" (click)="toggleSurveyDetail(s)">
+                    <i class="fa fa-cog"></i>
+                  </button>
+                  <button class="btn btn-sm btn-danger rounded-circle" (click)="deleteSurvey(s)">
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </li>
+          </ng-container>
+        </ul>
+      </div>
+    </div>
+    <div class="col-8" *ngIf="surveySelected">
+      <div class="card">
+        <div class="card-header">
+          <div class="form-row">
+            <div class="col-9 pt-2">
+              <i class="fa fa-edit mr-1"></i>Información del Formulario: {{surveySelected.title | uppercase}}
+            </div>
+            <div class="col-3 text-right">
+              <button class="btn-sm btn-danger" (click)="toggleSurveyDetail()">
+                <i class="fa fa-times mr-1"></i>Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <tabset>
+            <tab heading="Información General">
+              <div class="card mb-2">
+                <div class="card-body">
+                  <small class="text-primary"><strong>Titulo</strong></small><br>
+                  <p>{{surveySelected.title | uppercase}}</p> <br>
+                  <small class="text-primary"><strong>Descripción</strong></small><br>
+                  <p class="text-justify">{{surveySelected.description | uppercase}}</p> <br>
+                </div>
+                <ul class="list-group list-group-flush m-2">
+                  <caption *ngIf="questions.length">PREGUNTAS</caption>
+                  <li class="list-group-item p-1">
+                    <div class="form-row">
+                      <div class="col-9">
+                        <small><strong class="text-primary">Detalle de Pregunta</strong></small>
+                      </div>
+                      <div class="col-2">
+                        <small><strong class="text-primary">Tipo</strong></small>
+                      </div>
+                      <div class="col-1 text-center">
+                        <small><strong class="text-primary">Alternativas</strong></small>
+                      </div>
+                      <!-- <div class="col-4"></div> -->
+                    </div>
+                  </li>
+                  <li class="list-group-item p-1" *ngFor="let q of questions">
+                    <div class="form-row">
+                      <div class="col-9 pt-2">
+                        <small>{{q.questionOrder}}. {{q.question | uppercase}}</small> <br>
+                      </div>
+                      <div class="col-2 pt-2">
+                        {{q.questionTypeName | uppercase}}
+                        <!-- <small>
+                          <span class="badge badge-info">
+                          </span>
+                        </small> -->
+                      </div>
+                      <div class="col-1 pt-2 text-center">
+                        {{q.alternativeQuantity}}
+                        <!-- <small>
+                          <span class="badge badge-warning">
+                          </span>
+                        </small> -->
+                      </div>
+                      <!-- <div class="col-3 text-right">
+                        <button class="btn btn-sm btn-primary rounded-circle mr-2" (click)="toggleQuestion(q)">
+                          <i class="fa fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger rounded-circle" (click)="deleteQuestion(q)">
+                          <i class="fa fa-trash"></i>
+                        </button>
+                      </div> -->
+                    </div>
+                  </li>
+                  <!-- <li class="list-group-item text-center">
+                    <button class="btn btn-sm btn-light text-primary" (click)="toggleQuestion()">
+                      <i class="fa fa-plus mr-1"></i>Agregar Pregunta
+                    </button>
+                  </li> -->
+                </ul>
+              </div>
+            </tab>
+            <tab heading="Vista Previa">
+              <div class="card">
+                <div class="card-body">
+                  <div class="form-row">
+                    <div class="col-12 d-flex justify-content-between">
+                      <h4>
+                        <strong>{{ surveySelected.title | uppercase }}</strong>
+                      </h4>
+                      <button
+                        (click)="buildReport('external-absorption/report-question', surveySelected.surveyID);"
+                        class="download-button ml-3"
+                        mat-raised-button
+                        matTooltipPosition="above"
+                        matTooltip="Descargar PDF">
+                        Reporte
+                        <mat-icon class="red-icon">picture_as_pdf</mat-icon>
+                      </button>
+                    </div>
+                    <div class="col-12">
+                      <div class="alert alert-info text-justify">
+                        {{surveySelected.description | uppercase}}
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <ul class="list-group">
+                        <li class="list-group-item" *ngFor="let q of questions; let q_i = index">
+                          <div class="form-row">
+                            <div class="col-12">
+                              <small><strong>{{q_i + 1}}. {{q.question | uppercase}}</strong></small>
+                            </div>
+                            <div class="col-12 pl-3">
+                              <div class="form-row">
+                                <div class="col-6" *ngFor="let a of q.alternatives; let a_i = index">
+                                  <strong>{{'A'+(a_i + 1)}}.</strong>&nbsp;{{a.notation | uppercase}}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </tab>
+            <tab heading="Configuracion">
+              <div class="form-row">
+                <div class="col-12 p-2">
+                  <tabset>
+                    <tab heading="Individual">
+                      <div class="card">
+                        <div class="card-body p-2">
+                          <div class="form-row">
+                            <div class="col-4 pt-1">
+                              <label for="personID">Busca Persona por Documento</label>
+                            </div>
+                            <div class="col-8">
+                              <input type="text" name="textFilter" class="form-control" [(ngModel)]="filter.text">
+                            </div>
+                            <div class="col-12 text-center mt-2">
+                              <button class="btn btn-sm bg-primary-color" [disabled]="!filter.text" (click)="searchPerson()">
+                                <i class="fa fa-search mr-1"></i>Buscar
+                              </button>
+                            </div>
+                            <div class="col-12 mt-3" *ngIf="records.length && filter.searched">
+                              <ul class="list-group">
+                                <li class="list-group-item p-1" *ngFor="let r of records">
+                                  <div class="form-row">
+                                    <div class="col-9 pt-1">
+                                      {{r.lastName | uppercase}} {{r.middleName | uppercase}}, {{r.firstName | titlecase}}
+                                    </div>
+                                    <div class="col-3 text-right">
+                                      <button class="btn btn-sm rounded-circle btn-light text-primary-color" (click)="createAssignSurvey(r)">
+                                        <i class="fa fa-circle mr-1"></i>Seleccionar
+                                      </button>
+                                    </div>
+                                  </div>
+                                </li>
+                              </ul>
+                            </div>
+                            <div class="col-12">
+                              <hr>
+                            </div>
+                            <div class="col-12" *ngIf="surveyConfigsiIndividuals.length">
+                              <ul class="list-group">
+                                <li class="list-group-item p-1" *ngFor="let r of surveyConfigsiIndividuals">
+                                  <div class="form-row">
+                                    <div class="col-9 pt-1">
+                                      {{r.personFullName}}
+                                    </div>
+                                    <div class="col-3 text-right">
+                                      <button class="btn btn-sm rounded-circle btn-danger" (click)="deleteConfig(r)">
+                                        <i class="fa fa-trash"></i>
+                                      </button>
+                                    </div>
+                                  </div>
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </tab>
+                    <tab heading="Datos Académicos">
+                      <div class="card">
+                        <div class="card-body p-2">
+                          <div class="form-row">
+                            <div class="col-12 mt-2">
+                              <ul class="list-group">
+                                <li class="list-group-item">
+                                  <form #assignmentForm="ngForm">
+                                    <div class="form-row">
+                                      <div class="col">
+                                        <label for="modalityID">Modalidad</label>
+                                        <select name="modality" [(ngModel)]="newAssignment.modalityID" class="form-control form-control-sm" required>
+                                          <option [ngValue]="undefined">--SELECCIONE--</option>
+                                          <option *ngFor="let m of modalities" [ngValue]="m.modalityID">{{m.modalityDesc | uppercase}}</option>
+                                        </select>
+                                      </div>
+                                      <div class="col">
+                                        <label for="schoolID">Escuela</label>
+                                        <select name="school" [(ngModel)]="newAssignment.schoolID" (change)="selectSchool()" class="form-control form-control-sm" required>
+                                          <option [ngValue]="undefined">--SELECCIONE--</option>
+                                          <option *ngFor="let m of schools" [ngValue]="m.schoolID">{{m.schoolName | uppercase}}</option>
+                                        </select>
+                                      </div>
+                                      <div class="col">
+                                        <!-- [disabled]="careers.length" -->
+                                        <label for="careerID">Carrera Profesional</label>
+                                        <select name="career" [(ngModel)]="newAssignment.careerID" class="form-control form-control-sm" required>
+                                          <option [ngValue]="undefined">--SELECCIONE--</option>
+                                          <option *ngFor="let m of careers" [ngValue]="m.careerID">{{m.careerName | uppercase}}</option>
+                                        </select>
+                                      </div>
+                                      <div class="col text-right">
+                                        <button class="btn btn-sm bg-primary-color btn-block" [disabled]="assignmentForm.invalid" (click)="createAssignSurveyInBatch()">
+                                          <i class="fa fa-plus mr-1"></i>Grabar
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </form>
+                                </li>
+                                <li class="list-group-item p-1" *ngFor="let r of surveyConfigsInBatch">
+                                  <div class="form-row">
+                                    <div class="col pt-1">{{r.modalityDesc}}</div>
+                                    <div class="col pt-1">{{r.schoolDesc}}</div>
+                                    <div class="col pt-1">{{r.careerDesc}}</div>
+                                    <div class="col text-right">
+                                      <button class="btn btn-sm btn-danger rounded-circle">
+                                        <i class="fa fa-trash"></i>
+                                      </button>
+                                    </div>
+                                  </div>
+                                </li>
+                              </ul>
+                            </div>
+                            <div class="col-12"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </tab>
+                    <tab heading="Por Proceso">
+                      <div class="card">
+                        <div class="card-body p-2">
+                          <div class="form-row">
+                            <div class="col-12">
+                              <div class="alert alert-info">
+                                <div class="form-row" *ngIf="!surveySelected.otherProcesses.length">
+                                  <div class="col-12 text-center">
+                                    <i class="fa fa-check mr-1"></i>Se han agregado configuraciones a todos los procesos existentes.
+                                  </div>
+                                </div>
+                                <div class="form-row" *ngIf="surveySelected.otherProcesses.length">
+                                  <div class="col-5 pt-1 text-right">
+                                    El estudiante y/o postulante que se encuentre en el proceso de:
+                                  </div>
+                                  <div class="col-4">
+                                    <select name="otherProcessID" [(ngModel)]="newAssignment.otherProcessID" id="" class="form-control form-control-sm">
+                                      <option [ngValue]="undefined">--SELECCIONE--</option>
+                                      <option *ngFor="let o of surveySelected.otherProcesses" [ngValue]="o.otherProcessID">{{o.otherProcessName | uppercase}}</option>
+                                    </select>
+                                  </div>
+                                  <div class="col-3">
+                                    <button class="btn btn-block btn-sm bg-primary-color" [disabled]="!newAssignment.otherProcessID" (click)="createAssignByProcess()">
+                                      <i class="fa fa-plus mr-1"></i>Agregar
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-12" *ngIf="surveySelected.configs.length">
+                              <ul class="list-group">
+                                <caption>PROCESOS ASIGNADOS</caption>
+                                <li class="list-group-item" *ngFor="let s of surveySelected.configs">
+                                  <div class="form-row">
+                                    <div class="col-9 pt-1">
+                                      <i class="fa fa-cog mr-1"></i>PROCESO DE {{s.otherProcessName | uppercase}}
+                                    </div>
+                                    <div class="col-3 text-right">
+                                      <button class="btn btn-sm btn-danger rounded-circle" (click)="deleteConfig(s)">
+                                        <i class="fa fa-trash"></i>
+                                      </button>
+                                    </div>
+                                  </div>
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </tab>
+                  </tabset>
+                </div>
+              </div>
+            </tab>
+          </tabset>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div bsModal #institutionAssignSurveyModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name2">
+  <div class="modal-dialog modal-nm">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="col-12 mb-3">
+            <div class="form-row">
+              <div class="col-8">
+                <span class="modal-title">
+                  Instituciones Asignadas
+                </span>
+              </div>
+              <div class="col-2">
+                <button class="btn btn-sm btn-light text-primary-color" (click)="toggleAssignmentSurvey()">
+                  <i class="fa fa-plus mr-1"></i>Nuevo
+                </button>
+              </div>
+              <div class="col-2 text-right">
+                <button type="button" class="btn btn-sm btn-light text-danger" aria-label="Close" (click)="toggleInstitutions()">
+                  <span aria-hidden="true" ><i class="fa fa-times"></i></span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="col-12" *ngIf="newInstitution">
+            <form #newInstitutionForm="ngForm">
+              <div class="form-row">
+                <div class="col-12">
+                  <button class="btn btn-sm" [ngClass]="{'btn-light': !newInstitution.isCollege, 'btn-success': newInstitution.isCollege}" (click)="toggleIsCollege()">
+                    <i class="fa mr-1" [ngClass]="{'fa-circle': newInstitution.isCollege, 'fa-circle-o': !newInstitution.isCollege}"></i>{{newInstitution.isCollege ? 'ES' : 'NO ES'}}&nbsp;COLEGIO
+                  </button>
+                </div>
+                <div class="col-12" *ngIf="newInstitution.isCollege">
+                  <label for="collegeTypeID">Tipo de Institución</label>
+                  <select name="collegeTypeID" [(ngModel)]="newInstitution.collegeTypeID" (change)="filterCollegeType()" class="form-control">
+                    <option [ngValue]="undefined">--SELECCIONE--</option>
+                    <option *ngFor="let c of collegeTypes" [ngValue]="c.collegeTypeID">{{c.collegeTypeName | uppercase}}</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <label>Nombre de Institución</label>
+                </div>
+                <div class="col-10">
+                  <input type="text"
+                        placeholder="BUSCAR Institución"
+                        aria-label="Number"
+                        name="collegeName"
+                        [disabled]="newInstitution.isCollege && !newInstitution.collegeTypeID"
+                        style="border-radius: 15px;"
+                        (input)="filterCollege()"
+                        class="form-control rounded-pill text-uppercase"
+                        [(ngModel)]="newInstitution.collegeName"
+                        [matAutocomplete]="auto"
+                        required
+                    >
+                    <mat-autocomplete (optionSelected)='selectInstitution($event.option.value)' autoActiveFirstOption #auto="matAutocomplete">
+                        <mat-option *ngFor="let c of filteredOptions" [value]="c">{{c | uppercase}}</mat-option>
+                    </mat-autocomplete>
+                    <span class="text-danger" *ngIf="newInstitution.collegeName && newInstitution.error">
+                      <i class="fa fa-times mr-1"></i>La institución no existe
+                    </span>
+                </div>
+                <div class="col-2" style="text-align: right;">
+                  <button class="btn btn-sm bg-primary-color" matTooltip="Agregar nuevo&nbsp;{{newInstitution.isCollege ? 'colegio' : 'instituto'}}"
+                    (click)="openDialog();">
+                    <i class="fa fa-plus mr-1"></i>
+                    Nuevo
+                  </button>
+                </div>
+                <div class="col-6">
+                  <label for="initDate">Fecha de Inicio</label>
+                  <input type="date" name="initDate" [min]="currentDate" [(ngModel)]="newInstitution.initDate" (change)="cleanEndDate()" class="form-control" required>
+                </div>
+                <div class="col-6">
+                  <label for="endDate">Fecha de Fin</label>
+                  <input type="date" name="endDate" [min]="newInstitution.initDate" [disabled]="!newInstitution.initDate" [(ngModel)]="newInstitution.endDate" class="form-control" required>
+                </div>
+                <div class="col-6 mt-3">
+                  <button class="btn btn-sm btn-danger" (click)="toggleAssignmentSurvey()">
+                    <i class="fa fa-times mr-1"></i>Cancelar
+                  </button>
+                </div>
+                <div class="col-6 text-right mt-3">
+                  <button class="btn btn-sm bg-primary-color" [disabled]="newInstitutionForm.invalid || newInstitution.error" (click)="addInstitution()">
+                    <i class="fa fa-save mr-1"></i>Guardar
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="col-12" *ngIf="newInstitution">
+            <hr>
+          </div>
+          <div class="col-12 text-center" *ngIf="!institutions.length">
+            <i class="fa fa-times fa-2x"></i><br>
+            No se encontraron registros.
+          </div>
+          <div class="col-12" *ngIf="institutions.length">
+            <ul class="list-group">
+              <li class="list-group-item p-1" *ngFor="let i of institutions">
+                <div class="form-row">
+                  <div class="col-9 pt-1">
+                    <small>{{i.institutionName | uppercase}}</small>
+                  </div>
+                  <div class="col-3 text-right">
+                    <button class="btn btn-sm bg-primary-color mr-2" (click)="toggleAssignmentSurvey(i)">
+                      <i class="fa fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm bg-danger text-white" (click)="deleteAssignmentSurvey(i)">
+                      <i class="fa fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div bsModal #surveyModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name2">
+  <div class="modal-dialog modal-nm">
+    <div class="modal-content" *ngIf="newSurvey">
+      <div class="modal-header">
+        <h4 id="dialog-sizes-name2" class="modal-title pull-left">
+          {{newSurvey.editing ? 'Editando Formulario' : 'Nueva Formulario'}}
+        </h4>
+        <button type="button" class="btn btn-light pull-right text-danger" aria-label="Close" (click)="toggleSurvey()">
+          <span aria-hidden="true" ><i class="fa fa-times"></i></span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="surveyForm">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Titulo</mat-label>
+            <input type="text" [max]="5000" formControlName="title" matInput class="text-uppercase">
+          </mat-form-field>
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Descripción</mat-label>
+            <textarea matInput formControlName="description"></textarea>
+          </mat-form-field>
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Tipo de Formulario</mat-label>
+            <mat-select formControlName="surveyTypeID">
+                <mat-option *ngFor="let p of surveyTypes" [value]="p.surveyTypeID">{{p.name | uppercase}}</mat-option>
+            </mat-select>
+            <!-- <mat-error *ngIf="addressForm.hasError('required', 'provinceAddress')">
+                Sede es <strong>requerida</strong>
+            </mat-error> -->
+          </mat-form-field>
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Orden</mat-label>
+            <input type="number" formControlName="orderSurvey" matInput class="text-uppercase">
+          </mat-form-field>
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Referencia</mat-label>
+            <textarea matInput formControlName="reference"></textarea>
+          </mat-form-field>
+          <div class="row">
+            <div class="col-md-12 text-center">
+              <button class="btn btn-sm" [ngClass]="{'btn-primary': !newSurvey.editing, 'btn-success': newSurvey.editing}" [disabled]="procesing" (click)="saveSurvey()">
+                <i class="fa fa-save mr-1"></i>{{newSurvey.editing ? 'Guardar Cambios' : 'Crear Formulario'}}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div bsModal #questionModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name2">
+  <div class="modal-dialog modal-nm">
+    <div class="modal-content" *ngIf="newQuestion">
+      <div class="modal-header">
+        <h4 id="dialog-sizes-name2" class="modal-title pull-left">
+          {{newQuestion.editing ? 'Editando Pregunta' : 'Nueva Pregunta'}}
+        </h4>
+        <button type="button" class="btn btn-light text-danger pull-right" aria-label="Close" (click)="toggleQuestion()">
+          <span aria-hidden="true"><i class="fa fa-times"></i></span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="questionForm">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Pregunta</mat-label>
+            <textarea matInput formControlName="question"></textarea>
+          </mat-form-field>
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Tipo de Pregunta</mat-label>
+            <mat-select formControlName="questionType">
+                <mat-option *ngFor="let p of questionTypes" [value]="p.questionTypeID">{{p.name}}</mat-option>
+            </mat-select>
+            <!-- <mat-error *ngIf="addressForm.hasError('required', 'provinceAddress')">
+                Sede es <strong>requerida</strong>
+            </mat-error> -->
+          </mat-form-field>
+        </form>
+
+          <ul class="list-group">
+            <caption *ngIf="alternatives.length">ALTERNATIVAS</caption>
+            <li class="list-group-item" *ngFor="let a of alternatives">
+              <div class="form-row">
+                <div class="col-9 pt-1">
+                  <small><span class="badge badge-primary">{{a.value}}</span>&nbsp;{{a.notation | uppercase}}</small>
+                </div>
+                <div class="col-3 text-right">
+                  <button class="btn btn-sm btn-primary rounded-circle mr-2" [disabled]="newAlternative" (click)="addAlternative(a)">
+                    <i class="fa fa-edit"></i>
+                  </button>
+                  <button class="btn btn-sm btn-danger rounded-circle" [disabled]="newAlternative" (click)="deleteAlternative(a)">
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </li>
+            <li class="list-group-item" *ngIf="newAlternative">
+              <form [formGroup]="alternativeForm" class="mb-3">
+                <div class="form-row">
+                  <div class="col-12">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Alternativa</mat-label>
+                      <textarea matInput formControlName="notation"></textarea>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-6">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Tipo de Valor</mat-label>
+                      <mat-select formControlName="valueType">
+                        <mat-option [value]="1">Númerico</mat-option>
+                        <mat-option [value]="2">Texto</mat-option>
+                      </mat-select>
+                      <!-- <mat-error *ngIf="addressForm.hasError('required', 'provinceAddress')">
+                        Sede es <strong>requerida</strong>
+                      </mat-error> -->
+                    </mat-form-field>
+                  </div>
+                  <div class="col-6">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Valor</mat-label>
+                      <input type="text" [max]="5000" formControlName="value" matInput class="text-uppercase">
+                    </mat-form-field>
+                  </div>
+                  <div class="col-6">
+                    <button class="btn btn-sm btn-danger" (click)="cancelAlternative()">
+                      <i class="fa fa-times mr-1"></i>Cancelar
+                    </button>
+                  </div>
+                  <div class="col-6 text-right">
+                    <button class="btn btn-sm btn-light text-primary" (click)="saveAlternative()">
+                      <i class="fa fa-save mr-1"></i>Grabar
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </li>
+          </ul>
+          <div class="text-center" *ngIf="!newAlternative">
+            <button class="btn btn-sm btn-light text-primary" (click)="addAlternative()">
+              <i class="fa fa-plus mr-1"></i>Agregar Alternativa
+            </button>
+          </div>
+          <div class="row">
+            <div class="col-md-12 text-center">
+              <button class="btn btn-sm btn-primary" [disabled]="questionForm.invalid || procesing || newAlternative" (click)="saveQuestion()">
+                <i class="fa fa-save mr-1"></i>Crear Pregunta
+              </button>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>

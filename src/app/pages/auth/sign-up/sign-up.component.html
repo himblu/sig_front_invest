@@ -1,0 +1,235 @@
+<div class="animated fadeIn fast">
+    <div class="form-row">
+        <div class="col-9"
+          [ngStyle]="{
+            'background-image': !isUnacem ? backgroundImage : 'url(./assets/images/unacem_background.png)'
+          }"
+          style="background-repeat: no-repeat; min-height: 100vh; background-size: 100vw 100%">
+        </div>
+        <div class="col-3" [ngClass]="{'leveling-sidebar': !isUnacem, 'unacem-sidebar': isUnacem}"
+        style="background-repeat: no-repeat;
+        background-size: 100% 100%; padding: 0px 10px;
+        min-height: 100vh;">
+            <form class="form-horizontal form-material"
+                    autocomplete="off"
+                    [formGroup]="registerForm"
+                    (ngSubmit)="onSubmit()"
+                    [ngClass]="{'pt-login-leveling': !isUnacem, 'pt-login-unacem': isUnacem}"
+                >
+                <ng-container *ngIf="isUnacem">
+                    <strong class="text-white">
+                        <i class="fa fa-account mr-1"></i>Información Personal
+                    </strong>
+                    <hr class="p-1 mt-1 mb-1">
+                </ng-container>
+                <div class="form-group">
+                    <label for="dni" style="color: white; padding-left: 10px;">Tipo de Documento</label>
+                    <div class="input-group input-control">
+                        <mat-select formControlName="typeDocId" style="padding: 7px 0px;" placeholder="SELECCIONE TIPO DOCUMENTO" (selectionChange)="selectDocumentType()">
+                            <mat-option *ngFor="let t of documentTypes;" [value]="t.typeDocId">
+                                {{ t.typeDocName}}
+                            </mat-option>
+                        </mat-select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="dni" style="color: white; padding-left: 10px;">Cédula Ciudadanía</label>
+                    <div class="input-group">
+                        <input type="text" id="dni" [maxlength]="typDocLong" class="form-control input-control text-uppercase" (keypress)="registerForm.get('typeDocId').value === 1 ? onlyNumbers($event) : alphaNumeric($event)"
+                        formControlName="personDocumentNumber" placeholder="100xxxxxxx" (keyup)="queryCivilRecord()">
+                    </div>
+                </div>
+                <ng-container *ngIf="showAnotherFields">
+                    <div class="form-group">
+                        <label for="personFirstName" style="color: white; padding-left: 10px;">Nombres</label>
+                        <div class="input-group">
+                            <input type="text" id="personFirstName" [disabled]="recordFounded" class="form-control input-control text-uppercase" (keypress)="onlyLetters($event)" formControlName="personFirstName" placeholder="">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="personMiddleName" style="color: white; padding-left: 10px;">Apellido Paterno</label>
+                        <div class="input-group">
+                            <input type="text" id="personMiddleName" [disabled]="recordFounded" class="form-control input-control text-uppercase" (keypress)="onlyLetters($event)" formControlName="personMiddleName" placeholder="">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="personLastName" style="color: white; padding-left: 10px;">Apellido Materno</label>
+                        <div class="input-group">
+                            <input type="text" id="personLastName" [disabled]="recordFounded" class="form-control input-control text-uppercase" (keypress)="onlyLetters($event)" formControlName="personLastName" placeholder="">
+                        </div>
+                    </div>
+                </ng-container>
+                <div class="form-group">
+                    <label for="personEmail" style="color: white; padding-left: 10px;">Correo Electrónico</label>
+                    <div class="input-group">
+                        <input type="email" required class="form-control input-control" formControlName="personEmail" id="email" placeholder="Ingrese email">
+                    </div>
+                </div>
+                <div class="form-group">
+                  <label for="cellphone" style="color: white; padding-left: 10px;">Número de Celular</label>
+                  <div class="input-group">
+                      <input type="text" class="form-control input-control" maxlength="10" (keypress)="onlyNumbers($event)" formControlName="cellphone" id="cellphone" placeholder="Ingrese número">
+                  </div>
+                </div>
+                <ng-container *ngIf="isUnacem">
+                    <div class="form-group">
+                      <label for="billingName" style="color: white; padding-left: 10px;">Seleccione el Contratista</label>
+                      <div class="input-group input-control">
+                        <select name="contractorID" [(ngModel)]="unacem.contractorID" [ngModelOptions]="{standalone: true}" (change)="selectContractor()" class="form-control">
+                          <option [ngValue]="undefined">--SELECCIONE CONTRATISTA--</option>
+                          <option *ngFor="let c of contractors" [ngValue]="c.contractorID">{{c.businessName | uppercase}}</option>
+                        </select>
+                      </div>
+                    </div>
+                        <!-- <div class="form-row mt-3 mb-3">
+                            <div class="col-1"></div>
+                            <div class="col-10">
+                                <div class="form-row">
+                                    <div class="col-6">
+                                        <button class="btn btn rounded-pill" type="button" [disabled]="!unacem.continue" [ngClass]="{'btn-light text-primary-color': unacem.type !== 1, 'bg-primary-color': unacem.type == 1}" (click)="toggleSelectType(1)">
+                                            <i class="fa fa-user mr-1"></i>Individual
+                                        </button>
+                                    </div>
+                                    <div class="col-6 text-right">
+                                        <button class="btn btn rounded-pill" type="button" [disabled]="!unacem.continue" [ngClass]="{'btn-light text-primary-color': unacem.type !== 2, 'bg-primary-color': unacem.type == 2}" (click)="toggleSelectType(2)">
+                                            <i class="fa fa-users mr-1"></i>Grupo
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-1"></div>
+                        </div> -->
+                    <ng-container *ngIf="unacem.type === 2">
+                        <!-- <form #unacemForm="ngForm">
+
+                        </form> -->
+                        <hr class="p-1 mt-1 mb-1">
+                        <strong class="text-white">
+                            <i class="fa fa-money mr-1"></i>Información del Contratista
+                        </strong>
+                        <hr class="p-1 mt-1 mb-1">
+                        <div class="form-group">
+                            <ng-container *ngIf="!unacem.blockedContractor">
+                                <label for="billingName" style="color: white; padding-left: 10px;">Seleccione el Contratista</label>
+                                <div class="input-group input-control">
+                                    <select name="contractorID" [(ngModel)]="unacem.contractorID" [ngModelOptions]="{standalone: true}" (change)="selectContractor()" class="form-control">
+                                        <option [ngValue]="undefined">--SELECCIONE CONTRATISTA--</option>
+                                        <option *ngFor="let c of contractors" [ngValue]="c.contractorID">{{c.businessName | uppercase}}</option>
+                                    </select>
+                                </div>
+                            </ng-container>
+                            <div class="text-right">
+                                <span class="text-white">Si no encuentras el nombre de tu contratista.</span>
+                                <button class="btn btn-sm" [ngClass]="{'bg-primary-color': !unacem.blockedContractor, 'btn-danger': unacem.blockedContractor}" type="button" (click)="toggleCreateContractor()">
+                                    <i class="fa fa-plus mr-1"></i>{{unacem.blockedContractor ? 'Cancelar Contratista' :'Nuevo Contratista'}}
+                                </button>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <hr class="p-1 mt-1 mb-1">
+                    <strong class="text-white">
+                        <i class="fa fa-money mr-1"></i>Información de Facturación
+                    </strong>
+                    <hr class="p-1 mt-1 mb-1">
+                    <div class="form-group" *ngIf="unacem.blockedContractor">
+                        <label for="businessName" style="color: white; padding-left: 10px;">Nombre de la Empresa</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control input-control text-uppercase" [disabled]="!unacem.continue" (keypress)="alphaNumeric($event)" [ngModelOptions]="{standalone: true}" [(ngModel)]="unacem.businessName" id="businessName" placeholder="NOMBRE DE LA EMPRESA" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                      <div class="col-md-12">
+                        <div class="checkbox checkbox-primary pull-left p-t-0">
+                          <input id="checkbox-state" type="checkbox" formControlName="state" class="filled-in chk-col-light-blue">
+                          <label for="checkbox-state" class="color" style="color: white;">
+                            Usar información de contratista
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="billingName" style="color: white; padding-left: 10px;">Razón Social</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control input-control text-uppercase" [disabled]="!unacem.continue" (keypress)="alphaNumeric($event)" [ngModelOptions]="{standalone: true}" [(ngModel)]="unacem.billingName" id="billingName" placeholder="RAZON SOCIAL" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="billingDocumentNumber" style="color: white; padding-left: 10px;">Cédula / RUC</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control input-control text-uppercase" [disabled]="!unacem.continue" [ngModelOptions]="{standalone: true}" minlength="10" maxlength="13" (keypress)="onlyNumbers($event)" [(ngModel)]="unacem.billingDocumentNumber" id="billingDocumentNumber" placeholder="CÉDULA ó RUC" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="billingAddress" style="color: white; padding-left: 10px;">Dirección</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control input-control text-uppercase" [disabled]="!unacem.continue" [ngModelOptions]="{standalone: true}" (keypress)="alphaNumeric($event)" [(ngModel)]="unacem.billingAddress" id="billingAddress" placeholder="INGRESE DIRECCIÓN" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="billingPhone" style="color: white; padding-left: 10px;">Teléfono</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control input-control" maxlength="10" [disabled]="!unacem.continue" [ngModelOptions]="{standalone: true}" (keypress)="onlyNumbers($event)" [(ngModel)]="unacem.billingPhone" id="billingPhone" placeholder="NÚMERO TELEFÓNICO" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row mt-2 mb-2" *ngIf="unacem.type === 2">
+                        <div class="col-12 text-center">
+                            <a class="btn btn-block font-nm text-white bg-primary-color" href="assets/Doc/formato-en-lote.xlsx" *ngIf="!unacem.downloadedFormat" target="_blank" (click)="toggleDownloadFile()">
+                                <i class="fa fa-download mr-1"></i>Formato de Colaboradores
+                            </a>
+                        </div>
+                         <ng-container *ngIf="unacem.downloadedFormat">
+                             <div class="" [ngClass]="{'col-12': !unacem.fileCollaborators, 'col-10': unacem.fileCollaborators}">
+                                 <label for="fileCollaborators" style="color: white; padding-left: 10px;">Archivo de Colaboradores</label>
+                                 <div class="input-group">
+                                     <input type="file" [ngModelOptions]="{standalone: true}" class="form-control form-control-sm font-xs input-control" [disabled]="!unacem.continue" name="fileCollaborators" [(ngModel)]="unacem.fileCollaborators" accept=".xlsx,.xls" id="file-collaborators" placeholder="SUBE ARCHIVO">
+                                 </div>
+                             </div>
+                             <div class="col-1 pt-3" *ngIf="unacem.fileCollaborators">
+                                <button class="btn btn-sm btn-light rounded-circle" type="button" title="Validar" (click)="validCollaborators()">
+                                    <i class="fa" [ngClass]="{'fa-check text-primary-color': unacem.fileIsValid && unacem.fileSended, 'fa-times text-danger': !unacem.fileIsValid && unacem.fileSended, 'fa-circle-o text-secondary': !unacem.fileIsValid && !unacem.fileSended}"></i>
+                                </button>
+                             </div>
+                             <div class="col-1" *ngIf="unacem.fileCollaborators"></div>
+                             <div class="col-12 mt-2 text-center" *ngIf="unacem.returningData">
+                                <span class="badge" [ngClass]="{'bg-danger': unacem.existsInvalids, 'bg-primary-color': !unacem.existsInvalids}">
+                                    <i class="fa mr-1" [ngClass]="{'fa-times': unacem.existsInvalids, 'fa-check': !unacem.existsInvalids}"></i>
+                                    {{unacem.existsInvalids ? 'Existen personas con datos invalidos o incompletos. ¡Verificar!' : 'Todos los registros son correctos'}}
+                                </span>
+                             </div>
+                         </ng-container>
+                    </div>
+                </ng-container>
+                <div class="form-group row">
+                  <div class="col-md-12">
+                    <div class="checkbox checkbox-primary pull-left p-t-0">
+                      <input id="checkbox-signup" type="checkbox" formControlName="accept" class="filled-in chk-col-light-blue">
+                      <label for="checkbox-signup" class="color" style="color: white;"> Acepta
+                        <a style="color: rgba(0, 0, 0, 0.733);" href="assets/Doc/terminos_y_condiciones_ITCA.pdf" target="_blank">
+                          <small>Leer</small> Términos y Condiciones
+                        </a>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group text-center m-t-20">
+                  <div class="col-xs-12">
+                    <button mat-raised-button (click)="toContinue()" type="button" class="width" style="background-color: white; padding: 25px; border-radius: 25px; border: 3px solid #9ac12d;"
+                    [disabled]="personExists || !registerForm.controls['accept'].value || (isUnacem && (!unacem.billingName || !unacem.billingDocumentNumber || !unacem.billingAddress || !unacem.billingPhone))">
+                      CONTINUAR
+                    </button>
+                  </div>
+                </div>
+                <div class="form-group m-b-0">
+                    <div class="col-sm-12 text-center">
+                        <h3 style="color: white;">¿Ya tiene una cuenta creada?
+                          <a (click)="logout();" class="text-info m-l-5" style="cursor: pointer;">
+                            <b style="color: white;">Ingresar</b>
+                          </a>
+                        </h3>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

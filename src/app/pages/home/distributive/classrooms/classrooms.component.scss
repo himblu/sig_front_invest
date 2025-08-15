@@ -1,0 +1,41 @@
+
+table {
+    background: white;
+    tbody {
+      tr {
+        th {
+          line-height: 14px;
+          height: 30px;
+          font-size: 12px;
+          background: #014898;
+          color: white;
+          width: 150px;
+          text-align: center;
+          border: 1px solid #ccc;
+        }
+  
+        td {
+          line-height: 14px;
+          height: 30px;
+          max-height: 30px;
+          font-size: 12px;
+          color: black;
+          width: 150px;
+          text-align: center;
+          border: 1px solid #ccc;
+  
+          select {
+            border: 1px solid #ccc;
+            height: 28px;
+            width: 100%;
+            text-align: center;
+          }
+  
+                  .invalid {
+                      border: 1px solid #ff4500;
+                  }
+        }
+      }
+    }
+  }
+  

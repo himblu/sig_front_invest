@@ -1,0 +1,89 @@
+<div style="display: flex; justify-content: end; align-items: center; background: transparent;" class="p-2">
+  <mat-icon style="cursor: pointer; color: red;" [matDialogClose]="false" class="red-icon" matRipple>close</mat-icon>
+</div>
+
+<mat-dialog-content>
+  <div *ngIf="isLoading; else form;">
+    <spinner-loader></spinner-loader>
+  </div>
+
+  <ng-template #form>
+    <div class="card">
+      <div class="card-body">
+        <form [formGroup]="directorsForm">
+          <div class="row">
+            <div class="col-md-6">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Búsqueda por profesional</mat-label>
+                <input type="text" matInput formControlName="search">
+                <mat-icon matSuffix>search</mat-icon>
+              </mat-form-field>
+            </div>
+            <div class="col-md-6">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Documento de identidad</mat-label>
+                <input readonly="true" type="text" matInput formControlName="document">
+                <mat-error>
+                  Campo <strong>requerido</strong>
+                </mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-md-12">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Nombres y apellido</mat-label>
+                <input readonly="true" type="text" matInput formControlName="director">
+                <mat-error>
+                  Campo <strong>requerido</strong>
+                </mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-md-12">
+              <mat-form-field appearance="outline">
+                <mat-label>Escuelas</mat-label>
+                <mat-select formControlName="schoolID" multiple="true" placeholder="Seleccione la escuela">
+                  <mat-option *ngFor="let item of data.arr.schools" [value]="item.schoolID">{{item.schoolDesc}}</mat-option>
+                </mat-select>
+                <mat-error>
+                  Campo <strong>requerido</strong>
+                </mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-12">
+              <mat-form-field appearance="outline">
+                <mat-label>Periodo Académico</mat-label>
+                <mat-select formControlName="periodID" placeholder="Filtrar por Periodo Académico">
+                  <mat-option *ngFor="let period of data.arr.periods;" [value]="period.periodID">
+                    {{ period.periodName }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </ng-template>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <div class="d-flex no-block w-100 justify-content-between">
+    <div class="pl-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="warn"
+        [mat-dialog-close]="false">
+        Cerrar
+      </button>
+    </div>
+    <div class="pr-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="primary"
+        (click)="onSubmit();">
+        Guardar
+      </button>
+    </div>
+  </div>
+</mat-dialog-actions>

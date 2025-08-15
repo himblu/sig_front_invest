@@ -1,0 +1,233 @@
+
+<div style="display: flex; justify-content: end; align-items: center; background: transparent;" class="p-2">
+  <mat-icon style="cursor: pointer; color: red;" [matDialogClose]="false" class="red-icon" matRipple>close</mat-icon>
+</div>
+
+<mat-dialog-content>
+  <div *ngIf="isLoading; else form">
+    <spinner-loader></spinner-loader>
+  </div>
+
+  <ng-template #form>
+      <div class="card">
+        <div class="card-body">
+          <div class="row" [formGroup]="filtersForm" *ngIf="!data.item">
+            <div class="col-4">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Tipo de Trámite</mat-label>
+                <mat-select formControlName="p_typeManagementID">
+                  <mat-option *ngFor="let item of typesManagement" [value]="item.typeManagementID">{{item.typeManagementDesc}}</mat-option>
+                </mat-select>
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-4">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Remitente</mat-label>
+                <mat-select formControlName="p_typeRolID" (selectionChange)="getRolByTypeRolID();">
+                  <mat-option *ngFor="let item of typeRoles" [value]="item.typeRolID">{{item.typeRolDesc}}</mat-option>
+                </mat-select>
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-4">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Destinatario</mat-label>
+                <mat-select multiple formControlName="p_rolID">
+                  <mat-option [value]="0">Todos</mat-option>
+                  <mat-option *ngFor="let item of roles" [value]="item.rolId">{{item.RolName}}</mat-option>
+                </mat-select>
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+          </div>
+          <ng-container [formGroup]="procedureForm">
+            <div class="row">
+              <div class="col-4" *ngIf="!data.item; else info;">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Código</mat-label>
+                  <input type="text" matInput formControlName="p_documentManagementCode" maxlength="15">
+                  <mat-error>Campo requerido</mat-error>
+                </mat-form-field>
+              </div>
+              <ng-template #info>
+                <div class="col-6">
+                  <h4>Remitente: <small>{{data.item.typeRolDesc}}</small></h4>
+                </div>
+                <div class="col-6">
+                  <h4>Destinatario: <small>{{data.item.rolDesc}}</small></h4>
+                </div>
+              </ng-template>
+              <div class="col-8">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Asunto</mat-label>
+                  <input type="text" matInput formControlName="p_subject">
+                  <mat-error>Campo requerido</mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row" *ngIf="filtersForm.get('p_typeRolID')?.value">
+              <div class="col-1-5">
+                <button
+                  mat-raised-button
+                  class="styleButton"
+                  [disabled]="procedureForm.get('p_documentManagementDesc').value.includes('(-nombres-)')"
+                  (click)="addString('(-nombres-)');">
+                  <small>Nombres</small>
+                </button>
+              </div>
+              <div class="col-1-5">
+                <button
+                  mat-raised-button
+                  class="styleButton"
+                  [disabled]="procedureForm.get('p_documentManagementDesc').value.includes('(-documento-)')"
+                  (click)="addString('(-documento-)');">
+                  <small>Nro Documento</small>
+                </button>
+              </div>
+              <div class="col-1-5" *ngIf="+filtersForm.get('p_typeRolID').value === rol.ESTUDIANTE
+                || +filtersForm.get('p_typeRolID').value === rol.DOCENTE">
+                <button
+                  mat-raised-button
+                  class="styleButton"
+                  [disabled]="procedureForm.get('p_documentManagementDesc').value.includes('(-escuela-)')"
+                  (click)="addString('(-escuela-)');">
+                  <small>Escuela</small>
+                </button>
+              </div>
+              <div class="col-1-5" *ngIf="+filtersForm.get('p_typeRolID').value === rol.ESTUDIANTE
+                || +filtersForm.get('p_typeRolID').value === rol.DOCENTE">
+                <button
+                  mat-raised-button
+                  class="styleButton"
+                  [disabled]="procedureForm.get('p_documentManagementDesc').value.includes('(-carrera-)')"
+                  (click)="addString('(-carrera-)');">
+                  <small>Carrera</small>
+                </button>
+              </div>
+              <div class="col-1-5" *ngIf="+filtersForm.get('p_typeRolID').value === rol.ESTUDIANTE
+                || +filtersForm.get('p_typeRolID').value === rol.DOCENTE">
+                <button
+                  mat-raised-button
+                  class="styleButton"
+                  [disabled]="procedureForm.get('p_documentManagementDesc').value.includes('(-modalidad-)')"
+                  (click)="addString('(-modalidad-)');">
+                  <small>Modalidad</small>
+                </button>
+              </div>
+              <div class="col-1-5" *ngIf="+filtersForm.get('p_typeRolID').value === rol.ESTUDIANTE">
+                <button
+                  mat-raised-button
+                  class="styleButton"
+                  [disabled]="procedureForm.get('p_documentManagementDesc').value.includes('(-curso-)')"
+                  (click)="addString('(-curso-)');">
+                  <small>Curso</small>
+                </button>
+              </div>
+              <div class="col-1-5" *ngIf="+filtersForm.get('p_typeRolID').value === rol.ESTUDIANTE">
+                <button
+                  mat-raised-button
+                  class="styleButton"
+                  [disabled]="procedureForm.get('p_documentManagementDesc').value.includes('(-paralelo-)')"
+                  (click)="addString('(-paralelo-)');">
+                  <small>Paralelo</small>
+                </button>
+              </div>
+              <div class="col-1-5" *ngIf="+filtersForm.get('p_typeRolID').value === rol.ADMINISTRATIVO">
+                <button
+                  mat-raised-button
+                  class="styleButton"
+                  [disabled]="procedureForm.get('p_documentManagementDesc').value.includes('(-departamento-)')"
+                  (click)="addString('(-departamento-)');">
+                  <small>Departamento / Area</small>
+                </button>
+              </div>
+              <div class="col-1-5" *ngIf="+filtersForm.get('p_typeRolID').value === rol.ADMINISTRATIVO">
+                <button
+                  mat-raised-button
+                  class="styleButton"
+                  [disabled]="procedureForm.get('p_documentManagementDesc').value.includes('(-cargo-)')"
+                  (click)="addString('(-cargo-)');">
+                  <small>Cargo</small>
+                </button>
+              </div>
+              <div class="col-1-5">
+                <button
+                  mat-raised-button
+                  class="styleButton"
+                  [disabled]="procedureForm.get('p_documentManagementDesc').value.includes('(-descripción-)')"
+                  (click)="addString('(-descripción-)');">
+                  <small>Descripción</small>
+                </button>
+              </div>
+              <div class="col-12"><br></div>
+            </div>
+            <div class="row">
+              <div class="col-9">
+                <h3>Detalle:</h3>
+              </div>
+              <div class="col-1-5" *ngIf="filtersForm.get('p_typeRolID')?.value">
+                <button
+                  mat-raised-button
+                  class="styleButton"
+                  (click)="addString('(-fecha-)');">
+                  <small>Fecha</small>
+                </button>
+              </div>
+              <div class="col-1-5" *ngIf="filtersForm.get('p_typeRolID')?.value">
+                <button
+                  mat-raised-button
+                  class="styleButton"
+                  (click)="addString('(-remitente-)');">
+                  <small>Remitente</small>
+                </button>
+              </div>
+              <div class="col-12">
+                <ngx-editor-menu [editor]="details" [toolbar]="toolbar"></ngx-editor-menu>
+                <ngx-editor placeholder="Escribe aquí..." [editor]="details" outputFormat="html" formControlName="p_documentManagementDesc"></ngx-editor>
+              </div>
+            </div>
+            <br>
+            <div class="row">
+              <div class="col-10-5">
+                <h3>Especificaciones:</h3>
+              </div>
+              <div class="col-12">
+                <ngx-editor-menu [editor]="specifications" [toolbar]="toolbar"></ngx-editor-menu>
+                <ngx-editor placeholder="Escribe aquí..." [editor]="specifications" outputFormat="html" formControlName="p_documentManagementEsp"></ngx-editor>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+  </ng-template>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <div class="d-flex no-block w-100 justify-content-between">
+    <div class="pl-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="warn"
+        [mat-dialog-close]="false">
+        Cerrar
+      </button>
+    </div>
+    <div class="pr-3">
+      <button *ngIf="!data.item"
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="primary"
+        (click)="onSubmit();">
+        Guardar
+      </button>
+      <button *ngIf="data.item"mat-raised-button
+        style="letter-spacing: 0;"
+        color="primary"
+        (click)="update();">
+        Actualizar
+      </button>
+    </div>
+  </div>
+</mat-dialog-actions>

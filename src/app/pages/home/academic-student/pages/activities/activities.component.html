@@ -1,0 +1,273 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="!charging">
+  <div>
+    <div class="d-flex">
+      <div class="col-2">
+        <mat-card>
+          <mat-calendar #calendar [(selected)]="viewDate">
+          </mat-calendar>
+        </mat-card><br>
+        <mat-card>
+          <div class="pt-3 pl-4 pr-4">
+            <h4 style="color: #3f51b5;">Estados:</h4>
+          </div>
+          <div class="pl-4 pr-4" *ngIf="events && events.length != 0">
+            <p><i class="fa fa-circle" aria-hidden="true" [style.color]="events[0].submittedTask"></i>&nbsp; ACTIVIDAD ENVIADA</p>
+            <p><i class="fa fa-circle" aria-hidden="true" [style.color]="events[0].penddingTask"></i>&nbsp; ACTIVIDAD PENDIENTE</p>
+            <p><i class="fa fa-circle" aria-hidden="true" [style.color]="events[0].unsubmittedTask"></i>&nbsp; ACTIVIDAD NO ENVIADA</p>
+          </div>
+        </mat-card>
+      </div>
+
+      <div class="col-10">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div style="display: flex; align-items: center;">
+            <button
+              style="background: white"
+              mat-stroked-button
+              matTooltip="Eventos de hoy"
+              matTooltipClass="blue-tooltip"
+              class="mr-3"
+              (click)="selectToday()">
+              Eventos Hoy
+            </button>
+
+            <button mat-icon-button mwlCalendarPreviousView [view]="view" [(viewDate)]="viewDate">
+              <mat-icon>chevron_left</mat-icon>
+            </button>
+            <button mat-icon-button mwlCalendarNextView [view]="view" [(viewDate)]="viewDate">
+              <mat-icon>navigate_next</mat-icon>
+            </button>
+            <span class="ml-3"
+                  style="font-size: larger; color: black;">{{ viewDate | calendarDate:(view + 'ViewTitle'):'es' }}</span>
+
+            <button style="display: none;" data-toggle="modal" data-target="#eventModal" #modalOpen>modal</button>
+
+            <a
+              class="ml-3"
+              style="background-color: rgb(84, 158, 77);
+              color: white;"
+              mat-raised-button
+              matTooltipPosition="above"
+              matTooltip="Descargar"
+              href="https://tecnologicoitcaeduec-my.sharepoint.com/personal/encuba_itca_edu_ec/_layouts/15/onedrive.aspx?ga=1&id=%2Fpersonal%2Fencuba%5Fitca%5Fedu%5Fec%2FDocuments%2FCONTRATO%20SISTEMA%20INFORM%C3%81TICO%20DE%20GESTI%C3%93N%20%28SIG%29%20%2D%20ENCUBA%2FMANUALES%20DE%20USUARIO%20%28SIG%29%2FACAD%C3%89MICO%2FMU%5FPROCESO%5F%20ACTIVIDADES%20ESTUDIANTE%2Epdf&parent=%2Fpersonal%2Fencuba%5Fitca%5Fedu%5Fec%2FDocuments%2FCONTRATO%20SISTEMA%20INFORM%C3%81TICO%20DE%20GESTI%C3%93N%20%28SIG%29%20%2D%20ENCUBA%2FMANUALES%20DE%20USUARIO%20%28SIG%29%2FACAD%C3%89MICO"
+              target="_blank">
+              <small>Manual Usuario</small>
+            </a>
+          </div>
+
+          <!--<div>
+            <button
+              mat-icon-button
+              [ngClass]="view === 'month' ? 'blue' : 'black'"
+              matTooltip="Vista mensual"
+              matTooltipClass="blue-tooltip"
+              (click)="setView(calendarView.Month)">
+              <mat-icon>view_comfy</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              [ngClass]="view === 'week' ? 'blue' : 'black'"
+              matTooltip="Vista semanal"
+              matTooltipClass="blue-tooltip"
+              (click)="setView(calendarView.Week)"
+              [class.active]="view === 'week'">
+              <mat-icon>view_week</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              [ngClass]="view === 'day' ? 'blue' : 'black'"
+              matTooltip="Vista diaria"
+              matTooltipClass="blue-tooltip"
+              (click)="setView(calendarView.Day)"
+              [class.active]="view === 'day'">
+              <mat-icon>view_day</mat-icon>
+            </button>
+          </div>-->
+        </div>
+        <div [ngSwitch]="view">
+          <mwl-calendar-month-view
+            (dayClicked)="createOrEditEventMonthView($event.day, $event.sourceEvent)"
+            *ngSwitchCase="calendarView.Month"
+            [viewDate]="viewDate"
+            [cellTemplate]="customCellTemplate"
+            [events]="events">
+          </mwl-calendar-month-view>
+          <mwl-calendar-week-view
+            *ngSwitchCase="calendarView.Week"
+            [viewDate]="viewDate"
+            (eventClicked)="openContextMenu($event)"
+            (hourSegmentClicked)="createEventWeekOrDay($event)"
+            [hourSegments]="1"
+            [eventTemplate]="customWeekViewEventTemplate"
+            [events]="events">
+          </mwl-calendar-week-view>
+          <mwl-calendar-day-view
+            *ngSwitchCase="calendarView.Day"
+            (eventClicked)="openContextMenu($event)"
+            (hourSegmentClicked)="createEventWeekOrDay($event)"
+            [viewDate]="viewDate"
+            [hourSegments]="1"
+            [eventTemplate]="customWeekViewEventTemplate"
+            [events]="events">
+          </mwl-calendar-day-view>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--Check out the docs to override the templates-->
+  <!--https://github.com/mattlewis92/angular-calendar/blob/main/projects/angular-calendar/src/modules/month/calendar-month-view/calendar-month-cell/calendar-month-cell.component.ts-->
+  <ng-template
+    #customCellTemplate
+    let-day="day"
+    let-locale="locale"
+    let-highlightDay="highlightDay"
+    let-unhighlightDay="unhighlightDay"
+    let-eventClicked="eventClicked"
+    let-trackByEventId="trackByEventId">
+    <div class="cal-cell-top">
+      <ul>
+        <ng-container *ngFor="let event of $any(day.events | filterEventsByDay: day.date); let i=index; let count=count; let last=last;">
+          <li style="padding-bottom: 1px; padding-left: 5px; padding-right: 5px"
+            *ngIf="i===0 || i===1"
+            (click)="openModal(event)">
+            <div class="hover" style="cursor: pointer; text-align: left; border-radius: 5px;"
+              [style.background-color]="event.backgroundColor"
+              [style.color]="event.fontColor"
+              matTooltipPosition="right"
+              matTooltip="{{event.courseName}}: {{event.endDate | date: 'EEEE, dd/MM/yyyy'}}">
+              <div class="single-line"><small>&nbsp;{{event.courseName}}</small></div>
+            </div>
+          </li>
+          <li *ngIf="count > EVENTS_TO_SHOW && last" style="padding-bottom: 1px; padding-left: 5px; padding-right: 5px"
+              [matMenuTriggerFor]="menu">
+            <div class="hover" style="cursor: pointer; text-align: left; border-radius: 5px; background-color: #e0e0e0;"
+              matTooltipPosition="right" matTooltip="Click para desplegar submenú">
+              <a class="single-line">&nbsp;{{count-EVENTS_TO_SHOW}} más...</a>
+            </div>
+          </li>
+          <!--<li>
+            <ng-template
+              cdkConnectedOverlay
+              [cdkConnectedOverlayOrigin]="triggerOrigin"
+              [cdkConnectedOverlayOpen]="isOpen">
+              <ul>
+                <ng-container *ngFor="let item of $any(day.events | filterEventsByDay: day.date); let index=index;">
+                  <li style="padding-bottom: 1px; padding-left: 5px; padding-right: 5px;"
+                    *ngIf="index>1"
+                    (click)="openModal(event)">
+                    <div class="hover" style="cursor: pointer; text-align: left; border-radius: 5px; width: 125px;"
+                      [style.background-color]="item.backgroundColor"
+                      [style.color]="event.fontColor"
+                      matTooltipPosition="right"
+                      matTooltip="{{item.courseName}}: {{item.endDate | date: 'EEEE, dd/MM/yyyy' :'UTC'}}">
+                      <div class="single-line"><small>&nbsp;{{item.courseName}}</small></div>
+                    </div>
+                  </li>
+                </ng-container>
+              </ul>
+            </ng-template>
+          </li>-->
+          <mat-menu #menu="matMenu">
+            <ul>
+              <ng-container *ngFor="let item of $any(day.events | filterEventsByDay: day.date); let index=index;">
+                <li style="padding-bottom: 1px; padding-left: 5px; padding-right: 5px;"
+                  *ngIf="index>1"
+                  (click)="openModal(item)">
+                  <div class="hover" style="cursor: pointer; text-align: left; border-radius: 5px; width: 125px;"
+                    [style.background-color]="item.backgroundColor"
+                    [style.color]="event.fontColor"
+                    matTooltipPosition="right"
+                    matTooltip="{{item.courseName}}: {{item.endDate | date: 'EEEE, dd/MM/yyyy' :'UTC'}}">
+                    <div class="single-line"><small style="font-size: 10px;">&nbsp;{{item.courseName}}</small></div>
+                  </div>
+                </li>
+              </ng-container>
+            </ul>
+          </mat-menu>
+        </ng-container>
+      </ul>
+      <span class="cal-day-number">{{ day.date | calendarDate:'monthViewDayNumber':locale }}</span>
+
+    </div>
+
+  </ng-template>
+
+  <ng-template #customWeekViewEventTemplate let-weekEvent="weekEvent" let-locale="locale" let-eventClicked="eventClicked"
+               let-tooltipPlacement="tooltipPlacement" let-tooltipTemplate="tooltipTemplate"
+               let-tooltipAppendToBody="tooltipAppendToBody" let-tooltipDisabled="tooltipDisabled">
+    <div *ngIf="view === 'week'"
+         class="cal-event">
+    </div>
+
+    <div *ngIf="view === 'day'"
+         class="cal-event">
+    </div>
+  </ng-template>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="height: 40px;">
+        <div class="col-md-6">
+          <h3 class="modal-title" id="eventModalLabel"><br>Detalle de actividad</h3>
+        </div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" #modalClose>
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="card" *ngIf="tasks">
+          <div class="card-body">
+            <div class="row" *ngFor="let item of tasks">
+              <div class="col-12" style="text-align: center;">
+                <h3>{{item.courseName}}</h3>
+              </div>
+              <div class="col-7">
+                <h3 style="color: #014898;">Docente:</h3>
+              </div>
+              <div class="col-5">
+                <h3 style="color: #014898;">Fecha de entrega:</h3>
+              </div>
+              <div class="col-7">
+                <h3><small>{{item.nameTeacher}}</small></h3>
+              </div>
+              <div class="col-5">
+                <h3>{{item.endDate | date: 'dd/MM/yyyy, HH:mm' :'UTC'}}</h3>
+              </div>
+              <div class="col-4">
+                <h3 style="color: #014898;">Tarea:</h3>
+              </div>
+              <div class="col-8">
+                <h3>{{item.taskName}}</h3>
+              </div>
+              <div class="col-4">
+                <h3 style="color: #014898;">Descripción:</h3>
+              </div>
+              <div class="col-8">
+                <h3>{{item.taskDesc}}</h3>
+              </div>
+              <div class="col-12" style="text-align: right;">
+                <button type="button" mat-raised-button class="styleButton_sml" style="width: 140px;" (click)="sendEvent(item)">
+                  Subir tarea
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

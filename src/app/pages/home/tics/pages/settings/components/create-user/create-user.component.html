@@ -1,0 +1,112 @@
+<div style="display: flex; justify-content: end; align-items: center; background: transparent;" class="p-2">
+  <mat-icon style="cursor: pointer; color: red;" [matDialogClose]="false" class="red-icon" matRipple>close</mat-icon>
+</div>
+
+<mat-dialog-content>
+  <div *ngIf="isLoading; else form;">
+    <spinner-loader></spinner-loader>
+  </div>
+
+  <ng-template #form>
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12" style="text-align: center;">
+            <h4 style="color: #014898;">
+              Agregar Usuario
+            </h4>
+          </div>
+        </div>
+        <div class="row" [formGroup]="usersForm">
+          <div class="col-12">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Buscar por Documento</mat-label>
+              <input type="text" #search matInput (input)="getPersonByDocumentNumber(search.value)">
+              <mat-error>
+                Descripción es <strong>requerido</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-12">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Nombres</mat-label>
+              <input type="text" matInput readonly="false" formControlName="fullName">
+            </mat-form-field>
+          </div>
+          <div class="col-6">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Usuario</mat-label>
+              <input type="text" matInput formControlName="p_userName">
+              <mat-error>
+                Usuario es <strong>requerido</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-6">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Contraseña</mat-label>
+              <input type="text" matInput readonly="true" formControlName="p_userPassword">
+              <mat-error>
+                Contraseña es <strong>requerido</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-12">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Correo electrónico</mat-label>
+              <input type="text" matInput formControlName="p_recoveryEmail">
+              <mat-error>
+                Correo electrónico es <strong>requerido</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-6">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Rol</mat-label>
+              <mat-select formControlName="p_rolID">
+                <mat-option *ngFor="let item of data.roles" [value]="item.rolId">{{item.RolName}}</mat-option>
+              </mat-select>
+              <mat-error>
+                Rol es <strong>requerido</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-6">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Grupo</mat-label>
+              <mat-select formControlName="groupID">
+                <mat-option *ngFor="let item of data.groups" [value]="item.groupID">{{item.groupName}}</mat-option>
+              </mat-select>
+              <mat-error>
+                Grupo es <strong>requerido</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <div class="d-flex no-block w-100 justify-content-between">
+    <div class="pl-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="warn"
+        [mat-dialog-close]="false">
+        Cerrar
+      </button>
+    </div>
+    <div class="pr-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="primary"
+        (click)="onSubmitUsers();">
+        Enviar
+      </button>
+    </div>
+  </div>
+</mat-dialog-actions>

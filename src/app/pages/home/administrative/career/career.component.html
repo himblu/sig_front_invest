@@ -1,0 +1,280 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+<div class="row animated fadeIn fast" *ngIf="!charging">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="row pl-2 pr-2">
+          <div class="col-md-3"><components-input-search [label]="'Búsqueda por Carrera'" (return)="searchCareer($event)"></components-input-search></div>
+          <div class="col-md-9" style="text-align: right;"><button type="button" mat-raised-button class="styleButton_sml" style="width: 142px;" data-toggle="modal" data-target="#careerModal" (click)="openModal(0)">Agregar</button></div>
+        </div>
+        <div class="table-responsive">
+          <table id="demo-foo-addrow"
+                 class="table m-t-0 table-hover no-wrap contact-list footable-loaded footable"
+                 data-page-size="5">
+            <thead style="background-color: #004899; color: white;">
+            <tr>
+              <th class="footable-sortable">
+                Carrera
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Siglas
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Estado
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable" style="text-align: center;">
+                Acciones
+                <span class="footable-sort-indicator"></span>
+              </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let item of careerList" class="footable-even">
+              <td>{{item.careerName}}</td>
+              <td>{{item.careerAcronym}}</td>
+              <td>{{item.state}}</td>
+              <td style="text-align: center;">
+                <a type="button"
+                    matTooltipPosition="above"
+                    matTooltip="Activar"
+                    style="cursor: pointer; color: red;"
+                    *ngIf="!item.statusID"
+                    (click)="statusCareers(item, 1)">
+                    <i class="fa fa-toggle-off" aria-hidden="true"></i>
+                </a>
+                <a type="button"
+                    matTooltipPosition="above"
+                    matTooltip="Inactivar"
+                    style="cursor: pointer; color: blue;"
+                    *ngIf="item.statusID"
+                    (click)="statusCareers(item, 0)">
+                    <i class="fa fa-toggle-on" aria-hidden="true"></i>
+                </a>
+                &nbsp;
+                <a [matMenuTriggerFor]="menu"
+                  matTooltipPosition="above"
+                  matTooltip="Acciones"
+                  (click)="getStudyPlans(item.careerID)"
+                   style="cursor: pointer; color: black;"><i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                </a>
+                <mat-menu [xPosition]="'before'" #menu="matMenu">
+                    <button type="button" mat-menu-item
+                      data-toggle="modal"
+                      data-target="#careerModal"
+                      (click)="openModal(1, item)">
+                      <mat-icon style="color: green;">create</mat-icon>
+                      <span class="item">Editar</span>
+                    </button>
+                    <button type="button" mat-menu-item
+                      data-toggle="modal"
+                      data-target="#subjectsModal"
+                      (click)="subjectsForm.reset()"
+                      (click)="subjectsForm.get('careerID').patchValue(item.careerID)">
+                      <mat-icon style="color: black;">description</mat-icon>
+                      <span class="item">Asignar materias</span>
+                    </button>
+                    <button type="button" mat-menu-item
+                      [routerLink]="'/gestion-academica/crear-malla-curricular/'+item.careerID">
+                      <mat-icon style="color: blue;">add</mat-icon>
+                      <span class="item">Nueva Malla</span>
+                    </button>
+                    <button mat-menu-item [matMenuTriggerFor]="studyPlansMenu">
+                      <mat-icon style="color: red;">picture_as_pdf</mat-icon>
+                      <span class="item">Descargar</span>
+                   </button>
+                </mat-menu>
+                <mat-menu #studyPlansMenu="matMenu">
+                  <button type="button" mat-menu-item *ngFor="let studyPlan of studyPlans" (click)="getCareerDetailCatalogReportPdf(studyPlan.careerID, studyPlan.studyPlanID)">
+                    {{studyPlan.studyPlanDesc}}
+                  </button>
+                </mat-menu>
+              </td>
+            </tr>
+
+            </tbody>
+          </table>
+        </div>
+        <components-button-arrow [actual]="actualCareer" [totalPage]="totalPageCareer" [count]="countCareer" (result)="changePageCareer($event)"></components-button-arrow>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="careerModal" tabindex="-1" aria-labelledby="careerModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="height: 40px;">
+        <div class="col-md-4">
+          <h3 class="modal-title" id="careerModalLabel"><br>{{title}}</h3>
+        </div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-body">
+              <div>
+                <form [formGroup]="carrerForm"
+                      (submit)="subCarrerFrom()"
+                      autocomplete="off">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Escuela</mat-label>
+                        <mat-select formControlName="schoolID">
+                          <mat-option *ngFor="let item of (schools | filterByStatus: 1)" [value]="item.schoolID">{{item.schoolName}}</mat-option>
+                        </mat-select>
+                        <mat-error>
+                          Escuela es <strong>requerido</strong>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-9">
+                      <div>
+                        <mat-form-field class="width" appearance="outline">
+                          <mat-label>Nombre Carrera</mat-label>
+                          <input type="text" matInput formControlName="careerName">
+                          <mat-error>
+                            Nombre es <strong>requerido</strong>
+                          </mat-error>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Siglas</mat-label>
+                        <input type="text" matInput formControlName="careerAcronym" mask="S*" [patterns]="testPattern" >
+                        <mat-error *ngIf="carrerForm.hasError('maxlength', 'careerAcronym') ">
+                          Exedio Máximo 10
+                        </mat-error>
+                        <mat-error *ngIf="carrerForm.get('careerAcronym')?.touched">
+                          Siglas es <strong>requerido</strong>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Descripción Carrera</mat-label>
+                        <input type="text" matInput formControlName="careerDesc">
+                        <mat-error>
+                          Descripción es <strong>requerido</strong>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-3">
+                      <button type="submit" mat-raised-button class="styleButton_sml" style="width: 100px;">
+                        Guardar
+                      </button>
+                    </div>&nbsp;&nbsp;&nbsp;
+                    <div class="col-md-6">
+                      <button type="button" mat-raised-button class="styleButton_gray" style="width: 100px;" data-dismiss="modal" #modalClose>Cerrar</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- subjectsModal -->
+<div class="modal fade" id="subjectsModal" tabindex="-1" aria-labelledby="subjectsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="height: 40px;">
+        <div class="col-md-4">
+          <h3 class="modal-title" id="subjectsModalLabel"><br>Asignaturas</h3>
+        </div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-body">
+              <div class="col-md-12">
+                <form [formGroup]="subjectsForm"
+                      (submit)="onSubmitSubjects()"
+                      autocomplete="off">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Asignatura</mat-label>
+                        <mat-select formControlName="courseID" multiple="true">
+                          <mat-option *ngFor="let item of subjects" [value]="item">{{item.courseName}}</mat-option>
+                        </mat-select>
+                        <mat-error>
+                          Asignatura es <strong>requerido</strong>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-md-12">
+                      <div style="height: 250px; overflow-y: auto;">
+                        <table class="table table-hover">
+                          <thead style="background-color: #004899; color: white;">
+                            <tr>
+                              <th class="footable-sortable" colspan="2">
+                                Asignatura
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let item of getCourseRow().value; let i=index" class="footable-even">
+                              <td>{{item.courseName}}</td>
+                              <td
+                                matTooltipPosition="above"
+                                matTooltip="Borrar"
+                                (click)="removeCourseRow(i, item)"
+                                style="cursor: pointer;">
+                                <i class="fa fa-minus-circle" aria-hidden="true" style="color: red"></i>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                  <br>
+                  <div class="row">
+                    <div class="col-md-3">
+                      <button type="submit" mat-raised-button class="styleButton_sml" style="width: 100px;">
+                        Guardar
+                      </button>
+                    </div>&nbsp;&nbsp;&nbsp;
+                    <div class="col-md-6">
+                      <button type="button" mat-raised-button class="styleButton_gray" style="width: 100px;" data-dismiss="modal" #subjectsModalClose>Cerrar</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

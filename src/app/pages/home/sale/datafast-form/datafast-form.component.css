@@ -1,0 +1,103 @@
+.modal-wrapper {
+    padding: 1rem;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .title {
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+  
+  .custom-card {
+    border-radius: 5px;
+    box-shadow: 0px 0px 6px rgba(0,0,0,0.1);
+  }
+  
+  .close-button {
+    background: none;
+    border: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  
+  .bg-primary-color {
+    background-color: #0a53be !important;
+  }
+  
+  .text-primary-color {
+    color: #0a53be;
+  }
+  
+  .transparent-panel .mat-dialog-container {
+    position: fixed !important;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .custom-dialog .mat-dialog-container {
+    width: 100%;
+    max-width: 600px;
+    margin: auto;
+    border-radius: 8px;
+    top: 40px;
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+  }
+  
+  .modal-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+  
+  .section-header {
+    font-size: 14px;
+    font-weight: 600;
+    background-color: #0054a6; /* azul ITCA */
+    color: white;
+    padding: 6px 10px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .section-header i {
+    margin-right: 5px;
+  }
+  
+  .amount-text {
+    font-size: 14px;
+    font-weight: bold;
+    color: #0054a6;
+  }
+  
+  .font-xs {
+    font-size: 13px;
+  }
+
+  .modal-header-custom {
+    padding: 8px 16px;
+    font-size: 12px;
+    color: #6c757d; /* Gris claro como texto muted */
+  }
+  
+  .modal-title-custom {
+    font-size: 13px;
+    font-weight: 500;
+    color: #6c757d;
+  }
+  
+  hr.my-1 {
+    margin-top: 4px;
+    margin-bottom: 4px;
+  }

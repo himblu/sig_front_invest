@@ -1,0 +1,518 @@
+<div class="row animated fadeIn fast" *ngIf="loading">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<div class="row animated fadeIn fast" *ngIf="!loading">
+  <div class="col-md-12">
+    <h2 style="text-align: center; color: #004899;">LISTADO DE ACUERDOS/CONVENIOS</h2>
+    <div class="card" style="border-radius: 15px;">
+      <div class="card-body">
+        <section [formGroup]="filtersForm">
+          <div class="row pl-2 pr-2">
+            <div class="col-3">
+              <mat-form-field appearance="outline">
+                <mat-label>Seleccione</mat-label>
+                <mat-select formControlName="state" (selectionChange)="getdataforms($event.value); getAgreementConventions(); getBusiness($event.value);">
+                  <mat-option *ngFor="let item of agreementType;" [value]="item.agreementsID">
+                    {{item.agreementsDesc}}
+                  </mat-option>
+                </mat-select>
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-2">
+              <mat-form-field appearance="outline">
+                <mat-label>Estatus</mat-label>
+                <mat-select formControlName="statusAgreement" (selectionChange)="getAgreementConventions();">
+                  <mat-option [value]="0">Todos</mat-option>
+                  <mat-option *ngFor="let item of statusType;" [value]="item.descStatus">
+                    {{item.descStatus}}
+                  </mat-option>
+                </mat-select>
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-3-5">
+              <mat-form-field appearance="outline">
+                <mat-label>Buscar por nombre de empresa</mat-label>
+                <input matInput autocomplete="off" formControlName='search'
+                (input)="getAgreementConventions();" [readonly]="!filtersForm.get('state').value">
+                <mat-icon matSuffix>search</mat-icon>
+              </mat-form-field>
+            </div>
+            <div class="col-2">
+              <a
+                style="background-color: rgb(84, 158, 77);
+                color: white;"
+                mat-raised-button
+                matTooltipPosition="above"
+                matTooltip="Descargar"
+                href="https://tecnologicoitcaeduec-my.sharepoint.com/personal/encuba_itca_edu_ec/_layouts/15/onedrive.aspx?ga=1&id=%2Fpersonal%2Fencuba%5Fitca%5Fedu%5Fec%2FDocuments%2FCONTRATO%20SISTEMA%20INFORM%C3%81TICO%20DE%20GESTI%C3%93N%20%28SIG%29%20%2D%20ENCUBA%2FMANUALES%20DE%20USUARIO%20%28SIG%29%2FVINCULACI%C3%93N%2F10%5FMU%5FPROCESO%5FREGISTRO%20ACUERDOS%2DCONVENIOS%5FROL%20JUR%C3%8DDICO%2Epdf&parent=%2Fpersonal%2Fencuba%5Fitca%5Fedu%5Fec%2FDocuments%2FCONTRATO%20SISTEMA%20INFORM%C3%81TICO%20DE%20GESTI%C3%93N%20%28SIG%29%20%2D%20ENCUBA%2FMANUALES%20DE%20USUARIO%20%28SIG%29%2FVINCULACI%C3%93N"
+                target="_blank">
+                <small>Manual Usuario</small>
+              </a>
+            </div>
+            <div class="col-1-5" style="text-align: right;">
+              <button type="button" mat-raised-button class="styleButton_sml" style="max-width: 100px;"
+              #openModal data-toggle="modal" data-target="#projectModal" (click)="filtersForm.markAllAsTouched();">
+                CREAR
+              </button>
+            </div>
+          </div>
+        </section>
+        <div class="table-responsive">
+          <table id="demo-foo-addrow"
+                 class="table m-t-0 table-hover no-wrap contact-list footable-loaded footable"
+                 data-page-size="5">
+            <thead style="background-color: #004899; color: white;">
+            <tr>
+              <th class="footable-sortable">
+                Código
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Nombre de empresa
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th>
+                Objetivo
+              </th>
+              <th class="footable-sortable">
+                Fecha Inicio - Fecha fin
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th>Estado</th>
+              <th class="footable-sortable" style="text-align: center;" >
+                Acciones
+                <span class="footable-sort-indicator"></span>
+              </th>
+            </tr>
+            </thead>
+            <tbody style="color: black;">
+              <tr *ngFor="let item of agreementConventions; let i=index;">
+                <td>{{item.codeNumber}}</td>
+                <td>{{item.bussinesName}}</td>
+                <td class="wrap">{{item.objetivevincDesc}}</td>
+                <td>{{item.initdateAgreement | date: 'yyyy/MM/dd'}} - {{item.enddateAgreement | date: 'yyyy/MM/dd'}}</td>
+                <td>{{item.statusAgreement}}</td>
+                <td style="text-align: center; cursor: pointer;" (click)="$event.stopPropagation();" [matMenuTriggerFor]="menu" #menuTrigger="matMenuTrigger">
+                  <a type="button"
+                      matTooltipPosition="above"
+                      matTooltip="Acciones"
+                      (click)="$event.stopPropagation();"
+                      [matMenuTriggerFor]="menu"
+                      #menuTrigger="matMenuTrigger"
+                      style="cursor: pointer; color: blue;"><i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                  </a>
+                  <mat-menu [xPosition]="'before'" #menu="matMenu">
+                    <a mat-menu-item *ngIf="filtersForm.get('state').value === 2">
+                      <button type="button" mat-menu-item (click)="generateReport(item);">
+                        <i style="color: blue;" class="fa fa-file-word-o" aria-hidden="true"></i>&nbsp;
+                        Descargar Word
+                      </button>
+                    </a>
+                    <a mat-menu-item>
+                      <button type="button" mat-menu-item (click)="getAgreementConventionsByID(item);">
+                        <i style="color: blue;" class="fa fa-pencil" aria-hidden="true"></i>&nbsp;
+                        Editar
+                      </button>
+                    </a>
+                  </mat-menu>
+                </td>
+              </tr>
+              <tr *ngIf="!agreementConventions.length" style="text-align: center;">
+                <td colspan="5">Seleccione acuerdo o convenio</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <mat-paginator
+          #paginator
+          [length]="length"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions"
+          (page)="pageEvent = getBusinessPaginator($event)">
+        </mat-paginator>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal 1-->
+<div class="modal fade" *ngIf="filtersForm.get('state').value === 1" id="projectModal" tabindex="-1" aria-labelledby="projectModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="height: 40px;">
+        <div class="col-md-4">
+          <h3 class="modal-title" id="projectModalLabel" *ngIf="!isUpdating"><br>Agregar Convenio</h3>
+          <h3 class="modal-title" id="projectModalLabel" *ngIf="isUpdating"><br>Editar Convenio</h3>
+        </div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="initForms(); isUpdating= false;">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-body">
+              <form [formGroup]="conveniosForm">
+                <div class="row">
+                  <div class="col-4">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Nº de código</mat-label>
+                      <input matInput autocomplete="off" formControlName="p_codeNumber" #p_codeNumber (blur)="validateCode(p_codeNumber.value, 1);">
+                      <mat-error>Campo requerido</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-4">
+                    <form class="example-form">
+                      <mat-form-field class="example-full-width">
+                        <mat-label>Ruc de empresa</mat-label>
+                        <input type="text"
+                                placeholder="Seleccione una empresa"
+                                aria-label="Number"
+                                matInput
+                                [formControl]="myControl"
+                                [matAutocomplete]="auto">
+                        <mat-autocomplete #auto="matAutocomplete">
+                            <mat-option *ngFor="let option of filteredOptions | async options" [value]="option.ruc" (onSelectionChange)="fillBussines(option.typeBusiness, option.legalRepresentative, option.responsibleName, option.ruc, option)">
+                              {{option.bussinesName}}
+                            </mat-option>
+                        </mat-autocomplete>
+                        <mat-error>Campo requerido</mat-error>
+                      </mat-form-field>
+                    </form>
+                  </div>
+                  <div class="col-4">
+                    <form [formGroup]="businessForm">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Entidad</mat-label>
+                        <input matInput readonly="true" autocomplete="off" formControlName="entidad">
+                        <mat-error>Campo requerido</mat-error>
+                      </mat-form-field>
+                    </form>
+                  </div>
+                  <div class="col-4">
+                    <form [formGroup]="businessForm">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Representante Legal</mat-label>
+                        <input matInput readonly="true" autocomplete="off" formControlName="representante">
+                        <mat-error>Campo requerido</mat-error>
+                      </mat-form-field>
+                    </form>
+                  </div>
+                  <div class="col-4">
+                    <form [formGroup]="businessForm">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Responsable de la empresa</mat-label>
+                        <input matInput readonly="true" autocomplete="off" formControlName="responsable">
+                        <mat-error>Campo requerido</mat-error>
+                      </mat-form-field>
+                    </form>
+                  </div>
+                  <div class="col-6">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Fecha inicio - Fin del convenio</mat-label>
+                      <mat-date-range-input [rangePicker]="picker">
+                        <input matStartDate readonly="true" placeholder="Fecha Inicio" formControlName="p_initdateAgreement">
+                        <input matEndDate readonly="true" placeholder="Fecha Fin" formControlName="p_enddateAgreement">
+                      </mat-date-range-input>
+                      <mat-hint>DD/MM/AAAA – DD/MM/AAAA</mat-hint>
+                      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                      <mat-date-range-picker #picker></mat-date-range-picker>
+                      <mat-error>Campo requerido</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-6">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Línea operativa</mat-label>
+                      <mat-select formControlName="p_programvincID">
+                        <mat-option *ngFor="let item of programType;" [value]="item.programvincID">
+                          {{item.programvincDesc}}
+                        </mat-option>
+                      </mat-select>
+                      <mat-error>Campo requerido</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-6">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Estatus</mat-label>
+                      <mat-select formControlName="p_statusAgreement">
+                        <mat-option *ngFor="let item of statusType;" [value]="item.descStatus">
+                          {{item.descStatus}}
+                        </mat-option>
+                      </mat-select>
+                      <mat-error>Campo requerido</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-6">
+                    <form [formGroup]="businessForm">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Objetivo del Convenio</mat-label>
+                        <mat-select formControlName="objetives" multiple="true">
+                          <mat-option *ngFor="let item of objetiveType;" [value]="item.objetivevincID">
+                            {{item.objetivevincDesc}}
+                          </mat-option>
+                        </mat-select>
+                        <mat-error>Campo requerido</mat-error>
+                      </mat-form-field>
+                    </form>
+                  </div>
+                  <div class="col-6" *ngIf="findOther()">
+                    <form [formGroup]="businessForm">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Otro</mat-label>
+                        <input matInput type="text" formControlName="other" [required]="true">
+                        <mat-error>Campo requerido</mat-error>
+                      </mat-form-field>
+                    </form>
+                  </div>
+                  <!-- <div class="col-6">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Url</mat-label>
+                      <input matInput type="text" formControlName="p_urlFile">
+                      <mat-error>Campo requerido</mat-error>
+                    </mat-form-field>
+                  </div> -->
+                  <div class="col-2" *ngIf="updatingItem?.urlFile">
+                    <div class="w-100" (click)="openFile(updatingItem?.urlFile);" style="cursor: pointer;">
+                      <img style="width: 20px;" src="assets/images/file.png" alt="Payment File">
+                      <span style="color: #5090f5;">Ver Archivo</span>
+                    </div>
+                  </div>
+                  <div class="col-4">
+                    <input type="file"
+                      #input
+                      style="cursor: pointer;"
+                      autocomplete="off"
+                      (change)="onChangeInput(input.files, input, 1);"
+                      accept="application/pdf">
+                  </div>
+                </div>
+              </form>
+              <div class="row">
+                <div class="col-8"></div>
+                  <div class="col-2">
+                    <button type="submit"
+                      mat-raised-button
+                      class="styleButton_sml"
+                      style="width: 100px;"
+                      (click)="validateFile(1)"
+                      *ngIf="!isUpdating">
+                      Guardar
+                    </button>
+                    <button type="submit"
+                      mat-raised-button
+                      class="styleButton_sml"
+                      style="width: 100px;"
+                      (click)="validateFile(1)"
+                      *ngIf="isUpdating">
+                      Actualizar
+                    </button>
+                  </div>
+                  <div class="col-2">
+                    <button type="button" mat-raised-button class="styleButton_gray" style="width: 100px;" #modalClose data-dismiss="modal" (click)="initForms(); isUpdating= false;">Cerrar</button>
+                  </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal 2-->
+<div class="modal fade" *ngIf="filtersForm.get('state').value === 2" id="projectModal" tabindex="-1" aria-labelledby="projectModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="height: 40px;">
+        <div class="col-md-4">
+          <h3 class="modal-title" id="projectModalLabel" *ngIf="!isUpdating"><br>Agregar Acuerdos</h3>
+          <h3 class="modal-title" id="projectModalLabel" *ngIf="isUpdating"><br>Editar Acuerdos</h3>
+        </div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="initForms(); isUpdating= false;">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-body">
+              <form [formGroup]="acuerdosForm">
+                <div class="row">
+                  <div class="col-4">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Nº de código</mat-label>
+                      <input matInput autocomplete="off" formControlName="p_codeNumber" #p_codeNumber (blur)="validateCode(p_codeNumber.value, 2);">
+                      <mat-error>Campo requerido</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-4">
+                    <form class="example-form">
+                      <mat-form-field class="example-full-width">
+                        <mat-label>Ruc de empresa</mat-label>
+                        <input type="text"
+                                placeholder="Seleccione una empresa"
+                                aria-label="Number"
+                                matInput
+                                [formControl]="myControl"
+                                [matAutocomplete]="auto">
+                        <mat-autocomplete #auto="matAutocomplete">
+                            <mat-option *ngFor="let option of filteredOptions | async options" [value]="option.ruc" (onSelectionChange)="fillBussines(option.typeBusiness, option.legalRepresentative, option.responsibleName, option.ruc, option)">
+                              {{option.bussinesName}}
+                            </mat-option>
+                        </mat-autocomplete>
+                        <mat-error>Campo requerido</mat-error>
+                      </mat-form-field>
+                    </form>
+                  </div>
+                  <div class="col-4">
+                    <form [formGroup]="businessForm">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Entidad</mat-label>
+                        <input matInput readonly="true" autocomplete="off" formControlName="entidad">
+                        <mat-error>Campo requerido</mat-error>
+                      </mat-form-field>
+                    </form>
+                  </div>
+                  <div class="col-4">
+                    <form [formGroup]="businessForm">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Representante Legal</mat-label>
+                        <input matInput readonly="true" autocomplete="off" formControlName="representante">
+                        <mat-error>Campo requerido</mat-error>
+                      </mat-form-field>
+                    </form>
+                  </div>
+                  <div class="col-4">
+                    <form [formGroup]="businessForm">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Responsable de la empresa</mat-label>
+                        <input matInput readonly="true" autocomplete="off" formControlName="responsable">
+                        <mat-error>Campo requerido</mat-error>
+                      </mat-form-field>
+                    </form>
+                  </div>
+                  <div class="col-4">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Cargo</mat-label>
+                      <input matInput autocomplete="off" formControlName="p_position">
+                      <mat-error>Campo requerido</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-6">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Fecha inicio - Fin del Acuerdo</mat-label>
+                      <mat-date-range-input [rangePicker]="picker">
+                        <input matStartDate readonly="true" placeholder="Fecha Inicio" formControlName="p_initdateAgreement">
+                        <input matEndDate readonly="true" placeholder="Fecha Fin" formControlName="p_enddateAgreement">
+                      </mat-date-range-input>
+                      <mat-hint>DD/MM/AAAA – DD/MM/AAAA</mat-hint>
+                      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                      <mat-date-range-picker #picker></mat-date-range-picker>
+                      <mat-error>Campo requerido</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-6">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Carrera</mat-label>
+                      <mat-select formControlName="p_careerID">
+                        <mat-option *ngFor="let item of careers" [value]="item.careerID">{{item.careerName}}</mat-option>
+                      </mat-select>
+                      <mat-error>Campo requerido</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-6">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Estatus</mat-label>
+                      <mat-select formControlName="p_statusAgreement">
+                        <mat-option *ngFor="let item of statusType;" [value]="item.descStatus">
+                          {{item.descStatus}}
+                        </mat-option>
+                      </mat-select>
+                      <mat-error>Campo requerido</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-6">
+                    <form [formGroup]="businessForm">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Objetivo del Acuerdo</mat-label>
+                        <mat-select formControlName="objetives" multiple="true">
+                          <mat-option *ngFor="let item of objetiveType;" [value]="item.objetivevincID">
+                            {{item.objetivevincDesc}}
+                          </mat-option>
+                        </mat-select>
+                        <mat-error>Campo requerido</mat-error>
+                      </mat-form-field>
+                    </form>
+                  </div>
+                  <div class="col-6" *ngIf="findOther()">
+                    <form [formGroup]="businessForm">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Otro</mat-label>
+                        <input matInput type="text" formControlName="other" [required]="true">
+                        <mat-error>Campo requerido</mat-error>
+                      </mat-form-field>
+                    </form>
+                  </div>
+                  <!-- <div class="col-6">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Url</mat-label>
+                      <input matInput type="text" formControlName="p_urlFile">
+                      <mat-error>Campo requerido</mat-error>
+                    </mat-form-field>
+                  </div> -->
+                  <div class="col-2" *ngIf="updatingItem?.urlFile">
+                    <div class="w-100" (click)="openFile(updatingItem?.urlFile);" style="cursor: pointer;">
+                      <img style="width: 20px;" src="assets/images/file.png" alt="Payment File">
+                      <span style="color: #5090f5;">Ver Archivo</span>
+                    </div>
+                  </div>
+                  <div class="col-4">
+                    <input type="file"
+                      #input
+                      style="cursor: pointer;"
+                      autocomplete="off"
+                      (change)="onChangeInput(input.files, input, 2);"
+                      accept="application/pdf">
+                  </div>
+                </div>
+              </form>
+              <div class="row">
+                <div class="col-8"></div>
+                  <div class="col-2">
+                    <button type="submit"
+                      mat-raised-button
+                      class="styleButton_sml"
+                      style="width: 100px;"
+                      (click)="validateFile(2)"
+                      *ngIf="!isUpdating">
+                      Guardar
+                    </button>
+                    <button type="submit"
+                      mat-raised-button
+                      class="styleButton_sml"
+                      style="width: 100px;"
+                      (click)="validateFile(2)"
+                      *ngIf="isUpdating">
+                      Actualizar
+                    </button>
+                  </div>
+                  <div class="col-2">
+                    <button type="button" mat-raised-button class="styleButton_gray" style="width: 100px;" #modalClose data-dismiss="modal" (click)="initForms(); isUpdating= false;">Cerrar</button>
+                  </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

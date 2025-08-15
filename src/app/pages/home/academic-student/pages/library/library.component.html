@@ -1,0 +1,186 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<div class="row animated fadeIn fast" *ngIf="!charging">
+  <div class="col-md-12">
+    <div class="card" style="border-radius: 15px; ">
+      <div class="card-body pl-3 pr-3">
+        <img src="../../../../../../assets/images/library.jpg" alt="Biblioteca">
+      </div>
+    </div>
+  </div>
+</div>
+<br>
+<div class="row animated fadeIn fast pl-3 pr-3" *ngIf="!charging">
+  <div class="col-2-5" style="text-align: center;">
+    <h4 style="color: #004899;"><strong>HORARIO DE ATENCIÓN</strong></h4>
+  </div>
+  <div class="col-4">
+    <h4><strong>Lunes a viernes:</strong> 08:00 - 13:00, 14:00 - 16:00</h4>
+  </div>
+</div>
+<br>
+<div class="row animated fadeIn fast" *ngIf="!charging">
+  <div class="col-md-12">
+    <div class="card" style="border-radius: 15px;">
+      <div class="card-body">
+        <section [formGroup]="filtersForm">
+          <div class="row pl-3 pr-3">
+            <div class="col-3">
+              <mat-form-field appearance="outline">
+                <mat-label>Accesos rápidos</mat-label>
+                <mat-select formControlName="shortcuts">
+                  <mat-option *ngFor="let item of shortcuts;" [value]="1">1</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-4">
+              <mat-form-field appearance="outline">
+                <mat-label>Buscar publicaciones</mat-label>
+                <input type="text" matInput formControlName="search">
+              </mat-form-field>
+            </div>
+          </div>
+        </section>
+        <div class="table-responsive">
+          <table id="demo-foo-addrow"
+                 class="table m-t-0 table-hover no-wrap contact-list footable-loaded footable"
+                 data-page-size="5">
+            <thead style="background-color: #004899; color: white;">
+            <tr>
+              <th class="footable-sortable">
+                Código
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Título
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Autores
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Año
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Editorial
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Tipo de Documento
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Año
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Estado
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable" style="text-align: center;">
+                Acciones
+                <span class="footable-sort-indicator"></span>
+              </th>
+            </tr>
+            </thead>
+            <tbody style="color: black;">
+            <tr *ngFor="let item of books" class="footable-even" style="text-transform: uppercase;">
+              <td>1</td>
+              <td>2</td>
+              <td>3</td>
+              <td>4</td>
+              <td>5</td>
+              <td>6</td>
+              <td>7</td>
+              <td>8</td>
+              <td style="text-align: center;">
+                <a type="button"
+                    matTooltipPosition="above"
+                    matTooltip="Reservar"
+                    style="cursor: pointer; color: #004899;"><i class="fa fa-address-book" aria-hidden="true" data-toggle="modal" data-target="#reservationsModal"></i>
+                </a>&nbsp;
+                <a type="button"
+                    matTooltipPosition="above"
+                    matTooltip="Notificación"
+                    style="cursor: pointer; color: red;"><i class="fa fa-bell" aria-hidden="true"></i>
+                </a>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <components-button-arrow [actual]="actualBooks" [totalPage]="totalPageBooks" [count]="countBooks" (result)="changePageBooks($event)"></components-button-arrow>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="reservationsModal" tabindex="-1" aria-labelledby="reservationsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="height: 40px;">
+        <div class="col-md-5">
+          <h3 class="modal-title" id="reservationsModalLabel"><br>Registro de reservas</h3>
+        </div>
+        <div class="col-md-1">
+          <button type="button" id="btn_close" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12">
+          <label><strong>NOTA:</strong> Si no retira su publicación hasta la fecha de su reserva, su SOLICITUD será <strong>CANCELADA</strong>.</label>
+          <div class="card">
+            <div class="card-body">
+              <form [formGroup]="reservationsForm"
+                autocomplete="off"
+                (submit)="onSubmitReservations()">
+                <div class="row">
+                  <div class="col-md-6">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Fecha que solicita</mat-label>
+                      <input type="datetime-local" formControlName="startDate" #startDate matInput readonly="true">
+                      <mat-hint>dd/mm/aaaa</mat-hint>
+                      <mat-error>Fecha requerida</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Fecha de entrega</mat-label>
+                      <input type="datetime-local" formControlName="endDate" #endDate matInput [min]="reservationsForm.get('startDate').value" onkeydown="blur();" (click)="endDate.showPicker()">
+                      <mat-icon style="cursor: pointer;" matSuffix (click)="endDate.showPicker()">calendar_month</mat-icon>
+                      <mat-hint>dd/mm/aaaa</mat-hint>
+                      <mat-error>Fecha requerida</mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-3">
+                    <button type="submit" mat-raised-button class="styleButton_sml" style="width: 100px;">
+                      Guardar
+                    </button>
+                  </div>
+                  <div class="col-md-3">
+                    <button type="button" mat-raised-button class="styleButton_gray" style="width: 100px;" data-dismiss="modal" #modalClose>Cerrar</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,87 @@
+<div class="row">
+    <div class="col text-center">
+        <h2>Creación de Perfil Personal</h2>
+    </div>
+</div>
+<div class="card">
+    <form [formGroup]="formUser">
+        <div class="row m-4">
+            <div class="col-md-3">
+                <mat-form-field class="width" appearance="outline">
+                    <mat-label>Tipo de Documento</mat-label>
+                    <mat-select formControlName="typeDocId">
+                        <mat-option value="">Seleccione una opción</mat-option>
+                        <mat-option *ngFor="let item of identityList"
+                            [value]="item.typeDocId">{{item.typeDocName}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="width" appearance="outline">
+                    <mat-label>Documento Identificación</mat-label>
+                    <input formControlName="personDocumentNumber" type="text" matInput mask="S*"
+                        [patterns]="testPattern">
+                    <mat-error
+                        *ngIf="isValidField('personDocumentNumber')">{{getFielError('personDocumentNumber')}}</mat-error>
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="width" appearance="outline">
+                    <mat-label>Nombres</mat-label>
+                    <input formControlName="personFirstName" type="text" matInput>
+                    <!-- <mat-error *ngIf="isValidField('personFirstName')">{{getFielError('personFirstName')}}</mat-error> -->
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="width" appearance="outline">
+                    <mat-label>Apellido Paterno</mat-label>
+                    <input formControlName="personMiddleName" type="text" matInput>
+                    <mat-error *ngIf="isValidField('personMiddleName')">{{getFielError('personMiddleName')}}</mat-error>
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="width" appearance="outline">
+                    <mat-label>Apellido Materno</mat-label>
+                    <input formControlName="personLastName" type="text" matInput>
+                    <mat-error *ngIf="isValidField('personLastName')">{{getFielError('personLastName')}}</mat-error>
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="width" appearance="outline">
+                    <mat-label>Correo Electrónico</mat-label>
+                    <input formControlName="email" type="text" matInput>
+                    <mat-error *ngIf="isValidField('email')">{{getFielError('email')}}</mat-error>
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="width" appearance="outline">
+                    <mat-label><small>Fecha de Contratación</small></mat-label>
+                    <input formControlName="contratDate" readonly matInput [matDatepicker]="datepicker">
+                    <mat-hint>dd/mm/aaaa</mat-hint>
+                    <mat-error *ngIf="isValidField('contratDate')">{{getFielError('contratDate')}}</mat-error>
+                    <mat-datepicker-toggle matIconSuffix [for]="datepicker"></mat-datepicker-toggle>
+                    <mat-datepicker #datepicker>
+                    </mat-datepicker>
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="width" appearance="outline">
+                    <mat-label>Enviae Correo Electrónico</mat-label>
+                    <mat-select formControlName="sendMail">
+                        <mat-option value="">Seleccione una opción</mat-option>
+                        <mat-option [value]="0">NO</mat-option>
+                        <mat-option [value]="1">SÍ</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    </form>
+    <div class="row m-4">
+        <div class="col-md-9"></div>
+        <div class="col-md-3">
+            <button mat-raised-button (click)="saveUser()" type="button" class="styleButton">
+                Crear Colaborador
+            </button>
+        </div>
+    </div>
+</div>

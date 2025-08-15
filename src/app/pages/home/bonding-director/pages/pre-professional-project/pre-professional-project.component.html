@@ -1,0 +1,241 @@
+<div class="row animated fadeIn fast" *ngIf="loading">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<ng-container *ngIf="!loading">
+  <div class="card" style="background-color: rgb(221, 238, 243);">
+    <div class="card-body">
+      <form [formGroup]="firstFormGroup">
+        <ng-template matStepLabel>Documentación director</ng-template>
+        <br>
+        <div class="row">
+          <div class="col-10">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Nombre del proyecto</mat-label>
+              <textarea type="text" #nameProyect matInput formControlName="p_nameProyect" (input)="wordLimit(nameProyect, hint, 30)"
+              placeholder="Máximo 30 palabras"></textarea>
+              <mat-hint><label #hint><small>Palabras: 0</small></label></mat-hint>
+              <mat-error>
+                Campo <strong>requerido</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-2">
+            <mat-checkbox style="margin: 0 10px;" color="primary" formControlName="p_flag_general">General</mat-checkbox>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-4">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Código del proyecto</mat-label>
+              <input type="text" matInput formControlName="p_codeProject" #p_codeProject (blur)="validateCode(p_codeProject.value);">
+              <mat-error>
+                Campo <strong>requerido</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-4">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Periodo Inicio Proyecto</mat-label>
+              <mat-select required="true" formControlName="p_periodID" (selectionChange)="getSchool($event.value);">
+                <mat-option *ngFor="let item of periods" [value]="item.periodID">{{item.periodName}}</mat-option>
+              </mat-select>
+              <mat-error>
+                Campo <strong>requerido</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-4" *ngIf="!firstFormGroup.get('p_flag_general').value">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Escuela</mat-label>
+              <mat-select formControlName="p_schoolID" (selectionChange)="getCarrer($event.value);" [multiple]="true">
+                <mat-option *ngFor="let item of School;" [value]="item.schoolID" [disabled]="isUpdating">
+                  {{item.schoolName}}
+                </mat-option>
+              </mat-select>
+              <mat-error>
+                Campo <strong>requerido</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-4" *ngIf="!firstFormGroup.get('p_flag_general').value && firstFormGroup.get('p_schoolID').value.length < 2">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Carrera</mat-label>
+              <mat-select formControlName="p_careerID" (selectionChange)="getModality($event.value); getAgreementBusinessCareer();" [multiple]="true">
+                <mat-option *ngFor="let item of SPGetCareer;" [value]="item.careerID" [disabled]="isUpdating">
+                  {{item.careerName}}
+                </mat-option>
+              </mat-select>
+              <mat-error>
+                Campo <strong>requerido</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-4" *ngIf="!firstFormGroup.get('p_flag_general').value && firstFormGroup.get('p_schoolID').value.length < 2 && firstFormGroup.get('p_careerID').value.length < 2">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Modalidad de la carrera</mat-label>
+              <mat-select formControlName="p_modalityID">
+                <mat-option *ngFor="let item of SPGetModality;" [value]="item.modalityID" [disabled]="isUpdating">
+                  {{item.modalityName}}
+                </mat-option>
+              </mat-select>
+              <mat-error>
+                Campo <strong>requerido</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-4" *ngIf="!firstFormGroup.get('p_flag_general').value && firstFormGroup.get('p_schoolID').value.length < 2 && firstFormGroup.get('p_careerID').value.length < 2">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Malla Curricular</mat-label>
+              <mat-select formControlName="p_studyPlanID" (selectionChange)="getStudyPlans($event.value);">
+                <mat-option *ngFor="let item of StudyPlan;" [value]="item.studyPlanID" [disabled]="isUpdating">
+                  {{item.studyPlanDesc}}
+                </mat-option>
+              </mat-select>
+              <mat-error>
+                Campo <strong>requerido</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <!--<div class="col-4">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Nivel a fin</mat-label>
+              <mat-select formControlName="p_cycleID" (selectionChange)="getCareerAgreement();">
+                <mat-option *ngFor="let item of CycleDetail;" [value]="item.cycleID">
+                  {{item.cycleName}}
+                </mat-option>
+              </mat-select>
+              <mat-error>
+                Campo <strong>requerido</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>-->
+          <div class="col-4">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Modalidad de la práctica</mat-label>
+              <mat-select formControlName="p_objetivevincID">
+                <mat-option *ngFor="let item of projectPracticeModalities" [value]="item.modalityPracticeID">{{item.modalityPracticeDesc}}</mat-option>
+              </mat-select>
+              <mat-error>
+                Campo <strong>requerido</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-4">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Línea operativa</mat-label>
+              <mat-select formControlName="p_programvincID">
+                  <mat-option *ngFor="let item of programType" [value]="item.programvincID">{{item.programvincDesc}}</mat-option>
+              </mat-select>
+              <mat-error>
+                Campo <strong>requerido</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <!--<div class="col-4">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Asignatura rectora de la práctica</mat-label>
+              <mat-select [multiple]="true" formControlName="coursesOfPractice" (selectionChange)="getProjectHours();">
+                <mat-option *ngFor="let item of careerAgreements" [value]="item">{{item.courseNamePractice}}</mat-option>
+              </mat-select>
+              <mat-error>
+                Campo <strong>requerido</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>-->
+          <!--<div class="col-4">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Horas de proyecto por cumplir</mat-label>
+              <input type="number" matInput readonly="true" formControlName="p_hoursPracticeProject">
+              <mat-error>
+                Campo <strong>requerido</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>-->
+          <div class="col-4">
+            <mat-form-field>
+              <mat-label>Fecha de inicio</mat-label>
+              <input type="date" formControlName="p_initdateEstimated" #p_initdateEstimated matInput (click)="p_initdateEstimated.showPicker()">
+              <mat-icon style="cursor: pointer;" matSuffix (click)="p_initdateEstimated.showPicker()">calendar_month</mat-icon>
+              <mat-hint>dd/mm/aaaa</mat-hint>
+              <mat-error>
+                Campo <strong>requerido</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-4">
+            <mat-form-field>
+              <mat-label>Fecha de finalización</mat-label>
+              <input type="date" formControlName="p_enddateEstimated" #p_enddateEstimated matInput (click)="p_enddateEstimated.showPicker()"
+              [min]="p_initdateEstimated.value" (change)="dateDiff();">
+              <mat-icon style="cursor: pointer;" matSuffix (click)="p_enddateEstimated.showPicker()">calendar_month</mat-icon>
+              <mat-hint>dd/mm/aaaa</mat-hint>
+              <mat-error>
+                Campo <strong>requerido</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-4">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Número de días del proyecto</mat-label>
+              <input type="number" matInput formControlName="p_numberDaysProject" readonly="true">
+              <mat-error>
+                Campo <strong>requerido</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-4">
+            <div style="text-align: center;">
+            <h3>Beneficiarios del proyecto:</h3>
+            </div>
+          </div>
+          <div class="col-4">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Beneficiario</mat-label>
+              <mat-select formControlName="p_ruc">
+                <mat-option *ngFor="let item of agreementConventions" [value]="item.ruc" (onSelectionChange)="getCodeProject($event, item)">{{item.bussinesName}}</mat-option>
+              </mat-select>
+              <mat-error>
+                Campo <strong>requerido</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-4">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Número de beneficiarios</mat-label>
+              <input type="text" matInput formControlName="p_numberBeneficiaries" oninput="this.value=this.value.replace(/[^\d]/,'')">
+              <mat-error>
+                Campo <strong>requerido</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-12">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Nro de código de convenio</mat-label>
+              <input type="text" matInput formControlName="p_numberCodeProject" readonly="true">
+              <mat-error>
+                Campo <strong>requerido</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-10"></div>
+          <div class="col-2" style="text-align: right;">
+            <button *ngIf="!isUpdating" type="button" mat-raised-button class="styleButton_sml" style="max-width: 100px;" (click)="validations(false);">Guardar</button>
+            <button *ngIf="isUpdating" type="button" mat-raised-button class="styleButton_sml" style="max-width: 100px;" (click)="validations(true);">Actualizar</button>
+          </div>
+        </div>
+        <br>
+      </form>
+    </div>
+  </div>
+</ng-container>

@@ -1,0 +1,48 @@
+<mat-dialog-content>
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-10">
+            <h3>{{data.message}}</h3>
+          </div>
+          <div class="col-md-2" style="text-align: right;">
+            <mat-icon style="cursor: pointer;" (click)="dialogRef.close()" class="red-icon" matRipple>close</mat-icon>
+          </div>
+        </div>
+        <form  [formGroup]="form" (ngSubmit)="submit(form)">
+          <div class="row">
+            <div class="col-md-12">
+              <mat-form-field class="width" appearance="outline">
+                <label>{{data.label1}}</label>
+                <input matInput formControlName="in1" name="Nombre Escuela" field="Escuela">
+                <mat-error>
+                  Campo <strong>requerido</strong>
+                </mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-md-12">
+              <mat-form-field class="width" appearance="outline">
+                <label>{{data.label2}}</label>
+                <textarea type="text" matInput formControlName="in2" style="text-transform:uppercase"></textarea>
+                <mat-error>
+                  Campo <strong>requerido</strong>
+                </mat-error>
+              </mat-form-field>
+            </div>
+          </div>
+          <mat-dialog-actions>
+            <div>
+            </div>
+            <div>
+              <button type="submit" mat-raised-button class="styleButton_sml" style="width: 100px;">Guardar</button>
+              <button type="button" mat-raised-button class="styleButton_gray" style="width: 100px;" (click)="dialogRef.close()">Cerrar</button>
+            </div>
+          </mat-dialog-actions>
+        </form>
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>
+
+

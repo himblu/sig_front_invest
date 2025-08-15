@@ -1,0 +1,29 @@
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+body {
+	background-color: rgb(221, 238, 243);
+}
+
+.cont {
+	margin-top: 235px;
+	margin-left: 275px;
+	margin-right: 275px;
+	margin-bottom: 150px;
+	border: 1px solid black;
+	border-radius: 10px;
+	background: rgba(231, 241, 241, 0.9);
+	position: relative;
+}
+
+.img-bg {
+  opacity: 0.5;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}

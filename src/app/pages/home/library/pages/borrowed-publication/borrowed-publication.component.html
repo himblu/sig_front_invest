@@ -1,0 +1,407 @@
+<section [formGroup]="form" class="mt-3">
+  <div class="row">
+    <div class="col-12 col-md-6 col-lg-3">
+      <mat-form-field>
+        <mat-label>Buscar por Título, Solicitante, Edición,ISBN...</mat-label>
+        <input type="text" formControlName="search" matInput>
+      </mat-form-field>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-3">
+      <mat-form-field>
+        <mat-label>Carreras</mat-label>
+        <mat-select formControlName="majors" (selectionChange)="getBorrowedPublications();">
+
+          <mat-option value="">Buscar por todas las carreras</mat-option>
+          <mat-option  *ngFor="let career of careers" [value]="career.careerID">
+            {{ career.careerName }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-3">
+      <mat-form-field>
+        <mat-label>Tipo de Documento</mat-label>
+        <mat-select formControlName="publicationType" (selectionChange)="getBorrowedPublications();">
+          <mat-option value="">Todos</mat-option>
+          <mat-option *ngFor="let publicationType of publicationTypes" [value]="publicationType.publicationTypeID">
+            {{ publicationType.publicationTypeDesc }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-3">
+      <mat-form-field>
+        <mat-label>Estado de Préstamo</mat-label>
+        <mat-select formControlName="status" (selectionChange)="getBorrowedPublications();">
+          <mat-option value="">Todos</mat-option>
+          <mat-option *ngFor="let item of publicationStatuses" [value]="item.requestStatusID">
+            {{ item.requestStatusName }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div style="position: relative;">
+    <spinner-loader [absolute]="true" *ngIf="isLoadingBorrowedPublications"></spinner-loader>
+    <mat-table [dataSource]="dataSource" matSort (matSortChange)="getBorrowedPublications(true,$event);" multiTemplateDataRows>
+      <!-- documentNumber -->
+      <ng-container matColumnDef="documentNumber">
+        <mat-header-cell *matHeaderCellDef>Documento</mat-header-cell>
+        <mat-cell class="mat-cell" *matCellDef="let row;"> {{ row.documentNumber }} </mat-cell>
+      </ng-container>
+
+      <!-- names -->
+      <ng-container matColumnDef="names">
+        <mat-header-cell *matHeaderCellDef>Nombres</mat-header-cell>
+        <mat-cell class="mat-cell" *matCellDef="let row;"> {{ row.names + ' ' + row.surname + ' ' + row.secondSurname }} </mat-cell>
+      </ng-container>
+
+      <!-- numberPhone -->
+      <ng-container matColumnDef="numberPhone">
+        <mat-header-cell *matHeaderCellDef>Teléfono</mat-header-cell>
+        <mat-cell class="mat-cell" *matCellDef="let row">{{ row.numberPhone || 'N/D' }}</mat-cell>
+      </ng-container>
+
+<!--      &lt;!&ndash; email &ndash;&gt;-->
+<!--      <ng-container matColumnDef="email">-->
+<!--        <mat-header-cell *matHeaderCellDef>Correo</mat-header-cell>-->
+<!--        <mat-cell class="mat-cell" *matCellDef="let row;"> {{ row.email | lowercase }} </mat-cell>-->
+<!--      </ng-container>-->
+
+<!--      &lt;!&ndash; codeISBN &ndash;&gt;-->
+<!--      <ng-container matColumnDef="codeISBN">-->
+<!--        <mat-header-cell *matHeaderCellDef>ISBN/ISSN</mat-header-cell>-->
+<!--        <mat-cell class="mat-cell" *matCellDef="let row">{{ row.codeISBN || 'N/D' }}</mat-cell>-->
+<!--      </ng-container>-->
+
+      <!-- careerName -->
+      <ng-container matColumnDef="careerName">
+        <mat-header-cell *matHeaderCellDef>Carrera</mat-header-cell>
+        <mat-cell class="mat-cell" *matCellDef="let row">{{ row.careerName || 'N/A' }}</mat-cell>
+      </ng-container>
+
+      <!-- studyPlanDesc -->
+      <ng-container matColumnDef="studyPlanDesc">
+        <mat-header-cell *matHeaderCellDef>Malla Curricular </mat-header-cell>
+        <mat-cell class="mat-cell" *matCellDef="let row">{{ row.studyPlanDesc || 'N/A' }}</mat-cell>
+      </ng-container>
+
+      <!-- modalityName -->
+      <ng-container matColumnDef="modalityName">
+        <mat-header-cell *matHeaderCellDef>Modalidad</mat-header-cell>
+        <mat-cell class="mat-cell" *matCellDef="let row">{{ row.modalityName || 'N/D' }}</mat-cell>
+      </ng-container>
+
+      <!-- dateRequest -->
+      <ng-container matColumnDef="dateRequest">
+        <mat-header-cell *matHeaderCellDef>Fecha Préstamo</mat-header-cell>
+        <mat-cell class="mat-cell" *matCellDef="let row">{{ row.dateRequest | date: 'dd-MM-yyyy HH:mm': 'UTC-5'  }}</mat-cell>
+      </ng-container>
+
+      <!-- statusDesc -->
+      <ng-container matColumnDef="requestStatusID">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>Estado</mat-header-cell>
+        <mat-cell class="mat-cell" *matCellDef="let row">
+          <span
+            class="badge"
+            [style.color]="row.fontColor"
+            [style.background-color]="row.backgroundColor">
+            {{ row.requestStatusName }}
+          </span>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="expandedDetail">
+        <mat-cell class="mat-cell-expanded" *matCellDef="let element" [attr.colspan]="displayedColumnsWithDetail.length">
+          <div
+            class="example-element-detail w-100"
+            [ngClass]="{ 'mt-2 mb-2': element === expandedElement }"
+            [@detailExpand]="element === expandedElement ? 'expanded' : 'collapsed'">
+            <div *ngIf="isLoadingBorrowedPublicationDetail" class="justify-content-center d-flex">
+              <mat-progress-spinner color="primary" mode="indeterminate"></mat-progress-spinner>
+            </div>
+            <table *ngIf="!isLoadingBorrowedPublicationDetail && selectedBorrowedPublicationDetail && selectedBorrowedPublicationDetail.requestID === element?.requestID">
+              <thead>
+              <tr>
+<!--                <th colspan="1">ID Publicación</th>-->
+                <th colspan="1">Título</th>
+                <th colspan="1">Edición</th>
+                <th colspan="1">Fecha Estimada Devolución</th>
+                <th colspan="1">Fecha Devolución</th>
+                <th colspan="1">Estado</th>
+                <th colspan="1">Acciones</th>
+              </tr>
+              </thead>
+              <tbody>
+              <ng-container>
+                <tr *ngFor="let publication of selectedBorrowedPublicationDetail?.publications;">
+<!--                  <td data-label="ID Publicación">{{ publication.titlePublicationID }}</td>-->
+                  <td data-label="Título">{{ publication.title }}</td>
+                  <td data-label="Edición">{{ publication.edition }}</td>
+                  <td data-label="Fecha Estimada Devolución">{{ publication.dateDelivery ? (publication.dateDelivery  | date: 'dd-MM-yyyy HH:mm': 'UTC-5') : 'N/D' }}</td>
+                  <td data-label="Fecha Devolución">{{ publication.dateReturn ? (publication.dateReturn | date: 'dd-MM-yyyy HH:mm': 'UTC-5') : 'N/D' }}</td>
+                  <td
+                    cdkOverlayOrigin
+                    #trigger2="cdkOverlayOrigin"
+                    style="cursor: pointer;"
+                    (mouseenter)="publication.showObservationOverlay = true;"
+                    (mouseleave)="publication.showObservationOverlay = false;"
+                    data-label="Estado">
+                      <span
+                        class="badge"
+                        [style.color]="publication.fontColor"
+                        [style.background-color]="publication.backgroundColor">
+                        {{ publication.requestStatusName }}
+                      </span>
+                      <ng-template
+                        cdkConnectedOverlay
+                        [cdkConnectedOverlayOrigin]="trigger2"
+                        [cdkConnectedOverlayOpen]="publication.showObservationOverlay">
+                        <div style="min-width: 400px; width: 400px; max-width: 400px; min-height: 60px; background: white;">
+                          <p class="p-2" style="letter-spacing: 0; font-size: 14px;">{{ publication.observation || 'No existe una observación de esta solicitud' }}</p>
+                        </div>
+                      </ng-template>
+                  </td>
+                  <td data-label="Acciones">
+                    <div class="d-flex">
+                      <button
+                        class="blue-icon"
+                        mat-icon-button
+                        [matMenuTriggerFor]="menuDetail" #menuTrigger="matMenuTrigger">
+                        <mat-icon>more_vert</mat-icon>
+                      </button>
+                      <mat-menu [xPosition]="'before'" #menuDetail="matMenu">
+                        <button
+                          mat-menu-item
+                          (click)="publication.openOverlay = true"
+                          cdkOverlayOrigin
+                          #trigger2="cdkOverlayOrigin"
+                          [disabled]="publication.requestStatusID !== REQUESTED_PUBLICATION_STATUS.PENDING">
+                          <mat-icon [ngClass]="{ 'grey-icon': publication.requestStatusID !== REQUESTED_PUBLICATION_STATUS.PENDING }" class="red-icon">close</mat-icon>
+                          <span class="item">Rechazar Préstamo</span>
+                        </button>
+
+                        <button
+                          mat-menu-item
+                          (click)="approveRequestedPublicationDetail(publication)"
+                          [disabled]="publication.requestStatusID !== REQUESTED_PUBLICATION_STATUS.PENDING"
+                          [ngClass]="{ 'grey-icon': publication.requestStatusID !== REQUESTED_PUBLICATION_STATUS.PENDING }">
+                          <mat-icon class="green-icon">done</mat-icon>
+                          <span class="item">Aprobar Préstamo</span>
+                        </button>
+                        <button
+                          cdkOverlayOrigin
+                          #trigger3="cdkOverlayOrigin"
+                          (click)="openReturnForm(publication);"
+                          [ngClass]="{ 'grey-icon': publication.requestStatusID !== REQUESTED_PUBLICATION_STATUS.APPROVED || publication.dateReturn !== null }"
+                          [disabled]="publication.requestStatusID !== REQUESTED_PUBLICATION_STATUS.APPROVED || publication.dateReturn !== null"
+                          mat-menu-item>
+                          <mat-icon class="blue-icon">assignment_return</mat-icon>
+                          <span class="item">Registrar Devolución</span>
+                        </button>
+                        <button
+                          mat-menu-item
+                          (click)="downloadFile(publication)">
+                          <mat-icon class="red-icon">picture_as_pdf</mat-icon>
+                          <span class="item">Descargar Ficha de Documento</span>
+                        </button>
+                      </mat-menu>
+                    </div>
+                  </td>
+                  <ng-template
+                    cdkConnectedOverlay
+                    [cdkConnectedOverlayHasBackdrop]="true"
+                    (backdropClick)="publication.openOverlay = false; resetRequestedPublicationDetailFormManager();"
+                    (detach)="publication.openOverlay = false; resetRequestedPublicationDetailFormManager();"
+                    [cdkConnectedOverlayScrollStrategy]="overlay.scrollStrategies.close()"
+                    [cdkConnectedOverlayOrigin]="trigger3"
+                    [cdkConnectedOverlayOpen]="publication.openOverlay">
+                    <div
+                      class="mat-elevation-z4"
+                      style="border-radius: 4px; min-width: 600px; width: 600px; max-width: 600px; min-height: 60px; position: relative; background: white;">
+                      <form [formGroup]="manageRequestedPublicationDetailForm">
+                        <div class="p-2">
+                          <div>
+                            <mat-form-field>
+                              <mat-label>Escriba el motivo del rechazo de la solicitud</mat-label>
+                              <textarea style="min-height: 150px; max-height: 150px; height: 150px;" type="text" matInput formControlName="observation"></textarea>
+                            </mat-form-field>
+                          </div>
+                          <div class="d-flex justify-content-end">
+                            <div>
+                              <button mat-raised-button color="primary" style="background: #014898" (click)="rejectRequestPublicationDetailStatus(publication);">
+                                  <span style="letter-spacing: 0; font-size: 12px">
+                                    Rechazar Solicitud de esta Publicación
+                                  </span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </ng-template>
+                  <ng-template
+                    cdkConnectedOverlay
+                    [cdkConnectedOverlayHasBackdrop]="true"
+                    (backdropClick)="publication.openOverlayReturnForm = false; resetReturnPublicationDetailFormManager();"
+                    (detach)="publication.openOverlayReturnForm = false; resetReturnPublicationDetailFormManager();"
+                    [cdkConnectedOverlayScrollStrategy]="overlay.scrollStrategies.close()"
+                    [cdkConnectedOverlayOrigin]="trigger3"
+                    [cdkConnectedOverlayOpen]="publication.openOverlayReturnForm">
+                    <div
+                      class="modal-container"
+                      style="border-radius: 4px; min-width: 600px; max-width: 600px; min-height: 60px; background: white;">
+                      <form [formGroup]="returnRequestedPublicationDetailForm">
+                        <div class="p-2 row">
+                          <h3 class="col-12 text-center mt-2" style="letter-spacing: 0; text-transform: uppercase; font-weight: 500">Devolución de Documento</h3>
+                          <div class="mt-3 col-12">
+                            <mat-form-field>
+                              <mat-label>Estado de Documento</mat-label>
+                              <mat-select formControlName="condition">
+                                <mat-option *ngFor="let publicationCondition of publicationsCondition;" [value]="publicationCondition.physicalQualityID">
+                                  <span>{{ publicationCondition.physicalQualityDesc }}</span>
+                                </mat-option>
+                              </mat-select>
+                            </mat-form-field>
+                          </div>
+                          <div class="col-6">
+                            <mat-form-field>
+                              <mat-label>Fecha de Devolución</mat-label>
+                              <input (click)="picker.open();" [min]="minDate" [max]="maxDate" matInput [matDatepicker]="picker" formControlName="returnDate">
+                              <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                              <mat-datepicker #picker></mat-datepicker>
+                            </mat-form-field>
+                          </div>
+                          <div class="col-6">
+                            <mat-form-field>
+                              <mat-label>Hora de Devolución</mat-label>
+                              <input type="time" matInput formControlName="returnHour">
+                            </mat-form-field>
+                          </div>
+                          <div class="col-12">
+                            <mat-form-field>
+                              <mat-label>Observación</mat-label>
+                              <textarea style="min-height: 100px; max-height: 100px; height: 100px;" type="text" matInput formControlName="observation"></textarea>
+                            </mat-form-field>
+                          </div>
+                          <div class="d-flex justify-content-end col-12">
+                            <div>
+                              <button mat-raised-button color="primary" style="background: #014898" (click)="registerPublicationDetailReturn(publication, element);">
+                                <span style="letter-spacing: 0; font-size: 12px">
+                                  Registrar Devolución
+                                </span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </ng-template>
+                </tr>
+                <tr *ngIf="!selectedBorrowedPublicationDetail?.publications.length">
+                  <td colspan="7">No existe información de esta solicitud. Si cree que esto es un error, contacte al administrador.</td>
+                </tr>
+              </ng-container>
+              </tbody>
+            </table>
+          </div>
+        </mat-cell>
+      </ng-container>
+
+      <!-- actions -->
+      <ng-container matColumnDef="actions">
+        <mat-header-cell *matHeaderCellDef><span>Acciones</span></mat-header-cell>
+        <mat-cell class="mat-cell" *matCellDef="let row">
+          <button
+            class="blue-icon"
+            mat-icon-button
+            (click)="$event.stopPropagation();" [matMenuTriggerFor]="menu" #menuTrigger="matMenuTrigger">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu [xPosition]="'before'" #menu="matMenu">
+            <button
+              (click)="approveRequestedPublication(row)"
+              mat-menu-item [disabled]="row.requestStatusID !== REQUESTED_PUBLICATION_STATUS.PENDING">
+              <mat-icon class="green-icon">done</mat-icon>
+              <span class="item">Aprobar Solicitud</span>
+            </button>
+
+            <button
+              cdkOverlayOrigin
+              #trigger="cdkOverlayOrigin"
+              mat-menu-item
+              [disabled]="row.requestStatusID !== REQUESTED_PUBLICATION_STATUS.PENDING"
+              (click)="row.openOverlay = true">
+              <mat-icon class="red-icon">close</mat-icon>
+              <span class="item">Rechazar Solicitud</span>
+            </button>
+          </mat-menu>
+          <ng-template
+            cdkConnectedOverlay
+            [cdkConnectedOverlayHasBackdrop]="true"
+            (backdropClick)="row.openOverlay = false; resetRequestedPublicationFormManager();"
+            (detach)="row.openOverlay = false; resetRequestedPublicationFormManager();"
+            [cdkConnectedOverlayScrollStrategy]="overlay.scrollStrategies.close()"
+            [cdkConnectedOverlayOrigin]="trigger"
+            [cdkConnectedOverlayOpen]="row.openOverlay">
+            <div
+              class="mat-elevation-z4"
+              style="border-radius: 4px; min-width: 600px; width: 600px; max-width: 600px; min-height: 60px; position: relative; background: white;">
+              <form [formGroup]="manageRequestedPublicationForm">
+                <div class="p-2">
+                  <div>
+                    <mat-form-field>
+                      <mat-label>Escriba el motivo del rechazo de la solicitud</mat-label>
+                      <textarea style="min-height: 150px; max-height: 150px; height: 150px;" type="text" matInput formControlName="observation"></textarea>
+                    </mat-form-field>
+                  </div>
+                  <div class="d-flex justify-content-end">
+                    <div>
+                      <button mat-raised-button color="primary" style="background: #014898" (click)="rejectRequestPublicationStatus(row);">
+                          <span style="letter-spacing: 0; font-size: 12px">
+                            Rechazar Solicitud
+                          </span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </ng-template>
+        </mat-cell>
+        <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+      </ng-container>
+
+      <!-- noData -->
+      <ng-container matColumnDef="noData">
+        <mat-footer-cell *matFooterCellDef>
+          <p *ngIf="!borrowedPublications.length">No hay resultados que coincidan con los términos de búsqueda</p>
+        </mat-footer-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row
+        *matRowDef="let element; columns: displayedColumns;"
+        class="example-element-row"
+        [class.example-expanded-row]="expandedElement === element && element !== null"
+        (click)="getRequestedPublication(element)"></mat-row>
+      <mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></mat-row>
+      <mat-footer-row *matFooterRowDef="['noData']" [ngClass]="{'hide': borrowedPublications.length }"></mat-footer-row>
+    </mat-table>
+
+    <mat-paginator
+      #paginator
+      showFirstLastButtons
+      [length]="length"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="pageSizeOptions"
+      (page)="pageEvent = getPublicationsPaginator($event)">
+    </mat-paginator>
+  </div>
+</section>

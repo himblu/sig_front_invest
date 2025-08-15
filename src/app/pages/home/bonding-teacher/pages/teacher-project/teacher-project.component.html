@@ -1,0 +1,249 @@
+<div class="row animated fadeIn fast" *ngIf="loading; else body;">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<ng-template #body>
+  <mat-vertical-stepper [linear]="isLinear" #vStepper>
+    <mat-step>
+      <ng-template matStepLabel>Objetivos específicos:</ng-template>
+        <form>
+          <div class="card" style="background-color: rgb(221, 238, 243);">
+            <div class="card-body" [formGroup]="objetivesFormGroup">
+              <div class="row pr-2 pl-2" formArrayName="objetives">
+                <ng-container *ngFor="let project of projectObjetives; let i=index;" [formGroupName]="i">
+                  <div class="col-12">
+                    <h3>{{i+1}}: {{project.specificDescription}}</h3>
+                  </div>
+                  <div class="col-12">
+                    <table class="table" style="border: solid 1px #004899;">
+                      <thead style="background-color: #004899; color: white;">
+                        <tr>
+                          <th>Actividad</th>
+                          <th>Fecha inicio</th>
+                          <th>Fecha fin</th>
+                          <th>Indicador</th>
+                          <th>Medios verificación</th>
+                          <th style="cursor: pointer;"
+                            matTooltipPosition="above"
+                            matTooltip="Menos 50% rojo,
+                            51% - 99% amarillo,
+                            100% verde">
+                            Cumplimiento
+                          </th>
+                          <th>Observación</th>
+                          <th style="text-align: center;"></th>
+                        </tr>
+                      </thead>
+                      <tbody formArrayName="activities">
+                        <tr *ngFor="let item of getActivitiesRow(i).controls; let index=index;" [formGroupName]="index">
+                          <td>
+                            <div style="max-height: 50px; max-width: 175px;">
+                              <mat-form-field class="width" appearance="outline">
+                                <mat-label>Nombre</mat-label>
+                                <textarea matInput type="text" formControlName="activityName"></textarea>
+                                <mat-error></mat-error>
+                              </mat-form-field>
+                            </div>
+                          </td>
+                          <td>
+                            <div style="max-height: 50px; max-width: 100px;">
+                              <mat-form-field class="width" appearance="outline"
+                                matTooltip="{{initDateActivity.value}}">
+                                <mat-label>Fecha inicio</mat-label>
+                                <input type="date" formControlName="initDateActivity" #initDateActivity matInput (click)="initDateActivity.showPicker()">
+                                <mat-icon style="cursor: pointer;" matSuffix (click)="initDateActivity.showPicker()">calendar_month</mat-icon>
+                                <mat-hint>dd/mm/aaaa</mat-hint>
+                                <mat-error></mat-error>
+                              </mat-form-field>
+                            </div>
+                          </td>
+                          <td>
+                            <div style="max-height: 50px; max-width: 100px;">
+                              <mat-form-field class="width" appearance="outline"
+                                matTooltip="{{endDateActivity.value}}">
+                                <mat-label>Fecha fin</mat-label>
+                                <input type="date" formControlName="endDateActivity" #endDateActivity matInput (click)="endDateActivity.showPicker()">
+                                <mat-icon style="cursor: pointer;" matSuffix (click)="endDateActivity.showPicker()">calendar_month</mat-icon>
+                                <mat-hint>dd/mm/aaaa</mat-hint>
+                                <mat-error></mat-error>
+                              </mat-form-field>
+                            </div>
+                          </td>
+                          <td>
+                            <div style="max-height: 50px; max-width: 175px;">
+                              <mat-form-field class="width" appearance="outline">
+                                <mat-label>Indicador</mat-label>
+                                <textarea matInput type="text" formControlName="indicator"></textarea>
+                                <mat-error></mat-error>
+                              </mat-form-field>
+                            </div>
+                          </td>
+                          <td>
+                            <div style="max-height: 50px; max-width: 175px;">
+                              <mat-form-field class="width" appearance="outline">
+                                <mat-label>Medios verificación</mat-label>
+                                <textarea matInput type="text" formControlName="verificationMean"></textarea>
+                                <mat-error></mat-error>
+                              </mat-form-field>
+                            </div>
+                          </td>
+                          <td>
+                            <div style="max-height: 50px; max-width: 85px;">
+                              <mat-form-field class="width" appearance="outline">
+                                <mat-label [ngClass]="{'red': +compliance.value < 50, 'yellow': +compliance.value > 50, 'green': +compliance.value === 100}">Cumplimiento</mat-label>
+                                <input matInput type="number" formControlName="compliance" #compliance [min]="0" [max]="100">
+                                <mat-error></mat-error>
+                              </mat-form-field>
+                            </div>
+                          </td>
+                          <td>
+                            <div style="max-height: 50px; max-width: 175px;">
+                              <mat-form-field class="width" appearance="outline">
+                                <mat-label>Observación</mat-label>
+                                <textarea matInput type="text" formControlName="observation"></textarea>
+                                <mat-error></mat-error>
+                              </mat-form-field>
+                            </div>
+                          </td>
+                          <td style="text-align: center;">
+                            <a style="cursor: pointer;"
+                              matTooltipPosition="above"
+                              matTooltip="Agregar"
+                              (click)="addActivitiesRow(i, project);"
+                              *ngIf="index === 0">
+                              <i style="color: blue;" class="fa fa-plus-circle" aria-hidden="true"></i>
+                            </a>
+                            <a style="cursor: pointer;"
+                              matTooltipPosition="above"
+                              matTooltip="Eliminar"
+                              (click)="deleteActivitiesRow(i, index);"
+                              *ngIf="index > 0">
+                              <i style="color: red;" class="fa fa-minus-circle" aria-hidden="true"></i>
+                            </a>
+                          </td>
+                        </tr>
+                        <tr *ngIf="!getActivitiesRow(i).length">
+                          <td colspan="6" style="text-align: center;">Agregar actividad</td>
+                          <td style="text-align: center;">
+                            <a style="cursor: pointer;" matTooltipPosition="above" matTooltip="Agregar" (click)="addActivitiesRow(i, project);">
+                              <i style="color: blue;" class="fa fa-plus-circle" aria-hidden="true"></i>
+                            </a>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </ng-container>
+              </div>
+              <div class="row">
+                <div class="col-10"></div>
+                <div class="col-2">
+                  <button *ngIf="isLinear" type="button" mat-raised-button class="styleButton_sml" (click)="postActivities();">Siguiente</button>
+                  <button *ngIf="!isLinear" type="button" mat-raised-button class="styleButton_sml" matStepperNext>Siguiente</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+    </mat-step>
+    <mat-step>
+      <ng-template matStepLabel>Actividades:</ng-template>
+        <form>
+          <div class="card" style="background-color: rgb(221, 238, 243);">
+            <div class="card-body" [formGroup]="activitiesFormGroup">
+              <div class="row pr-2 pl-2" formArrayName="objetives">
+                <ng-container *ngFor="let objetive of projectActivitiesByObjetive; let i=index;" [formGroupName]="i">
+                  <div class="col-12">
+                    <h3>{{i+1}}: {{objetive.specificDescription}}</h3>
+                  </div>
+                  <div class="col-12">
+                    <table class="table" style="border: solid 1px #004899;">
+                      <thead style="background-color: #004899; color: white;">
+                        <tr>
+                          <th>Actividad</th>
+                          <th>Tiempo estimado</th>
+                          <th>Presupuesto ITCA</th>
+                          <th>Presupuesto Otros</th>
+                          <th>Total</th>
+                        </tr>
+                      </thead>
+                      <tbody formArrayName="activities">
+                        <tr *ngFor="let item of objetive.activities; let index=index;" [formGroupName]="index">
+                          <td>A{{index+1}}: {{item.activityName}}</td>
+                          <td>
+                            <div style="max-height: 40px; max-width: 175px;">
+                              <mat-form-field class="width" appearance="outline">
+                                <mat-label>Horas</mat-label>
+                                <input matInput type="number" formControlName="hours" [min]="0">
+                                <mat-error></mat-error>
+                              </mat-form-field>
+                            </div>
+                          </td>
+                          <td>
+                            <div style="max-height: 40px; max-width: 175px;">
+                              <mat-form-field class="width" appearance="outline">
+                                <mat-label>ITCA</mat-label>
+                                <input matInput type="number" formControlName="itca" #itca [min]="0">
+                                <mat-error></mat-error>
+                              </mat-form-field>
+                            </div>
+                          </td>
+                          <td>
+                            <div style="max-height: 40px; max-width: 175px;">
+                              <mat-form-field class="width" appearance="outline">
+                                <mat-label>Otros</mat-label>
+                                <input matInput type="number" formControlName="other" #other [min]="0">
+                                <mat-error></mat-error>
+                              </mat-form-field>
+                            </div>
+                          </td>
+                          <td>
+                            <div style="max-height: 40px; max-width: 175px;">
+                              <mat-form-field class="width" appearance="outline">
+                                <mat-label>Total</mat-label>
+                                <input matInput type="number" readonly="true" [value]="(+itca.value) + (+other.value)">
+                                <mat-error></mat-error>
+                              </mat-form-field>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </ng-container>
+              </div>
+              <div class="row">
+                <ng-container *ngIf="projectValidation?.length; else col;">
+                  <div class="col-4"></div>
+                  <div class="col-3">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Total de horas</mat-label>
+                      <input matInput type="number" readonly="true" formControlName="projectPracticeHours">
+                      <mat-error>Máximo {{projectValidation[0].projectPracticeHours}}</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-3">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Total de presupuesto</mat-label>
+                      <input matInput type="number" readonly="true" formControlName="budgeted">
+                      <mat-error>Máximo {{projectValidation[0].budgeted}}</mat-error>
+                    </mat-form-field>
+                  </div>
+                </ng-container>
+                <ng-template #col><div class="col-10"></div></ng-template>
+                <div class="col-2">
+                  <button type="button" mat-raised-button class="styleButton_sml" (click)="putActivities();">Guardar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+    </mat-step>
+  </mat-vertical-stepper>
+</ng-template>

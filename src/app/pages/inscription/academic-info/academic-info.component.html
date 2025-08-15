@@ -1,0 +1,216 @@
+<div class="animated fadeIn fast">
+  <div class="row">
+    <div class="col-md-12 mb-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-8">
+              <h1 class="">Inscripción</h1>
+            </div>
+            <div class="col-4">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-body">
+          <form [formGroup]="academicInfoForm" >
+            <div class="row">
+              <div class="" [ngClass]="{'col-4': !haveWorkDay, 'col-3': haveWorkDay}">
+                <mat-form-field class="" appearance="outline">
+                  <mat-label>Sede</mat-label>
+                  <mat-select formControlName="branchID">
+                      <mat-option *ngFor="let i of campus" [value]="i.campusID">{{i.campusName}}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="" [ngClass]="{'col-4': !haveWorkDay, 'col-3': haveWorkDay}">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Modalidad</mat-label>
+                  <mat-select formControlName="modalityID" (selectionChange)="selectModality()">
+                      <mat-option *ngFor="let o of modalities" [value]="o.modalityID">{{o.modalityDesc}}</mat-option>
+                  </mat-select>
+                </mat-form-field>  
+              </div>
+              <div class="col-3" *ngIf="haveWorkDay">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Jornada</mat-label>
+                  <mat-select formControlName="workingDayID" (selectionChange)="selectWorkingDay()">
+                      <mat-option *ngFor="let o of workingDays" [value]="o.workingOrModuleID">{{o.workingOrModuleDesc | uppercase}}</mat-option>
+                  </mat-select>
+                </mat-form-field>  
+              </div>
+              <div class="" *ngIf="(workingDays.length && academicInfoForm.controls['workingDayID'].value) || !workingDays.length" [ngClass]="{'col-4': !haveWorkDay, 'col-3': haveWorkDay}">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Carrera Profesional</mat-label>
+                  <mat-select formControlName="careerID" (selectionChange)="selectCareer()">
+                      <mat-option *ngFor="let o of careers" [value]="o.careerID">{{o.careerName}}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-12 mb-3">
+                <div class="card">
+                  <div class="card-header">
+                    DATOS DE FORMACIÓN ACADÉMICA
+                  </div>
+                  <div class="card-body">
+                    <div class="form-row">
+                      <div class="col-6">
+                        <mat-form-field class="width" appearance="outline">
+                          <mat-label>Título de Bachiller</mat-label>
+                          <input type="text" formControlName="degreeTitle" matInput>
+                          <!-- <mat-error *ngIf="isValidField('teachingContact')">{{getFielError('teachingContact')}}</mat-error> -->
+                        </mat-form-field>
+                      </div>
+                      <div class="col-3">
+                        <mat-checkbox color="primary" (change)="filterCollegeType()" formControlName="bachalorExtern" >
+                          Bachiller Extranjero
+                        </mat-checkbox>
+                      </div>
+                      <div class="col-3">
+                        <!-- <mat-checkbox color="primary" formControlName="studentGrant" >
+                          Tiene BECA
+                        </mat-checkbox> -->
+                      </div>
+                      <div class="col-4" *ngIf="academicInfoForm.get('bachalorExtern').value">
+                        <mat-form-field class="width" appearance="outline">
+                          <mat-label>País</mat-label>
+                          <mat-select formControlName="countryID" (selectionChange)="filterCollegeType()">
+                              <mat-option *ngFor="let o of countries" [value]="o.countryID">{{o.countryName | uppercase}}</mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+                      <div class="" [ngClass]="{'col-4': academicInfoForm.get('bachalorExtern').value, 'col-6': !academicInfoForm.get('bachalorExtern').value}">
+                        <mat-form-field class="width" appearance="outline">
+                          <mat-label>Tipo de Colegio</mat-label>
+                          <mat-select formControlName="collegeTypeID" (selectionChange)="filterCollegeType()">
+                              <mat-option *ngFor="let o of collegeTypes" [value]="o.collegeTypeID">{{o.collegeTypeName | uppercase}}</mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+                      <div class="" [ngClass]="{'col-3': academicInfoForm.get('bachalorExtern').value, 'col-5': !academicInfoForm.get('bachalorExtern').value}">
+                        <mat-form-field class="width" appearance="outline">
+                          <mat-label>Busca Colegio</mat-label>
+                          <input type="text"
+                            placeholder="Pick one"
+                            aria-label="Number"
+                            matInput
+                            [formControl]="myControl"
+                            [matAutocomplete]="auto"
+                          >
+                          <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                            <mat-option *ngFor="let c of filteredOptions | async" [value]="c">{{c}}</mat-option>
+                          </mat-autocomplete>
+                        </mat-form-field>
+                      </div>
+                      <div class="col-1">
+                        <button class="btn btn-sm btn-block bg-primary-color" [disabled]="!academicInfoForm.get('countryID').value || !academicInfoForm.get('collegeTypeID').value || newPostulant.editing" (click)="toggleCollege()">
+                          <i class="fa fa-plus mr-1"></i>Nuevo
+                        </button>
+                      </div>
+                      
+                      <div class="col-4">
+                        <mat-form-field class="width" appearance="outline">
+                          <mat-label>Nota de Grado</mat-label>
+                          <input type="number" max="20" min="1" formControlName="degreeScore" matInput>
+                          <mat-error *ngIf="academicInfoForm.controls['degreeScore'].errors && (academicInfoForm.controls['degreeScore'].errors['min'] || academicInfoForm.controls['degreeScore'].errors['max'])">La Nota debe estar comprendida entre 1 y 20</mat-error>
+                        </mat-form-field>
+                        <!-- <span class="text-danger" *ngIf="academicInfoForm.controls['degreeScore'].errors && (academicInfoForm.controls['degreeScore'].errors['min'] || academicInfoForm.controls['degreeScore'].errors['max'])">La Nota debe estar comprendida entre 1 y 20</span> -->
+                      </div>
+                      <div class="col-4">
+                        <mat-form-field class="width" appearance="outline">
+                          <mat-label>Nota de Conducta</mat-label>
+                          <input type="number"  max="20" min="1" formControlName="conductScore" matInput>
+                          <mat-error *ngIf="academicInfoForm.controls['conductScore'].errors && (academicInfoForm.controls['conductScore'].errors['min'] || academicInfoForm.controls['conductScore'].errors['max'])">La Nota debe estar comprendida entre 1 y 20</mat-error>
+                        </mat-form-field>
+                        <!-- <span class="text-danger" *ngIf="academicInfoForm.controls['conductScore'].errors && (academicInfoForm.controls['conductScore'].errors['min'] || academicInfoForm.controls['conductScore'].errors['max'])">La Nota debe estar comprendida entre 1 y 20</span> -->
+                      </div>
+                      <div class="col-4">
+                        <select name="yearGetDegree" formControlName="yearGetDegree" class="form-control">
+                          <option *ngFor="let y of currentYear-50 | range:currentYear" [value]="y">{{y}}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <a class="btn btn-light text-primary-color" [routerLink]="['../../informacion-de-discapacidad', userId]">
+                  <i class="fa fa-arrow-left mr-1"></i>Volver
+                </a>
+              </div>
+              <div class="col-6 text-right">
+                <button class="btn bg-primary-color text-white" [disabled]="academicInfoForm.invalid" (click)="toContinue()">
+                  Continuar<i class="fa fa-arrow-right ml-1"></i>
+                </button>
+              </div>
+              <!-- <div class="col-12">
+                <small class="text-primary">Archivos necesarios para la Inscripción:</small>
+              </div>
+              <div class="col-6">
+                <div class="form-group">
+                  <label for="titleGradeID" class="btn btn-custom">Subir Archivo de Titulo o Acta de Grado</label>
+                  <input type="file" id="titleGradeID" style="visibility: hidden; width: 0px !important;" name="titleGradeID" class="form-control">
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-group">
+                  <label for="documentNumberID" class="btn btn-custom">Subir Archivo de Cedula</label>
+                  <input type="file" id="documentNumberID" style="visibility: hidden; width: 0px !important;" name="documentNumberID" class="form-control">
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-group">
+                  <label for="voteCertificateID" class="btn btn-custom">Subir Archivo de Certificación de Votación</label>
+                  <input type="file" id="voteCertificateID" style="visibility: hidden; width: 0px !important;" name="voteCertificateID" class="form-control">
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-group">
+                  <label for="bloodTypeID" class="btn btn-custom">Subir Archivo de Tipo de Sangre</label>
+                  <input type="file" id="bloodTypeID" style="visibility: hidden; width: 0px !important;" name="bloodTypeID" class="form-control">
+                </div>
+              </div> -->
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div bsModal #collegeModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name2">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 id="dialog-sizes-name2" class="modal-title pull-left">
+          Nuevo Colegio
+        </h4>
+        <button type="button" class="btn btn-sm btn-light text-danger pull-right" aria-label="Close" (click)="toggleCollege()">
+          <span aria-hidden="true"><i class="fa fa-times"></i></span>
+        </button>
+      </div>
+      <div class="modal-body" style="max-height: 350px; overflow: auto;">
+        <form [formGroup]="collegeForm">
+          <div class="form-row">
+            <div class="col-12">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Nombre</mat-label>
+                <input type="text" formControlName="collegeName" matInput class="text-uppercase">
+                <!-- <mat-error *ngIf="isValidField('teachingContact')">{{getFielError('teachingContact')}}</mat-error> -->
+              </mat-form-field>
+            </div>
+            <div class="col-12 text-center">
+              <button class="btn btn-sm btn-primary" (click)="saveCollege()">
+                <i class="fa fa-save mr-1"></i>Crear
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

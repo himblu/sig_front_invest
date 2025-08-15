@@ -1,0 +1,336 @@
+<div class="animated fadeIn fast">
+  <div class="form-row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="form-row">
+            <div class="col-12">
+              <div class="alert alert-info" *ngIf="shoppingCart.disabled">
+                <i class="fa fa-exclamation mr-1"></i>No puedes editar esta información ya que no eres el titular/creador del carrito de compras.
+              </div>
+            </div>
+            <!-- Parte Central Izquierda: Lista de artículos en el carrito -->
+            <div class="" [ngClass]="{'col-md-12': !(newSale.detail && newSale.detail.length), 'col-md-8': newSale.detail && newSale.detail.length}">
+                <!-- Filtros en la parte superior de la sección central -->
+              <div class="filter-section">
+                <div class="form-row mb-3">
+                  <div class="col-12">
+                    <div class="input-group">
+                      <input type="text" class="form-control text-uppercase" name="filter.text" [(ngModel)]="filter.text" placeholder="BUSCAR POR TITULO, DESCRIPCIÓN y/o PRECIO">
+                      <!-- <div class="input-group-append">
+                        <button class="btn bg-primary-color" type="button">Buscar</button>
+                      </div> -->
+                    </div>
+                  </div>
+                  <!-- <div class="col-4 text-right">
+                    <select class="custom-select">
+                      <option selected>Ordenar por...</option>
+                      <option value="1">Precio</option>
+                      <option value="2">Categoría</option>
+                    </select>
+                  </div> -->
+                </div>
+              </div>
+
+              <!-- Lista de productos -->
+              <div class="scrollable-content p-2" style="max-height: 500px; overflow: auto;">
+                <div class="card mb-2" *ngFor="let r of shoppingCart.detail | filter:filter.text; let i = index">
+                  <div class="card-body p-0">
+                    <div class="form-row">
+                      <!-- <div class="col-4">
+                        <img src="{{r.urlImage}}" style="border-top-left-radius: 20px; border-bottom-left-radius: 20px;" height="100%" width="100%" alt="Imagen del producto">
+                      </div> -->
+                      <div class="col-12 p-3">
+                        <div class="form-row">
+                          <div class="col-11">
+                            <span class="font-xl font-title">{{r.courseName | uppercase}}</span> <br>
+                          </div>
+                          <div class="col-1 text-right">
+                            <button class="btn btn-light text-danger" (click)="deleteToShoppingCart(r, i)">
+                              <i class="fa fa-times"></i>
+                            </button>
+                          </div>
+                        </div>
+                        <hr>
+                        <p>{{r.courseDesc | uppercase}}</p> <br>
+                        <div class="form-row">
+                          <div class="col-6">
+                            <p class="card-text"><strong>Precio Unitario:</strong> ${{r.price | number:'1.2-2'}}</p>
+                          </div>
+                          <div class="col-6 text-right text-danger" *ngIf="r.observation">
+                            <i class="fa fa-comment mr-1"></i>{{r.observation | uppercase}}
+                          </div>
+                        </div>
+                        <p class="card-text"><strong>Cantidad:</strong> {{r.participants?.length}}</p>
+                        <p class="card-text"><strong>Precio Total:</strong> ${{r.totalPrice | number:'1.2-2'}}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                          <div>
+                            <button class="btn btn-secondary border-primary-color text-primary-color btn-quantity" *ngIf="user.responsibleID && !user.isASolePropietor" (click)="toggleParticipantModal(r)">
+                              {{r.participants.length}} participantes
+                            </button>
+                          </div>
+                          <button class="btn mr-1" type="button" [disabled]="user.responsibleID && r.participants.length === 0"
+                          [ngClass]="{'bg-primary-color': r.include, 'btn-light border-primary-color': !r.include}" (click)="toggleIncludeInSale(r)">
+                            <i class="fa mr-1" [ngClass]="{'fa-check-square': r.include, 'fa-square-o': !r.include}"></i>
+                            <span *ngIf="r.saleID">
+                              En la Venta Nro&nbsp;{{r.saleID}}
+                            </span>
+                            <span *ngIf="!r.saleID">
+                              Incluir en esta compra
+                            </span>
+                          </button>
+                        </div>
+                         <!-- <br>
+                        <button class="btn btn-light text-primary-color" (click)="toggleIncludeInSale(r)">
+                          <i class="fa mr-1" [ngClass]="{'fa-circle': r.include, 'fa-circle-o': !r.include}"></i>Incluir en la COMPRA
+                        </button> -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Parte Central Derecha: Totales y opciones de pago -->
+            <div class="col-md-4" *ngIf="newSale.detail && newSale.detail.length">
+              <div class="card">
+                <div class="card-body">
+                  <div class="totales">
+                    <h4 class="text-primary-color font-title">Totales</h4>
+                    <table class="table table-sm table-borderless" *ngIf="newSale.detail && newSale.detail.length">
+                      <tbody>
+                        <tr *ngFor="let d of newSale.detail">
+                          <td style="vertical-align: middle;">
+                            <span>{{d.courseName | uppercase}}</span> <br>
+                            <span class="badge border-primary-color text-primary-color font-nm float-right">x{{d.participants?.length}}</span>
+                          </td>
+                          <td style="vertical-align: middle;" style="width: 25%;" class="font-nm text-right text-primary-color">
+                            <span>{{d.price | number:'1.2-2'}}</span>
+                          </td>
+                        </tr>
+                        <tr *ngIf="newSale.detail && newSale.detail.length">
+                          <td class="text-right font-nm">
+                            <span>Sub Total</span>
+                          </td>
+                          <td class="text-right text-primary-color font-nm">
+                            ${{(newSale.subTotal || 0) | number:'1.2-2'}}
+                          </td>
+                        </tr>
+                        <!-- <tr *ngIf="newSale.detail && newSale.detail.length">
+                          <td class="text-right font-nm">
+                            <span>Descuento</span>
+                          </td>
+                          <td class="text-right text-primary-color font-nm">
+                            ${{newSale.discount | number:'1.2-2'}}
+                          </td>
+                        </tr> -->
+                        <tr *ngIf="newSale.detail && newSale.detail.length">
+                          <td class="text-right font-nm">
+                            <span>Total</span>
+                          </td>
+                          <td class="text-right text-primary-color font-nm">
+                            ${{newSale.totalPrice | number: '1.2-2'}}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <!-- <div class="form-group alert alert-light">
+                      <label for="coupon">Añadir cupón:</label>
+                      <input type="text" class="form-control" id="coupon" placeholder="Código del cupón">
+                    </div> -->
+                    <div class="form-row">
+                      <div class="col-12 mb-3">
+                        <!-- <button class="btn btn-light btn-block border-primary-color text-primary-color" (click)="verityDatafast()">
+                          <i class="fa fa-credit-card mr-1"></i>PAGO CON TARJETA
+                        </button> -->
+                        <button class="btn btn-light btn-block border-primary-color text-primary-color"
+                                matTooltip="Pagar con tarjeta"
+                                (click)="openDatafastDialog()">
+                          <i class="fa fa-credit-card mr-1"></i>PAGO CON TARJETA
+                        </button>
+                      </div>
+                      <div class="col-12 mt-2">
+                        <button class="btn bg-primary-color btn-block" (click)="verityPayment()">
+                          <!-- Comprar {{newSale.totalPrice | number:'1.2-2'}} -->
+                          PAGO DEPOSITO/TRANSFERENCIA DE {{newSale.totalPrice | number:'1.2-2'}}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" bsModal #participantModal="bs-modal" [config]="{backdrop: 'static'}" tabindex="-1" role="dialog" aria-labelledby="dialog-static-name">
+	<div class="modal-dialog modal-nm">
+		<div class="modal-content">
+			<div class="modal-body">
+        <form #enrollInBulkForm="ngForm">
+          <div class="form-row">
+            <div class="col-9 pt-1">
+              <i class="fa fa-check mr-1"></i>Participantes a incluir en este curso:
+            </div>
+            <div class="col-3 text-right">
+              <button class="btn btn-sm btn-light text-danger" (click)="toggleParticipantModal()">
+                <i class="fa fa-times mr-1"></i>Cerrar
+              </button>
+            </div>
+            <div class="col-12 mb-2">
+              <div class="card">
+                <div class="card-header bg-primary-color p-2">
+                  <span><i class="fa fa-list-alt mr-1"></i>Participantes</span>
+                </div>
+                <ng-container style="max-height: 350px; overflow: auto;">
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item p-2 hand" (click)="!disableSelection && toggleSelectParticipant(p)" *ngFor="let p of user.collaborators" style="line-height: 90%;">
+                      <div class="form-row">
+                        <div class="col-10">
+                          {{p.personDocumentNumber}} - {{p.personFullName | uppercase}}
+                        </div>
+                        <div class="col-2 text-right text-primary-color">
+                          <i class="fa" [ngClass]="{'fa-circle text-success': p.selected, 'fa-circle-o': !p.selected}"></i>
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </ng-container>
+              </div>
+            </div>
+            <div class="col-12 mt-2 text-center">
+              <button class="btn btn-sm bg-primary-color" (click)="toggleParticipantModal()">
+                <i class="fa fa-check mr-1"></i>Listo!
+              </button>
+            </div>
+          </div>
+        </form>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<div class="modal fade" bsModal #verifyPaymentModal="bs-modal" [config]="{backdrop: 'static'}" tabindex="-1" role="dialog" aria-labelledby="dialog-static-name">
+	<div class="modal-dialog modal-nm">
+		<div class="modal-content">
+			<div class="modal-body">
+        <form #enrollInBulkForm="ngForm">
+          <div class="form-row">
+            <div class="col-9 pt-1">
+              <i class="fa fa-check mr-1"></i>Proceso de Verificación de la Compra
+            </div>
+            <div class="col-3 text-right">
+              <button class="btn btn-sm btn-light text-danger" (click)="toggleVerifyPaymentModal()">
+                <i class="fa fa-times mr-1"></i>Cerrar
+              </button>
+            </div>
+            <div class="col-12 mb-2">
+              <div class="card">
+                <div class="card-header bg-primary-color p-2">
+                  <span><i class="fa fa-list-alt mr-1"></i>Detalle de la Compra</span>
+                </div>
+                <ng-container style="max-height: 300px; overflow: auto;">
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item p-2" *ngFor="let d of newSale.detail" style="line-height: 90%;">
+                      <div class="form-row">
+                        <div class="col-10">
+                          <span class="badge badge-light border-primary-color text-primary-color mr-1">
+                            x{{d.participants?.length}}
+                          </span>
+                          <small>
+                            {{d.courseName | uppercase}}
+                          </small> <br>
+                          <span class="badge badge-danger float-right hand" title="QUITAR CURSO DE LA COMPRA ACTUAL" (click)="toggleIncludeInSale(d, true)">
+                            <i class="fa fa-trash"></i>
+                          </span>
+                        </div>
+                        <div class="col-2 text-right text-primary-color">
+                          {{d.totalPrice | number:'1.2-2'}}
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </ng-container>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="card">
+                <div class="card-header bg-primary-color p-2">
+                  <span><i class="fa fa-info mr-1"></i>Información del Comprobante de Pago</span>
+                </div>
+                <div class="card-body p-1">
+                  <form #paymentForm="ngForm">
+                    <div class="form-row">
+                      <div class="col-12" *ngIf="newPayment.newFile && newPayment.imageUrl">
+                        <img src="{{newPayment.imageUrl}}" width="100%" height="450" style="border-radius: 5px;" alt="">
+                        <button class="btn btn-danger btn-sm" (click)="resetFile()" style="position: absolute; bottom: 5px; right: 10px;">
+                          <i class="fa fa-times mr-1"></i>Quitar
+                        </button>
+                      </div>
+                      <div class="col-12">
+                        <span class="font-xs">Suba el Comprobante de Pago (Formato PNG, JPG)</span>
+                        <!-- <label for="voucherFile">Suba el Comprobante de Pago (Formato PNG, JPG)</label> -->
+                        <input type="file" name="newFile" accept="image/*" (change)="changeImageFile($event)" [(ngModel)]="newPayment.newFile" id="new-file" required class="form-control">
+                      </div>
+                      <div class="col-12">
+                        <span class="font-xs">Fecha que consta en el Comprobante de Pago</span>
+                        <!-- <label for="payDay">Fecha que consta en el Comprobante de Pago</label> -->
+                        <input type="date" name="payDay" [max]="currentDate" min="1" [(ngModel)]="newPayment.payDay" required class="form-control form-control-sm">
+                      </div>
+                      <div class="col-6">
+                        <span class="font-xs">Entidad Financiera</span>
+                        <!-- <label for="financialEntityID">Entidad Financiera</label> -->
+                        <select name="financialEntityID" [(ngModel)]="newPayment.financialEntityID" required class="form-control form-control-sm">
+                          <option [ngValue]="undefined">--SELECCIONE--</option>
+                          <option *ngFor="let f of financialEntities" [ngValue]="f.financialEntityID">{{f.financialEntityDesc | uppercase}}</option>
+                        </select>
+                      </div>
+                      <div class="col-6">
+                        <span class="font-xs">Tipo de Transacción</span>
+                        <!-- <label for="transactionTypeID">Tipo de Transacción</label> -->
+                        <select name="transactionTypeID" [(ngModel)]="newPayment.transactionTypeID" required class="form-control form-control-sm">
+                          <option [ngValue]="undefined">--SELECCIONE--</option>
+                          <option *ngFor="let f of transactionTypes" [ngValue]="f.transactionTypeID">{{f.transactionTypeDesc | uppercase}}</option>
+                        </select>
+                      </div>
+                      <div class="col-6">
+                        <span class="font-xs">Número de Comprobante de Pago</span>
+                        <!-- <label for="voucherNumber">Número de Comprobante de Pago</label> -->
+                        <input type="text" name="voucherNumber" min="1" (keypress)="alphaNumeric($event)" [(ngModel)]="newPayment.voucherNumber" required class="form-control form-control-sm">
+                      </div>
+                      <div class="col-6">
+                        <span class="font-xs">Monto</span>
+                        <!-- <label for="amount">Monto</label> -->
+                        <input type="text" name="amount" readonly value="{{newPayment.amount | number:'1.2-2'}}" required class="form-control form-control-sm text-primary-color text-right">
+                      </div>
+                      <div class="col-12 mt-3">
+                        <div class="form-row">
+                          <div class="col-6">
+                            <button class="btn btn-sm btn-light text-danger" (click)="toggleVerifyPaymentModal()">
+                              <i class="fa fa-times mr-1"></i>Cancelar
+                            </button>
+                          </div>
+                          <div class="col-6 text-right">
+                            <button class="btn btn-sm bg-primary-color" [disabled]="paymentForm.invalid" (click)="buy()">
+                              <i class="fa fa-check mr-1"></i>Realizar Compra
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+			</div>
+		</div>
+	</div>
+</div>

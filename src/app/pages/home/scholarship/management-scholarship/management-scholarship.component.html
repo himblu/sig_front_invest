@@ -1,0 +1,369 @@
+<div class="animated fadeIn fast">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa fa-cog mr-1"></i>Administraciṕon de Beneficios
+                </div>
+                <div class="card-body">
+                    <tabset>
+                        <tab heading="Beca">
+                          <br>
+                            <div class="row" [formGroup]="filtersForm">
+                              <div class="col-4">
+                                <mat-form-field appearance="outline">
+                                  <mat-label>Periodo académico</mat-label>
+                                  <mat-select formControlName="periodID" (selectionChange)="getScholarships();">
+                                    <mat-option [value]="0">TODOS</mat-option>
+                                    <mat-option *ngFor="let item of periods" [value]="item.periodID">{{item.periodName}}</mat-option>
+                                  </mat-select>
+                                </mat-form-field>
+                              </div>
+                              <div class="col-4"></div>
+                              <div class="col-2 text-right">
+                                <button class="btn btn-sm bg-secondary-color"
+                                (click)="openFile('api/scholarship/report-Scholarship-by-period/'+filtersForm.get('periodID').value)">
+                                    <i class="fa fa-file-excel-o green-icon mr-1"></i>Descargar excel
+                                </button>
+                              </div>
+                              <div class="col-2 text-right">
+                                  <button class="btn btn-sm bg-primary-color" (click)="toggleScholarship()">
+                                      <i class="fa fa-plus mr-1"></i>Agregar Beca
+                                  </button>
+                              </div>
+                            </div>
+                            <div class="row">
+                              <div class="col-12 text-center" *ngIf="!scholarships.length">
+                                  <i class="fa fa-times fa-3x"></i> <br>
+                                  No se tienen items registrados.
+                              </div>
+                              <div class="col-12" *ngIf="scholarships.length">
+                                  <ul class="list-group">
+                                      <li class="list-group-item" *ngFor="let s of scholarships">
+                                          <div class="row">
+                                              <div class="col-2">
+                                                  {{s.name | uppercase}} <br>
+                                                  <small>{{s.description | uppercase}}</small>
+                                              </div>
+                                              <div class="col-3">
+                                                  <small *ngIf="!s.studentID">
+                                                      {{s.modalityName | uppercase}} | {{s.schoolName}} | {{s.careerName}}
+                                                  </small>
+                                                  <small *ngIf="s.studentID">
+                                                      {{s.personFullName}}
+                                                  </small>
+                                              </div>
+                                              <div class="col-4 text-right">
+                                                  <button class="btn btn-sm btn-light text-primary-color" (click)="toggleRequirement(s)">
+                                                      <i class="fa fa-list-alt mr-1"></i>Requisitos
+                                                  </button>
+                                              </div>
+                                              <div class="col-3 text-right">
+                                                  <button class="btn btn-sm btn-light text-primary-color mr-2" (click)="toggleScholarship(s)">
+                                                      <i class="fa fa-edit"></i>
+                                                  </button>
+                                                  <button class="btn btn-sm btn-light text-danger" (click)="toggleScholarship(s, s.scholarshipID)">
+                                                      <i class="fa fa-trash"></i>
+                                                  </button>
+                                              </div>
+                                          </div>
+                                      </li>
+                                  </ul>
+                              </div>
+                            </div>
+                            <mat-paginator
+                              #paginator
+                              [length]="scholarshipLength"
+                              [pageSize]="pageSize"
+                              [pageSizeOptions]="pageSizeOptions"
+                              (page)="pageEvent = changePageScholarship($event)">
+                            </mat-paginator>
+                        </tab>
+                        <tab heading="Tipo de Beca">
+                          <div class="row">
+                              <div class="col-12 text-right">
+                                  <button class="btn btn-sm bg-primary-color" (click)="toggleScholarshipType()">
+                                      <i class="fa fa-plus mr-1"></i>Agregar Tipo
+                                  </button>
+                              </div>
+                              <div class="col-12 text-center" *ngIf="!scholarshipTypes.length">
+                                  <i class="fa fa-times fa-3x"></i> <br>
+                                  No se tienen items registrados.
+                              </div>
+                              <div class="col-12" *ngIf="scholarshipTypes.length">
+                                  <ul class="list-group">
+                                      <li class="list-group-item" *ngFor="let s of scholarshipTypes">
+                                          <div class="row">
+                                              <div class="col-9">
+                                                  {{s.name | uppercase}} <br>
+                                                  <small>{{s.description | uppercase}}</small>
+                                              </div>
+                                              <div class="col-3 text-right">
+                                                  <button class="btn btn-sm btn-light text-primary-color mr-2" (click)="toggleScholarshipType(s)">
+                                                      <i class="fa fa-edit"></i>
+                                                  </button>
+                                                  <button class="btn btn-sm btn-light text-danger" (click)="toggleScholarshipType(s, s.scholarshipTypeID)">
+                                                      <i class="fa fa-trash"></i>
+                                                  </button>
+                                              </div>
+                                          </div>
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                          <mat-paginator
+                            #paginator
+                            [length]="scholarshipTypesLength"
+                            [pageSize]="pageSize"
+                            [pageSizeOptions]="pageSizeOptions"
+                            (page)="pageEvent = changePageScholarshipTypes($event)">
+                          </mat-paginator>
+                        </tab>
+                    </tabset>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div bsModal #scholarshipModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name2">
+    <div class="modal-dialog modal-nm">
+      <div class="modal-content" *ngIf="newScholarship">
+        <div class="modal-header">
+          <h4 id="dialog-sizes-name2" class="modal-title pull-left">
+            {{newScholarship.editing ? 'Editando' : 'Nuevo'}} Beneficio
+          </h4>
+          <button type="button" class="btn btn-light pull-right text-danger" aria-label="Close" (click)="toggleScholarship()">
+            <span aria-hidden="true" ><i class="fa fa-times"></i></span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form #scholarshipForm="ngForm">
+            <div class="row">
+                <div class="col-12">
+                    <small>Tipo de Beca</small>
+                    <select name="scholarshipTypeID" [(ngModel)]="newScholarship.scholarshipTypeID" class="form-control" required>
+                        <option [ngValue]="undefined">--SELECCIONE--</option>
+                        <option *ngFor="let st of scholarshipTypes" [ngValue]="st.scholarshipTypeID">{{st.name | uppercase}}</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <small>Nombre</small>
+                    <input type="text" name="name" [(ngModel)]="newScholarship.name" class="form-control" required>
+                </div>
+                <div class="col-12">
+                    <small>Descripción</small>
+                    <textarea name="description" rows="4" [(ngModel)]="newScholarship.description" class="form-control no-resize"></textarea>
+                </div>
+                <div class="col-12">
+                    <small>Porcentaje de Descuento</small>
+                    <input type="number" name="discountPercentage" [(ngModel)]="newScholarship.discountPercentage" class="form-control" required>
+                </div>
+                <div class="col-12 mt-2 text-center">
+                    <button class="btn btn-sm" [ngClass]="{'bg-primary-color': newScholarship.isIndividual, 'btn-light text-primary-color': !newScholarship.isIndividual}" (click)="toggleIsIndividual()">
+                        <i class="fa fa-circle mr-1"></i>{{newScholarship.isIndividual ? 'Se asignará a un estudiante': 'Se asignará a una población en especifico'}}
+                    </button>
+                </div>
+                    <ng-container *ngIf="!newScholarship.isIndividual">
+                        <div class="col-12">
+                            <small>Periodo Académico</small>
+                            <select name="academicPeriod" [(ngModel)]="newScholarship.academicPeriod" class="form-control">
+                                <option [ngValue]="undefined">--SELECCIONE--</option>
+                                <option *ngFor="let a of academicPeriods" [ngValue]="a.periodID">{{a.periodName | uppercase}}</option>
+                            </select>
+                        </div>
+                        <div class="col-12" *ngIf="newScholarship.academicPeriod">
+                            <small>Modalidad</small>
+                            <select name="modalityID" [(ngModel)]="newScholarship.modalityID" (change)="selectModality()" class="form-control">
+                                <option [ngValue]="undefined">--SELECCIONE--</option>
+                                <option *ngFor="let m of modalities" [ngValue]="m.modalityID">{{m.modalityName | uppercase}}</option>
+                            </select>
+                        </div>
+                        <div class="col-12" *ngIf="newScholarship.modalityID">
+                            <small>Escuela Académica</small>
+                            <select name="schoolID" [(ngModel)]="newScholarship.schoolID" (change)="getCareers()" class="form-control">
+                                <option [ngValue]="undefined">--SELECCIONE--</option>
+                                <option *ngFor="let m of schools" [ngValue]="m.schoolID">{{m.schoolName | uppercase}}</option>
+                            </select>
+                        </div>
+                        <div class="col-12" *ngIf="newScholarship.schoolID">
+                            <small>Carrera Profesional</small> <br>
+                            <button class="btn btn-sm" [ngClass]="{'bg-primary-color': newScholarship.allCareers, 'btn-light text-primary-color': !newScholarship.allCareers}" (click)="toggleAllCareers()">
+                                <i class="fa mr-1" [ngClass]="{'fa-square-o': !newScholarship.allCareers, 'fa-check-square': newScholarship.allCareers}"></i>Seleccionar todas las carreras
+                            </button>
+                            <select name="careerID" multiple style="height: 150px;" [disabled]="!newScholarship.schoolID || !careers.length" [(ngModel)]="newScholarship.careers" class="form-control">
+                                <option *ngFor="let c of careers" [ngValue]="c.careerID">{{c.careerName | uppercase}}</option>
+                            </select>
+                        </div>
+                    </ng-container>
+                <div class="col-12" *ngIf="newScholarship.isIndividual">
+                    <small>Número de Documento</small>
+                    <div class="input-group mb-3">
+                        <input type="text" name="studentToSearch" [(ngModel)]="newScholarship.studentToSearch" class="form-control">
+                        <input type="hidden" name="studentID" [(ngModel)]="newScholarship.studentID">
+                        <div class="input-group-append" *ngIf="newScholarship.studentToSearch">
+                          <button class="btn bg-primary-color" type="button" id="button-addon2" (click)="searchStudent()"><i class="fa fa-search mr-1"></i>Buscar</button>
+                        </div>
+                    </div>
+                    <ng-container *ngIf="foundeds.length">
+                        <ul class="list-group">
+                            <li class="list-group-item" *ngFor="let f of foundeds">
+                                <button class="btn btn-sm float-right" (click)="selectToAssign(f)" *ngIf="!f.hasManyCareers" [ngClass]="{'bg-primary-color': newScholarship.studentID === f.identity, 'btn-light text-primary-color': newScholarship.studentID !== f.identity}">
+                                    <i class="fa mr-1" [ngClass]="{'fa-circle': newScholarship.studentID === f.identity, 'fa-circle-o': newScholarship.studentID !== f.identity}"></i>{{newScholarship.studentID === f.identity ? 'Quitar' : 'Seleccionar'}}
+                                </button>
+                                {{f.middleName | uppercase}} {{f.lastName | uppercase}}, {{f.firstName | titlecase}}
+                                <ng-container *ngIf="!f.hasManyCareers">
+                                    <br>
+                                    {{f.careers[0].careerName | uppercase}}</ng-container>
+                                <hr *ngIf="f.hasManyCareers">
+                                <ul class="list-group" *ngIf="f.hasManyCareers">
+                                    <li class="list-group-item" *ngFor="let c of f.careers">
+                                        {{c.careerName}}
+                                        <button class="btn btn-sm float-right" (click)="selectToAssign(f, c)" [ngClass]="{'bg-primary-color': newScholarship.studentID === c.studentID, 'btn-light text-primary-color': newScholarship.studentID !== c.studentID}">
+                                            <i class="fa mr-1" [ngClass]="{'fa-circle': newScholarship.studentID === c.studentID, 'fa-circle-o': newScholarship.studentID !== c.studentID}"></i>{{newScholarship.studentID === c.studentID ? 'Quitar' : 'Seleccionar'}}
+                                        </button>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </ng-container>
+                </div>
+                <div class="col-12 mt-3 text-center">
+                    <button class="btn" [disabled]="scholarshipForm.invalid" [ngClass]="{'bg-primary-color': !newScholarship.editing, 'btn-success': newScholarship.editing}" (click)="saveScholarship()">
+                        <i class="fa fa-save mr-1"></i>Guardar Cambios
+                    </button>
+                </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div bsModal #scholarshipTypeModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name2">
+    <div class="modal-dialog modal-nm">
+      <div class="modal-content" *ngIf="newScholarship">
+        <div class="modal-header">
+          <h4 id="dialog-sizes-name2" class="modal-title pull-left">
+            {{newScholarship.editing ? 'Editando' : 'Nuevo'}} Tipo de Beneficio
+          </h4>
+          <button type="button" class="btn btn-light pull-right text-danger" aria-label="Close" (click)="toggleScholarshipType()">
+            <span aria-hidden="true" ><i class="fa fa-times"></i></span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form #scholarshipTypeForm="ngForm">
+            <div class="row">
+                <div class="col-12">
+                    <small>Nombre</small>
+                    <input type="text" name="name" [(ngModel)]="newScholarshipType.name" class="form-control" required>
+                </div>
+                <div class="col-12">
+                    <small>Descripción</small>
+                    <textarea name="description" rows="4" [(ngModel)]="newScholarshipType.description" class="form-control no-resize"></textarea>
+                </div>
+                <div class="col-12 mt-3 text-center">
+                    <button class="btn" [disabled]="scholarshipTypeForm.invalid" [ngClass]="{'bg-primary-color': !newScholarshipType.editing, 'btn-success': newScholarshipType.editing}" (click)="saveScholarshipType()">
+                        <i class="fa fa-save mr-1"></i>Guardar Cambios
+                    </button>
+                </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div bsModal #requirementModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name2">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 id="dialog-sizes-name2" class="modal-title pull-left">
+            Requerimientos de la Beca
+          </h4>
+          <button type="button" class="btn btn-light pull-right text-danger" aria-label="Close" (click)="toggleRequirement()">
+            <span aria-hidden="true" ><i class="fa fa-times"></i></span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-12">
+                <div class="alert alert-info">
+                    Los nombres de las <strong>variables</strong> para validación de estudiantes que se les asignará el Beneficio, será el mismo que lleve en el <strong>Procedimiento Almacenado <code>LISTA de POSTULANTE</code></strong>, que sera considerado como <strong>POBLACIÓN</strong>.
+                </div>
+            </div>
+            <div class="col-12">
+                <ul class="list-group">
+                    <li class="list-group-item text-center">
+                        <button class="btn btn-sm btn-light text-primary-color" (click)="addRequirement()">
+                            <i class="fa fa-plus mr-1"></i>Agregar requerimiento
+                        </button>
+                    </li>
+                    <ng-container *ngIf="newRequirement">
+                        <li class="list-group-item bg-primary-color">
+                            {{newRequirement && newRequirement.editing ? 'Editando' : 'Nuevo'}} Requerimiento
+                        </li>
+                        <li class="list-group-item">
+                            <form #requirementForm="ngForm">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <small>Nombre</small>
+                                        <input type="text" name="name" [(ngModel)]="newRequirement.name" class="form-control form-control-sm" required>
+                                    </div>
+                                    <div class="col-12">
+                                        <small>Descripción</small>
+                                        <textarea name="description" [(ngModel)]="newRequirement.description" rows="3"  class="form-control form-control-sm no-resize"></textarea>
+                                    </div>
+                                    <div class="col-12">
+                                        <small>Campo a Evaluar</small>
+                                        <input type="text" name="field" [(ngModel)]="newRequirement.field" class="form-control form-control-sm" required>
+                                    </div>
+                                    <div class="col-12">
+                                        <small>Condición a Aplicar</small>
+                                        <select name="condition" [(ngModel)]="newRequirement.condition" class="form-control form-control-sm">
+                                            <option [ngValue]="undefined">--SELECCIONE--</option>
+                                            <option *ngFor="let c of conditions" [ngValue]="c.conditionID">{{c.conditionName | uppercase}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <small>Valores</small>
+                                        <input type="text" name="values" [(ngModel)]="newRequirement.values" class="form-control form-control-sm" required>
+                                    </div>
+                                    <div class="col-12" *ngIf="newRequirement.editing">
+                                        <small>Estado</small>
+                                        <select name="statusID" name="statusID" [(ngModel)]="newRequirement.statusID" class="form-control form-control-sm" required>
+                                            <option [ngValue]="undefined">--SELECCIONE--</option>
+                                            <option *ngFor="let s of statuses" [ngValue]="s.statusID">{{s.statusName | uppercase}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12 mt-3 text-center">
+                                        <button class="btn" [disabled]="requirementForm.invalid" [ngClass]="{'bg-primary-color': !newRequirement.editing, 'btn-success': newRequirement.editing}" (click)="saveRequirement()">
+                                            <i class="fa fa-save mr-1"></i>Guardar Cambios
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </li>
+                    </ng-container>
+                    <li class="list-group-item p-2" *ngFor="let r of requirements">
+                        <div class="row">
+                            <div class="col-10">
+                                <code class="float-right"><i class="fa fa-hashtag mr-1"></i>{{r.field}} {{r.condition}} {{r.values}}</code>
+                                {{r.name | uppercase}} <br>
+                                <small>{{r.description | uppercase}}</small>
+                            </div>
+                            <div class="col-2 text-right">
+                                <button class="btn btn-sm btn-light text-primary-color" (click)="addRequirement(r)">
+                                    <i class="fa fa-edit mr-1"></i>Editar
+                                </button>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

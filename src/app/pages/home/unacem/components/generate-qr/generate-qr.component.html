@@ -1,0 +1,20 @@
+<div style="display: flex; align-items: center; background: transparent;" class="p-2 justify-content-between">
+  <button
+    class="download-button"
+    mat-raised-button
+    matTooltipPosition="above"
+    matTooltip="Descargar QR"
+    (click)="openFile('api/unacem-report/unic-qr-report');">
+    <small>Descargar QR</small>
+    <mat-icon class="red-icon">description</mat-icon>
+  </button>
+  <mat-icon style="cursor: pointer; color: red;" [matDialogClose]="false" class="red-icon" matRipple>close</mat-icon>
+</div>
+
+<mat-dialog-content>
+  <div class="row">
+    <div class="col-12">
+      <img *ngIf="data.qrCode" [src]="data.qrCode" alt="Código QR" class="img-fluid w-100 h-100"/>
+    </div>
+  </div>
+</mat-dialog-content>

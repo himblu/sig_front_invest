@@ -1,0 +1,164 @@
+:host mat-cell {
+	font-size: 90%;
+	line-height: normal;
+}
+
+:host .mat-mdc-row {
+	height: 41px;
+	min-height: 41px;
+}
+
+:host mat-header-row {
+	height: 44px;
+	min-height: 44px;
+}
+
+:host mat-header-cell {
+	line-height: normal;
+}
+
+:host ::ng-deep .mat-mdc-menu-content {
+	padding: 0 !important;
+}
+
+:host ::ng-deep .mat-mdc-menu-item {
+	font-size: 95%;
+	letter-spacing: 0;
+}
+
+mat-table, mat-paginator {
+	background: transparent;
+}
+
+mat-header-row {
+	background: #004899;
+	color: white;
+}
+
+.leading-publications-container::-webkit-scrollbar {
+	width: 10px;
+	height: 6px;
+}
+
+.leading-publications-container::-webkit-scrollbar-track {
+	background-color: transparent;
+}
+
+.leading-publications-container::-webkit-scrollbar-thumb {
+	background-color: #d6dee1;
+	border-radius: 20px;
+	border: 0 solid transparent;
+	background-clip: content-box;
+}
+
+.leading-publications-container::-webkit-scrollbar-thumb:hover {
+	background-color: grey;
+}
+
+ul li:nth-child(odd) {
+	background-color: #fff;
+}
+
+ul li:nth-child(even) {
+	background-color: transparent;
+}
+
+::ng-deep .mat-mdc-menu-content {
+	padding: 0 !important;
+}
+
+::ng-deep .mat-mdc-menu-item {
+	min-height: 36px !important;
+}
+
+.item {
+	font-size: 14px;
+	letter-spacing: 0;
+}
+
+::ng-deep .mat-drawer-backdrop.mat-drawer-shown {
+	background-color: transparent !important;
+}
+
+:host ::ng-deep .mat-mdc-select-value-text {
+	font-size: 14px;
+	letter-spacing: 0;
+}
+
+:host ::ng-deep div.mat-mdc-select-panel {
+	padding: 0 !important;
+}
+
+:host ::ng-deep .mat-mdc-tab .mdc-tab__text-label {
+	letter-spacing: 0;
+	font-size: 14px;
+}
+
+::ng-deep .mat-mdc-icon-button.mat-mdc-button-base {
+	height: 36px !important;
+	width: 36px !important;
+	padding: 0 !important;
+}
+
+.mat-column-deweyCodeInternal {
+	flex: 0 0 15% !important;
+	width: 15% !important;
+	justify-content: start;
+}
+
+.mat-column-title {
+	flex: 0 0 33% !important;
+	width: 33% !important;
+	justify-content: start;
+}
+
+.mat-column-edition {
+	flex: 0 0 10% !important;
+	width: 10% !important;
+	justify-content: start;
+}
+
+.mat-column-codeISBN {
+	flex: 0 0 10% !important;
+	width: 10% !important;
+	justify-content: center;
+}
+
+.mat-column-publicationYear {
+	flex: 0 0 10% !important;
+	width: 10% !important;
+	justify-content: center;
+	text-align: center;
+}
+
+.mat-column-statusID {
+	flex: 0 0 10% !important;
+	width: 10% !important;
+	justify-content: center;
+}
+
+.mat-column-stock {
+	flex: 0 0 5% !important;
+	width: 5% !important;
+	justify-content: center;
+}
+
+/*.mat-column-deweySubcategory {*/
+/*	text-transform: uppercase;*/
+/*	flex: 0 0 10% !important;*/
+/*	width: 10% !important;*/
+/*	justify-content: center;*/
+/*}*/
+
+/*.mat-column-specificSubAreaKnowledgeDesc {*/
+/*	text-transform: uppercase;*/
+/*	flex: 0 0 10% !important;*/
+/*	width: 10% !important;*/
+/*	justify-content: center;*/
+/*}*/
+
+.mat-column-actions {
+	flex: 0 0 7% !important;
+	width: 7% !important;
+	justify-content: center;
+}

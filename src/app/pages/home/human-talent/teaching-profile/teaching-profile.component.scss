@@ -1,0 +1,12 @@
+th .mat-mdc-header-cell{
+    background-color: red;
+}
+
+::ng-deep .mat-mdc-menu-content {
+    padding: 0 !important;
+}
+
+th {
+  /* row border */
+  border-bottom: 0.5px solid #cccc;
+}

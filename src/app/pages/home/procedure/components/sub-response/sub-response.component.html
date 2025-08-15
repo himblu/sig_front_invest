@@ -1,0 +1,74 @@
+<ng-container *ngIf="replies?.length > 0">
+  <div class="row">
+    <div class="col-2">
+      <div class="row">
+        <div class="col-12">
+          <p>Respuestas</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-8">
+      <div class="row">
+        <div class="col-12" *ngFor="let item of replies">
+          <div class="comment mat-elevation-z6">
+            <div class="row">
+              <div class="col-9">
+                <span style="color: black;">
+                  <small>{{item.personFullName}}</small>
+                </span>
+              </div>
+              <div class="col-1">
+                <a style="cursor: pointer; color: #014898" [matMenuTriggerFor]="menu">
+                  <i class="fa fa-paperclip" aria-hidden="true"></i>
+                </a>
+                <mat-menu #menu="matMenu">
+                  <ng-container *ngIf="item.attachments?.length > 0; else message">
+                    <button mat-menu-item *ngFor="let item of item.attachments; let index=index;" (click)="openFile(item.fileUrl);">
+                      <mat-icon>attachment</mat-icon>
+                      <span>{{index+1}}</span>
+                    </button>
+                  </ng-container>
+                  <ng-template #message>
+                    <button mat-menu-item disabled="true">
+                      <span><small>Sin archivos</small></span>
+                    </button>
+                  </ng-template>
+                </mat-menu>
+              </div>
+            </div>
+            <h5 [innerHTML]="item.reply"></h5>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row" [formGroup]="responseForm">
+    <div class="col-8">
+      <mat-form-field class="width" appearance="outline">
+        <mat-label>Mensaje</mat-label>
+        <input type="text" matInput formControlName="message">
+        <mat-error></mat-error>
+      </mat-form-field>
+    </div>
+    <div class="col-0-5">
+      <button (click)="input.click();" mat-raised-button class="styleButton_sml" style="height: 25px;" type="button"
+        matTooltipPosition="above" matTooltip="Cargar archivos">
+        <i class="fa fa-paperclip" aria-hidden="true"></i>
+      </button>
+      <input type="file"
+        hidden
+        multiple
+        #input
+        style="cursor: pointer;"
+        autocomplete="off"
+        (change)="onChangeInput(input.files, input);"
+        accept="application/pdf">
+    </div>
+    <div class="col-0-5">
+      <button (click)="onSubmit();" mat-raised-button class="styleButton_sml" style="height: 25px;" type="button"
+        matTooltipPosition="above" matTooltip="Enviar" [disabled]="!responseForm.valid">
+        <i class="fa fa-share" aria-hidden="true"></i>
+      </button>
+    </div>
+  </div>
+</ng-container>

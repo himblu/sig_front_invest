@@ -1,0 +1,240 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<div class="col-12" *ngIf="!charging">
+  <div class="card">
+    <div class="card-body">
+      <form [formGroup]="approvalsForm">
+        <div class="row">
+          <div class="col-3">
+            <mat-form-field appearance="outline">
+              <mat-label>Buscar por estudiante</mat-label>
+              <input matInput autocomplete="off" #search formControlName="search" (input)="searchStudent(search.value)">
+              <mat-icon style="cursor: pointer;" (click)="searchStudent(search.value)" matSuffix>search</mat-icon>
+            </mat-form-field>
+          </div>
+          <div class="col-6">
+            <h3 style="color: #004899;">{{approvalsForm.get('personFirstName').value}} {{approvalsForm.get('personMiddleName').value}} {{approvalsForm.get('personLastName').value}}</h3>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<br>
+<div *ngIf="!charging">
+  <ng-container *ngIf="!studentInformation && !academicalHistory.length"><br>
+    <div class="col-12" style="text-align: center;">No existen registros.</div>
+  </ng-container>
+  <ng-container>
+    <div class="col-12" *ngIf="student && studentInformation">
+      <div class="card">
+        <div class="card-body">
+          <form [formGroup]="approvalsForm">
+            <div class="row pl-2 pr-2">
+              <div class="col-0-5"></div>
+              <div class="col-5-5">
+                <div class="row">
+                  <div class="col-12">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Sede</mat-label>
+                      <mat-select formControlName="campusID">
+                        <mat-option *ngFor="let item of campuses" [value]="item.campusID">{{ item.campusDetail }}</mat-option>
+                      </mat-select>
+                      <mat-error>Campo requerido</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-12">
+                    <mat-form-field class="width" appearance="outline" *ngIf="currentPeriod">
+                      <mat-label>Periodo Académico</mat-label>
+                      <mat-select formControlName="periodID">
+                        <mat-option [value]="currentPeriod.periodID">{{ currentPeriod.periodName }}</mat-option>
+                      </mat-select>
+                      <mat-error>Campo requerido</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-12">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Escuela</mat-label>
+                      <mat-select formControlName="schoolID" (selectionChange)="getCareersBySchool($event.value);">
+                        <mat-option *ngFor="let item of schools" [value]="item.schoolID">{{ item.schoolName }}</mat-option>
+                      </mat-select>
+                      <mat-error>Campo requerido!</mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+              <div class="col-5-5">
+                <div class="row">
+                  <div class="col-12">
+                    <mat-form-field class="width" appearance="outline">
+                      <!-- Al seleccionar una carrera, se traen las mallas de esa carrera -->
+                      <!-- Al seleccionar una carrera, se traen las modalidades -> Carrera -->
+                      <mat-label>Carrera</mat-label>
+                      <mat-select formControlName="careerID" (selectionChange)="getStudyPlansByCareer($event.value); getModalitiesByCareer($event.value);">
+                        <mat-option *ngFor="let item of careers" [value]="item.careerID">{{item.careerName}}</mat-option>
+                      </mat-select>
+                      <mat-error>Campo requerido!</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-12">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Malla Curricular</mat-label>
+                      <mat-select formControlName="studyPlanID" (selectionChange)="getCycles($event.value, approvalsForm.get('careerID').value)">
+                        <mat-option *ngFor="let item of studyPlans" [value]="item.studyPlanID"> {{ item.studyPlanDesc }}</mat-option>
+                      </mat-select>
+                      <mat-error>Campo requerido!</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-12">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Modalidad</mat-label>
+                      <mat-select formControlName="modalityID">
+                        <mat-option *ngFor="let item of modalities" [value]="item.modalityID" (onSelectionChange)="getWorkingDays(item)">{{ item.modalityName }}</mat-option>
+                      </mat-select>
+                      <mat-error>Campo requerido!</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-12" *ngIf="approvalsForm.get('modalityID').value === 1">
+                    <!-- La lista de módulos depende de la modalidad seleccionada -->
+                    <!-- Al seleccionar una jornada, se construye la tabla-->
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Sección</mat-label>
+                      <mat-select formControlName="workingDayID">
+                        <mat-option *ngFor="let item of workingDays" [value]="item.workingDayID">{{item.workingDayDesc}}</mat-option>
+                      </mat-select>
+                      <mat-error>Campo requerido!</mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12" style="text-align: right;">
+                <button type="button" mat-raised-button class="styleButton_sml" style="width: 100px;" (click)="postStudentInformation()">Guardar</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <br>
+    <form [formGroup]="homologationForm" *ngIf="student && studentInformation && academicalHistory.length">
+      <div class="col-12" formArrayName="news">
+        <div class="row" *ngFor="let item of academicalHistory; let i=index;" [formGroupName]="i">
+          <div class="col-6">
+            <div class="card">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-12">
+                    <h3>Origen: {{studentInformation.careerName}}</h3>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-4" style="height: 55px;">
+                    <label>Asignatura</label>
+                  </div>
+                  <div class="col-8"></div>
+                  <div class="col-6">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Periodo Académico</mat-label>
+                      <input readonly="true" matInput autocomplete="off" formControlName="periodSource">
+                      <mat-error>Campo requerido</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-6">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Asignatura</mat-label>
+                      <input readonly="true" matInput autocomplete="off" formControlName="courseName">
+                      <mat-error>Campo requerido</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-3">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Créditos</mat-label>
+                      <input readonly="true" type="number" matInput autocomplete="off" formControlName="creditSource">
+                      <mat-error>Campo requerido</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-3">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Promedio</mat-label>
+                      <input readonly="true" type="number" matInput autocomplete="off" formControlName="gradeSource">
+                      <mat-error>Campo requerido</mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-6">
+            <div class="card">
+              <div class="card-body">
+                <div class="col-12">
+                  <h3>Destino</h3>
+                </div>
+                <div class="row">
+                  <div class="col-4">
+                    <label>Asignatura {{i+1}}</label>
+                  </div>
+                  <div class="col-2"></div>
+                  <div class="col-6">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Tipo</mat-label>
+                      <mat-select placeholder="Seleccione el Tipo" formControlName="recognitionTypeID">
+                        <mat-option *ngFor="let item of retrieveTypes" [value]="item.recognitionTypeID">{{item.recognitionTypeName}}</mat-option>
+                      </mat-select>
+                      <mat-error>Campo requerido</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-6">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Nivel</mat-label>
+                      <mat-select placeholder="Seleccione el Nivel" (selectionChange)="getCoursesDetail($event.value, i)">
+                        <mat-option *ngFor="let cycle of cycles" [value]="cycle.cycleID">{{cycle.cycleName}}</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-6">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Asignatura</mat-label>
+                      <mat-select placeholder="Seleccione el Asignatura" formControlName="courseID">
+                        <mat-option *ngFor="let course of gethomologationFormControl().controls[i].get('courses').value" [value]="course.courseID"
+                          (onSelectionChange)="setCredits(course, i)">
+                          {{course.courseName}}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-3">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Créditos</mat-label>
+                      <input type="number" matInput autocomplete="off" formControlName="creditFate">
+                      <mat-error>Campo requerido</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-3">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Promedio</mat-label>
+                      <input type="number" matInput formControlName="gradeFate">
+                      <mat-error>Campo requerido</mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+            </div><br>
+          </div>
+        </div>
+      </div>
+    </form>
+  </ng-container>
+</div>
+

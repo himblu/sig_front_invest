@@ -1,0 +1,86 @@
+<div class="row animated fadeIn fast" *ngIf="isLoading">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<div class="row animated fadeIn fast" *ngIf="!isLoading">
+  <div class="col-md-12">
+    <h3 style="text-align: center; color: #004899;">DIRECTORES DE ESCUELA</h3>
+    <div class="card" style="border-radius: 15px;">
+      <div class="card-body">
+        <section [formGroup]="filtersForm">
+          <div class="row pl-3 pr-3">
+            <div class="col-3">
+              <mat-form-field appearance="outline">
+                <mat-label>Periodo Académico</mat-label>
+                <mat-select formControlName="periodID" placeholder="Filtrar por Periodo Académico" (selectionChange)="getDirectorList();">
+                  <mat-option [value]="0">TODOS</mat-option>
+                  <mat-option *ngFor="let period of periods;" [value]="period.periodID">
+                    {{ period.periodName }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-4">
+              <mat-form-field appearance="outline">
+                <mat-label>Buscar por profesional</mat-label>
+                <input matInput formControlName="search" autocomplete="off">
+                <mat-icon matSuffix>search</mat-icon>
+              </mat-form-field>
+            </div>
+            <div class="col-5" style="text-align: right;">
+              <button type="button" mat-raised-button class="styleButton_sml" style="max-width: 155px;" (click)="openDialog();">Asignar escuela</button>
+            </div>
+          </div>
+        </section>
+        <div>
+          <table class="table">
+            <thead style="background-color: #004899; color: white;">
+              <tr>
+                <th>No. Documento</th>
+                <th>Profesional</th>
+                <th>Escuela</th>
+                <th>Estado</th>
+                <th style="text-align: center;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody style="color: black;">
+              <tr *ngFor="let item of directorsList">
+                <td><small>{{item.PersonDocumentNumber}}</small></td>
+                <td><small>{{item.director}}</small></td>
+                <td><small>{{item.schoolName}}</small></td>
+                <td>
+                  <small>{{item.statusID ? 'Activo' : 'Inactivo'}}</small>
+                </td>
+                <td style="text-align: center;">
+                  <a type="button"
+                    matTooltipPosition="above"
+                    matTooltip="{{item.statusID ? 'Inactivar' : 'Activar'}}"
+                    style="cursor: pointer;"
+                    [ngStyle]="{'color': !item.statusID ? 'red' : 'blue'}"
+                    (click)="putStatusDirector(item)">
+                    <i class="fa"
+                      [ngClass]="{'fa-toggle-off': !item.statusID, 'fa-toggle-on': item.statusID}">
+                    </i>
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <mat-paginator
+          #paginator
+          [length]="length"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions"
+          (page)="pageEvent = getPaginator($event)">
+        </mat-paginator>
+      </div>
+    </div>
+  </div>
+</div>

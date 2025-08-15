@@ -1,0 +1,141 @@
+:host mat-cell {
+	font-size: 90%;
+	line-height: normal;
+}
+
+:host .mat-mdc-row {
+	height: 41px;
+	min-height: 41px;
+}
+
+:host mat-header-row {
+	height: 44px;
+	min-height: 44px;
+}
+
+:host mat-header-cell {
+	line-height: normal;
+}
+
+mat-header-row {
+	background: #004899;
+	color: white;
+}
+
+.download-label {
+	font-size: 90%;
+	color: black;
+}
+
+::ng-deep .mat-mdc-menu-content {
+	padding: 0 !important;
+}
+
+::ng-deep .mat-mdc-menu-item-text {
+	letter-spacing: 0 !important;
+	font-size: 14px !important;
+	color: black;
+}
+
+.mat-mdc-menu-item {
+	min-height: 41px !important;
+}
+
+mat-header-row {
+	min-height: 40px !important;
+}
+
+.download-button {
+	font-size: 14px;
+	background: transparent;
+	letter-spacing: 0;
+	color: #00000099 !important;
+	font-weight: 400;
+}
+
+mat-calendar {
+	margin-bottom: -9px;
+}
+
+::ng-deep .mat-datepicker-actions {
+	background: white;
+	border-radius: 4px;
+}
+
+::ng-deep .mat-calendar-content {
+	padding: 0 8px 0 8px !important;
+}
+
+::ng-deep .mat-datepicker-content {
+	border-bottom-left-radius: 0 !important;
+	border-bottom-right-radius: 0 !important;
+}
+
+mat-cell {
+	word-wrap: break-word !important;
+	white-space: unset !important;
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	word-break: break-word;
+	-ms-hyphens: auto;
+	-moz-hyphens: auto;
+	-webkit-hyphens: auto;
+	hyphens: auto;
+	font-size: 90%;
+}
+
+.mat-column-documentNumber {
+	flex: 0 0 9.5% !important;
+	width: 9.5% !important;
+}
+
+.mat-column-parallelCode {
+	flex: 0 0 5% !important;
+	width: 5% !important;
+}
+
+.mat-column-nameProject {
+	flex: 0 0 12% !important;
+	width: 12% !important;
+}
+
+.mat-column-modalityName {
+	flex: 0 0 8% !important;
+	width: 8% !important;
+}
+
+.mat-column-levelName {
+	flex: 0 0 9% !important;
+	width: 9% !important;
+}
+
+.mat-column-careeName {
+	flex: 0 0 9% !important;
+	width: 9% !important;
+}
+
+.mat-column-cycleDesc {
+	flex: 0 0 9% !important;
+	width: 9% !important;
+}
+
+.mat-column-grade {
+	flex: 0 0 6% !important;
+	width: 6% !important;
+}
+
+.mat-column-gradeState {
+	flex: 0 0 8% !important;
+	width: 8% !important;
+}
+
+mat-header-cell {
+	justify-content: center;
+}
+
+.link {
+	color: #004899;
+	text-decoration: underline;
+	cursor: pointer;
+	font-size: smaller;
+}

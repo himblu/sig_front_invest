@@ -1,0 +1,83 @@
+<!-- Mostrar el buscador y las tarjetas solo si no se está en modo formulario -->
+<div *ngIf="!isFormActive">
+  <div class="search-container">
+    <div class="input-group">
+            <span class="input-group-text">
+                <mat-icon>search</mat-icon>
+            </span>
+      <input
+        type="text"
+        class="form-control search-input"
+        placeholder="Buscar Instrumento"
+        [(ngModel)]="searchText">
+    </div>
+  </div>
+
+  <div class="card-container">
+    <mat-card *ngFor="let instrument of filteredInstruments()" class="instrument-card">
+      <!--            <img mat-card-image [src]="instrument.FormImageUrl || 'assets/default.jpg'" alt="Instrument Image">-->
+      <mat-card-content>
+        <h1 matTooltip="{{ instrument.FormDescription }}">{{ instrument.FormName }}</h1>
+        <button class="btn bg-primary-color" (click)="showForm(instrument)">
+          <i class="fa fa-gear mr-1"></i>Crear
+        </button>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+<!-- Mostrar solo cuando el formulario está activo -->
+<div *ngIf="isFormActive" class="d-flex flex-column " style="gap:20px">
+  <div class="d-flex justify-content-between p-2">
+    <button class="btn bg-primary-color " (click)="goBack()">
+      <i class="fa fa-chevron-left mr-1"></i>Volver
+    </button>
+    <div class=" d-flex align-items-center">
+      <h1 class="text-primary-color d-flex align-items-center">
+        <strong>{{ instrumentSelected?.FormName }}</strong>
+      </h1>
+    </div>
+    <button class="btn bg-primary-color" (click)="onSubmit()" [disabled]="Object.keys(this.selectedUsers).length==0">
+      <i class="fa fa-save mr-1"></i>Guardar Configuración
+    </button>
+  </div>
+
+  <app-dynamic-form [formConfig]="formConfig" [urlReport]="instrumentSelected.endPointPostReport" (changeEvent)="onFormChange($event)"
+                    (clearResult)="clearResult()"></app-dynamic-form>
+
+  <app-dynamic-list
+    *ngIf="this.instrumentSelected.evaluationTeachers && dataEvaluationTeachers.length>0  "
+    [availableEvaluators]="dataEvaluationTeachers" (data)="fillData($event)"></app-dynamic-list>
+
+
+  <app-cards-users
+    *ngIf="!Array.isArray(dataFollowUp) && !this.instrumentSelected.evaluationTeachers"
+    [data]="dataFollowUp"
+    [isDisabled]="!!instrumentSelected.isDisabledSelects"
+    [selectAll]="!!instrumentSelected.selectAllSelects"
+    (selectionChange)="onSelectionChange($event)">
+  </app-cards-users>
+
+
+  <ng-container class="m-2"
+                *ngIf="dataEvaluationTeachers.length>0 && instrumentSelected.evaluationTeachers && data.length>0">
+    <div class=" d-flex align-items-center justify-content-center">
+      <h1 class="text-primary-color"><strong>Grupos de evaluaciones</strong></h1>
+    </div>
+    <div *ngFor="let item of data; let i = index" class="d-flex justify-content-center">
+      <app-cards-users
+        class="w-100"
+        [data]="item"
+        [isDisabled]="!!instrumentSelected.isDisabledSelects"
+        [selectAll]="!!instrumentSelected.selectAllSelects"
+        (selectionChange)="onSelectionChange($event)">
+      </app-cards-users>
+      <button class="btn btn-danger btn-sm" (click)="deleteGroup(i)" style="height: 40px">
+        <i class="fa fa-times mr-1"></i>Eliminar
+      </button>
+    </div>
+  </ng-container>
+
+</div>
+
+

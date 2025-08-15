@@ -1,0 +1,121 @@
+
+<div style="display: flex; justify-content: end; align-items: center; background: transparent;" class="p-2 mb-3">
+  <mat-icon style="cursor: pointer; color: red;" [matDialogClose]="false" class="red-icon" matRipple>close</mat-icon>
+</div>
+
+<mat-dialog-content>
+
+  <div *ngIf="loading; else table">
+    <spinner-loader></spinner-loader>
+  </div>
+
+  <ng-template #table>
+    <div [formGroup]="form">
+      <h3 class="text-center mb-4" style="font-weight: 500; color: #014898;">VALIDACIÓN DE DOCUMENTOS</h3>
+      <div class="row mb-4 no-gutters p-3" style="border: 1px solid #cccccc; border-radius: 3px;">
+        <div class="col-8 row no-gutters">
+          <div class="col-6 pl-2">
+            <h5 style="font-weight: bold; letter-spacing: 1px; margin-bottom: 0">NOMBRE:</h5>
+            <p style="font-size: 12px;">{{ data.enrolledStudent.student }}</p>
+          </div>
+          <div class="col-6 pl-2">
+            <h5 style="font-weight: bold; letter-spacing: 1px; margin-bottom: 0">CARRERA:</h5>
+            <p style="font-size: 12px;">{{ data.enrolledStudent.career }}</p>
+          </div>
+          <div class="col-6 pl-2">
+            <h5 style="font-weight: bold; letter-spacing: 1px; margin-bottom: 0">IDENTIFICACIÓN:</h5>
+            <p style="font-size: 12px;">{{ data.enrolledStudent.documentNumber }}</p>
+          </div>
+          <div class="col-6 pl-2">
+            <h5 style="font-weight: bold; letter-spacing: 1px; margin-bottom: 0">CELULAR:</h5>
+            <p style="font-size: 12px;">{{ data.enrolledStudent.cellPhone }}</p>
+          </div>
+        </div>
+        <div class="col-4" style="text-align: right;">
+          <div class="d-flex justify-content-center">
+            <img *ngIf="image" width="100" height="100" src="{{image}}" alt="Imagen de perfil del estudiante">
+            <img *ngIf="!image" width="100" height="100" [ngSrc]="'assets/images/avatar.jpg'" alt="Imagen de perfil del estudiante">
+          </div>
+        </div>
+        <div class="col-12">
+          <mat-checkbox color="primary" formControlName="sendEmail">
+            Notificar por correo al estudiante el cambio de estado
+          </mat-checkbox>
+        </div>
+      </div>
+      <div>
+        <table class="w-100 mat-elevation-z6">
+          <tbody>
+          <tr>
+            <th>DETALLE</th>
+<!--            <th>ESTADO ACTUAL</th>-->
+            <th>ARCHIVO</th>
+            <th>OBSERVACIÓN</th>
+            <th>ESTADO</th>
+          </tr>
+          <tr *ngIf="!validationDocuments.length">
+            <td colspan="8">EL ESTUDIANTE NO HA CARGADO ARCHIVOS</td>
+          </tr>
+          <tr *ngFor="let item of documentsFormArray.controls; let index = index;" formArrayName="documents">
+
+            <ng-container [formGroupName]="index">
+              <td>
+                {{ item.value.fileTypeName }}
+              </td>
+<!--              <td>-->
+<!--                {{ item.value.statusFileDesc }}-->
+<!--              </td>-->
+              <td>
+                <div class="w-100" (click)="openFile(item.value.urlFile);" style="cursor: pointer;">
+                  <img style="width: 20px;" src="assets/images/file.png" alt="Payment File">
+                  <span style="color: #5090f5;">Ver Archivo</span>
+                </div>
+              </td>
+              <td>
+                <input
+                  class="w-100"
+                  [ngClass]="{ 'invalid': documentsFormArray.get(index.toString())?.hasError('required', 'commentary')
+                 && getDocumentFormGroup(index).get('commentary')?.touched }"
+                  type="text" formControlName="commentary">
+              </td>
+              <td>
+                <select
+                  #select
+                  (change)="setCommentaryAsRequiredField(index, select.value);"
+                  [ngClass]="{ 'invalid': documentsFormArray.get(index.toString())?.hasError('required', 'statusFileID')
+                 && getDocumentFormGroup(index).get('statusFileID')?.touched }"
+                  formControlName="statusFileID">
+                  <option
+                    *ngFor="let state of documentStates;" [ngValue]="state.statusFileID">
+                    {{ state.statusFileDesc }}
+                  </option>
+                </select>
+              </td>
+            </ng-container>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </ng-template>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <div *ngIf="!loading" class="d-flex no-block w-100 justify-content-between">
+    <div class="pl-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;" color="warn" [mat-dialog-close]="false">
+        Cerrar
+      </button>
+    </div>
+    <div class="pr-3">
+      <button
+        mat-raised-button
+        (click)="sendForm();"
+        style="letter-spacing: 0;" color="primary">
+        Validar Documentos
+      </button>
+    </div>
+  </div>
+</mat-dialog-actions>

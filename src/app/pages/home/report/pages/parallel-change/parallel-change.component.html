@@ -1,0 +1,307 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="!charging">
+  <div class="card" *ngIf="student && studentInformation">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-0-5"></div>
+        <div class="col-10"><h4 style="color: #004899;">{{student.firstName}} {{student.surname}} {{student.secondSurname}}</h4></div>
+      </div>
+      <div class="row pl-2 pr-2">
+        <div class="col-0-5"></div>
+        <div class="col-5-5">
+          <div class="row">
+            <div class="col-12">
+              <strong>Escuela: </strong><label style="color: #004899;">{{studentInformation.schoolName}}</label>
+            </div>
+            <div class="col-12">
+              <strong>Carrera: </strong><label style="color: #004899;">{{studentInformation.careerName}}</label>
+            </div>
+            <div class="col-12">
+              <strong>Modalidad: </strong><label style="color: #004899;">{{studentInformation.modalityName}}</label>
+            </div>
+            <div class="col-12" *ngIf="studentInformation.workingDayID">
+              <strong>Sección: </strong><label style="color: #004899;">{{studentInformation.workingDayDesc}}</label>
+            </div>
+            <div class="col-12">
+              <strong>Malla curricular: </strong><label style="color: #004899;">{{studentInformation.studyPlanDesc}}</label>
+            </div>
+          </div>
+        </div>
+        <div class="col-0-5"></div>
+        <div class="col-5-5">
+          <div class="row">
+            <div class="col-12">
+              <strong>Paralelo: </strong>
+              <label style="color: #004899;" *ngIf="studentInformation.parallelCode">{{studentInformation.parallelCode}}</label>
+              <label style="color: #004899;" *ngIf="!studentInformation.parallelCode">-</label>
+            </div>
+            <div class="col-12">
+              <strong>Nro documento: </strong><label style="color: #004899;">{{student.documentNumber}}</label>
+            </div>
+            <div class="col-12">
+              <strong>Fecha nacimiento: </strong><label style="color: #004899;">{{student.birthday}}</label>
+            </div>
+            <div class="col-12">
+              <strong>Periodo (Nivel): </strong><label style="color: #004899;">{{studentInformation.cycleDesc}}</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12" style="text-align: right;">
+          <button type="button" mat-raised-button class="styleButton_sml" style="width: 100px;" (click)="onSubmit()">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<br>
+<div *ngIf="!charging && !singleSubject">
+  <div class="row">
+    <div class="col-12">
+      <!--<button type="button" mat-raised-button class="styleButton_sml" style="max-width: 250px;" (click)="singleSubject= !singleSubject">Por asignatura</button>-->
+    </div>
+  </div><br>
+  <form>
+    <div class="row">
+      <div class="col-6">
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-12">
+                <h3>Origen</h3>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <ng-container *ngFor="let module of schedulesModules">
+                  <p>{{module.classModuleDesc}}</p>
+                  <table class="table-striped">
+                    <thead>
+                      <tr>
+                        <th>Horas</th>
+                        <th>Lunes</th>
+                        <th>Martes</th>
+                        <th>Miércoles</th>
+                        <th>Jueves</th>
+                        <th>Viernes</th>
+                        <th>Sábado</th>
+                        <th>Domingo</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of schedules | filterByModule: module.classModuleID; let i = index">
+                        <td><!-- Horas -->
+                          <label>{{item.startTime}} - {{item.endTime}}</label>
+                        </td>
+                        <td><!-- Lunes -->
+                          <label>{{item.mon}}</label><br>
+                        </td>
+                        <td><!-- Martes -->
+                          <label>{{item.tue}}</label><br>
+                        </td>
+                        <td><!-- Miércoles -->
+                          <label>{{item.wed}}</label><br>
+                        </td>
+                        <td><!-- Jueves -->
+                          <label>{{item.thu}}</label><br>
+                        </td>
+                        <td><!-- Viernes -->
+                          <label>{{item.fri}}</label><br>
+                        </td>
+                        <td><!-- Sábado -->
+                          <label>{{item.sat}}</label><br>
+                        </td>
+                        <td><!-- Domingo -->
+                          <label>{{item.sun}}</label><br>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table><br>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6">
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-2-5">
+                <h3>Destino</h3>
+              </div>
+              <div class="col-4" style="max-height: 10px;" *ngIf="parallels.length">
+                <form [formGroup]="filtersForm">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Paralelos</mat-label>
+                    <mat-select placeholder="Seleccione un paralelo" formControlName="paralleCodeDestin">
+                      <mat-option *ngFor="let item of parallels" [value]="item.parallelCode" (onSelectionChange)="getDestinySchedule(item.parallelCode);">{{item.parallelCode}}</mat-option>
+                    </mat-select>
+                    <mat-error></mat-error>
+                  </mat-form-field>
+                </form>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12" *ngIf="!parallels.length">
+                <h5>No existen paralelos disponibles</h5>
+              </div>
+
+              <ng-container *ngIf="destinySchedules.length">
+                <ng-container *ngFor="let module of schedulesModules">
+                  <div class="col-12">
+                    <p>{{module.classModuleDesc}}</p>
+                    <table class="table-striped" *ngFor="let schedules of destinySchedules">
+                      <thead>
+                        <tr>
+                          <ng-container *ngFor="let head of scheduleHeader">
+                            <th>{{ head }}</th>
+                          </ng-container>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <ng-container *ngFor="let hour of listHours">
+                          <tr>
+                            <td>{{ hour?.startTime }}</td>
+                            <td>{{ hour?.endTime }}</td>
+                            <td >
+                              <ng-container *ngIf="schedules?.lun">
+                                <p *ngFor="let subj of schedules?.lun[hour.startTime+'-'+hour.endTime] | filterDestinyByModule: module.classModuleID">
+                                  {{ subj.courseName }} - {{ subj.teacher}}
+                                </p>
+                              </ng-container>
+                            </td>
+                            <td>
+                              <ng-container *ngIf="schedules?.mar">
+                                <p *ngFor="let subj of schedules?.mar[hour.startTime+'-'+hour.endTime] | filterDestinyByModule: module.classModuleID">
+                                  {{ subj.courseName }} - {{ subj.teacher}}
+                                </p>
+                              </ng-container>
+                            </td>
+                            <td>
+                              <ng-container *ngIf="schedules?.mie">
+                                <p *ngFor="let subj of schedules?.mie[hour.startTime+'-'+hour.endTime] | filterDestinyByModule: module.classModuleID">
+                                  {{ subj.courseName }} - {{ subj.teacher}}
+                                </p>
+                              </ng-container>
+                            </td>
+                            <td>
+                              <ng-container *ngIf="schedules?.jue">
+                                <p *ngFor="let subj of schedules?.jue[hour.startTime+'-'+hour.endTime] | filterDestinyByModule: module.classModuleID">
+                                  {{ subj.courseName }} - {{ subj.teacher}}
+                                </p>
+                              </ng-container>
+                            </td>
+                            <td>
+                              <ng-container *ngIf="schedules?.vie">
+                                <p *ngFor="let subj of schedules?.vie[hour.startTime+'-'+hour.endTime] | filterDestinyByModule: module.classModuleID">
+                                  {{ subj.courseName }} - {{ subj.teacher}}
+                                </p>
+                              </ng-container>
+                            </td>
+                            <td>
+                              <ng-container *ngIf="schedules?.sab">
+                                <p *ngFor="let subj of schedules?.sab[hour.startTime+'-'+hour.endTime] | filterDestinyByModule: module.classModuleID">
+                                  {{ subj.courseName }} - {{ subj.teacher}}
+                                </p>
+                              </ng-container>
+                            </td>
+                            <td>
+                              <ng-container *ngIf="schedules?.dom">
+                                <p *ngFor="let subj of schedules?.dom[hour.startTime+'-'+hour.endTime] | filterDestinyByModule: module.classModuleID">
+                                  {{ subj.courseName }} - {{ subj.teacher}}
+                                </p>
+                              </ng-container>
+                            </td>
+                          </tr>
+                        </ng-container>
+                      </tbody>
+                    </table><br>
+                  </div>
+                </ng-container>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div *ngIf="!charging && singleSubject">
+  <div class="row">
+    <div class="col-12">
+      <button type="button" mat-raised-button class="styleButton_sml" style="max-width: 250px;" (click)="singleSubject= !singleSubject">Todas las asignaturas</button>
+    </div>
+  </div><br>
+  <form>
+    <div class="row">
+      <div class="col-6">
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-12">
+                <h3>Origen</h3>
+              </div>
+              <div class="col-12">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>Asignaturas</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Tics</td>
+                      <td>></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6">
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-12">
+                <h3>Destino</h3>
+              </div>
+              <div class="col-12">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>Asignaturas</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Tics</td>
+                      <td>-</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

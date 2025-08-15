@@ -1,0 +1,75 @@
+<div style="display: flex; justify-content: end; align-items: center; background: transparent;" class="p-2">
+  <mat-icon style="cursor: pointer; color: red;" [matDialogClose]="false" class="red-icon" matRipple>close</mat-icon>
+</div>
+
+<mat-dialog-content>
+  <div *ngIf="isLoading; else form;">
+    <spinner-loader></spinner-loader>
+  </div>
+
+  <ng-template #form>
+    <div class="card">
+      <div class="card-body">
+        <form [formGroup]="sustantiveForm">
+          <div class="row">
+            <div class="col-12">
+              <h4 style="color: #004899;">NOMBRE: <label style="color: black;">{{currentTeacher?.firstName}} {{currentTeacher?.surname}}</label></h4>
+            </div>
+            <div class="col-10">
+              <h4 style="color: #004899;">NRO IDENTIFICACIÓN: <label style="color: black;">{{currentTeacher?.documentNumber}}</label></h4>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th colspan="2">Funciones sustantivas</th>
+                  </tr>
+                </thead>
+                <tbody formArrayName="dynamics">
+                  <ng-container>
+                    <tr *ngFor="let item of sustantiveFunctions; let i=index;" [formGroupName]="i">
+                      <td>{{item.scheduleTypeName}}</td>
+                      <td>
+                        <div style="height: 12px;">
+                          <mat-form-field class="width" appearance="outline">
+                            <mat-label>Horas</mat-label>
+                            <input type="number" matInput formControlName="amount">
+                          </mat-form-field>
+                        </div>
+                      </td>
+                    </tr>
+                  </ng-container>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </ng-template>
+</mat-dialog-content>
+
+<mat-dialog-actions *ngIf="data.flag">
+  <div class="d-flex no-block w-100 justify-content-between">
+    <div class="pl-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="warn"
+        [mat-dialog-close]="false">
+        Cerrar
+      </button>
+    </div>
+    <div class="pr-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="primary"
+        (click)="onSubmit();">
+        Guardar
+      </button>
+    </div>
+  </div>
+</mat-dialog-actions>

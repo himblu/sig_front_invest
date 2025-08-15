@@ -1,0 +1,7 @@
+<div class="progress progress-xs margin-vertical-10 ">
+    <div class="progress-bar progress-bar-striped active" 
+        style="height:15px; background-color: #28a745;"
+        [style.width]="getPercentage">
+        <span *ngIf="progress > 0" style="background-color: #0002035b;">{{busyHours}} de {{totalHours}}</span>
+    </div>
+</div>

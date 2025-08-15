@@ -1,0 +1,75 @@
+<div class="container">
+
+    <div class="row mt-4">
+        <div class="col">
+            <mat-form-field class="width" appearance="outline">
+                <mat-label>Bloque</mat-label>
+                <mat-select formControlName="tipoDocumento">
+                    <mat-option [value]=1>Pasaporte</mat-option>
+                    <mat-option [value]=2>Carnet Refugiado</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div class="col">
+            <mat-form-field class="width" appearance="outline">
+                <mat-label>Aula</mat-label>
+                <mat-select formControlName="tipoDocumento">
+                    <mat-option [value]=1>Pasaporte</mat-option>
+                    <mat-option [value]=2>Carnet Refugiado</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+    <div class="table-wrapper">
+        <table class="mat-elevation-z8">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th *ngFor="let day of daysOfWeek;" class="text-capitalize">{{ day.name }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>00:00</td>
+                    <td>Disponible</td>
+                    <td>Disponible</td>
+                    <td>Disponible</td>
+                    <td>Disponible</td>
+                    <td>Disponible</td>
+                    <td>Disponible</td>
+                    <td>Disponible</td>
+                </tr>
+                <tr>
+                    <td>01:00</td>
+                    <td>Disponible</td>
+                    <td>Disponible</td>
+                    <td>Disponible</td>
+                    <td>Disponible</td>
+                    <td>Disponible</td>
+                    <td>Disponible</td>
+                    <td>Disponible</td>
+                </tr>
+                <tr>
+                    <td>02:00</td>
+                    <td>Disponible</td>
+                    <td>Disponible</td>
+                    <td>Disponible</td>
+                    <td>Disponible</td>
+                    <td>Disponible</td>
+                    <td>Disponible</td>
+                    <td>Disponible</td>
+                </tr>
+                <tr>
+                    <td>03:00</td>
+                    <td>Disponible</td>
+                    <td>Disponible</td>
+                    <td>Disponible</td>
+                    <td>Disponible</td>
+                    <td>Disponible</td>
+                    <td>Disponible</td>
+                    <td>Disponible</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

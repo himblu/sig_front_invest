@@ -1,0 +1,91 @@
+<div class="animated fadeIn fast">
+  <div class="form-row">
+    <div class="col-12 p-3">
+      <div class="card">
+        <div class="card-header p-2">
+          <div class="form-row">
+            <div class="col-5 pt-2 text-primary-color">
+              <strong class="text-uppercase">
+                <i class="fa fa-cog mr-1"></i>Administración de Notas --
+              </strong>
+            </div>
+            <div class="col-7 text-right">
+              <span class="badge font-nm mt-1 mr-2" *ngIf="newSaveScore.existsInvalids || newSaveScore.existsModifies"
+               [ngClass]="{'bg-danger': newSaveScore.existsInvalids, 'bg-warning': newSaveScore.existsModifies}">
+                <span *ngIf="newSaveScore.existsInvalids" class="">
+                  <i class="fa fa-times mr-1"></i>Existen errores en el formulario
+                </span>
+                <span *ngIf="newSaveScore.existsModifies" class="">
+                  <i class="fa fa-check mr-1"></i>Existen modificaciones en el formulario
+                </span>
+              </span>
+              <button class="btn btn bg-primary-color" [disabled]="newSaveScore.existsInvalids || !newSaveScore.existsModifies" (click)="saveScores()">
+                <i class="fa fa-save mr-1"></i>Guardar Cambios en Notas
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body p-2">
+          <div class="form-row">
+            <div class="col-4">
+              <button class="btn btn-sm bg-primary-color" (click)="getGradesReport('pdf')">
+                <i class="fa fa-copy mr-1"></i>Calificaciones PDF
+              </button>
+            </div>
+            <div class="col-4">
+              <input type="text" placeholder="BUSCAR POR TEXTO" name="text" [(ngModel)]="filter.text"
+              class="form-control text-uppercase">
+            </div>
+            <div class="col-4 text-right">
+              <span class="badge badge-light font-nm">
+                <i class="fa fa-check text-primary-color mr-1"></i>Solo las notas habilitadas serán evaluadas.
+              </span> <br>
+              <span class="badge badge-light font-nm">
+                <i class="fa fa-square-o text-primary-color mr-1"></i>Las notas nulas serán reemplazadas con 0 (cero).
+              </span>
+            </div>
+          </div>
+          <div class="col-12 mt-3 p-0">
+            <div class="table-responsive">
+              <table class="table table-bordered table-sm" id="studentsTable">
+                <thead class="bg-primary-color">
+                  <tr>
+                    <th style="vertical-align: middle;" class="text-uppercase">Nombre del Estudiante</th>
+                    <th style="vertical-align: middle;" class="text-uppercase">NRO DOCUMENTO</th>
+                    <th style="width: 10%; vertical-align: middle;" *ngFor="let g of componentsOfCourse"
+                      class="text-center" [ngClass]="{'bg-danger': g.nroSequence === 1}">
+                      <small>{{g.typeEvaluacionDesc}}</small>
+                    </th>
+                    <th class="text-center" style="vertical-align: middle;">
+                      ESTADO
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let s of students">
+                    <td class="p-0 pl-2" style="vertical-align: middle;">{{s.fullName | uppercase}}</td>
+                    <td class="p-0 pl-2" style="vertical-align: middle;">{{s.documentNumber | uppercase}}</td>
+                    <td class="p-0" *ngFor="let g of s.scores; let i = index">
+                      <input type="number" name="grade-{{i}}" [ngClass]="{'is-invalid': g.isInvalid}" placeholder="NULO"
+                             (change)="validateScore()" (keyup)="validateScore()" (blur)="validateScore()"
+                             [disabled]="!g.inBD || g.blocked"
+                             [(ngModel)]="g.grade" min="0" max="20" step="0.01"
+                             class="form-control form-control-sm text-right"
+                             required
+                             [title]="(!g.inBD || g.blocked) ? s.gradingTeacher +'\n'+ s.gradingDate : ''">
+<!--                             [title]="(!g.inBD || g.blocked) && g.grade>0 ? 'Zoyla &#45;&#45;Cabrera \n 10/02/2025' : ''">-->
+
+                      <!-- <span class="invalid-feedback" *ngIf="g.grade == null || g.grade === undefined">Nota sera 0</span> -->
+                      <span class="invalid-feedback" *ngIf="g.isInvalid">Nota erronea</span>
+                    </td>
+                    <td class="text-center">{{(s.stateGrade || 'REPROBADO') | uppercase}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

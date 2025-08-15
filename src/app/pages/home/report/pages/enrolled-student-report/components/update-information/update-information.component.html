@@ -1,0 +1,424 @@
+<div class="animated fadeIn fast">
+  <!--<h2 class="text-center">ACTUALIZACIÓN DE INFORMACIÓN</h2>-->
+  <mat-stepper #stepper class="mat-elevation-z2 custom-header" [linear]="true" [formGroup]="form">
+
+    <mat-step>
+
+      <ng-template matStepLabel><span class="step-label">INFORMACIÓN PERSONAL</span></ng-template>
+      <form [formGroup]="form | stepFormGroup : 1">
+        <div class="row mt-4">
+          <div class="col-md-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label><small>Tipo de documento</small></mat-label>
+              <mat-select formControlName="typeDocument" #typeDocument (selectionChange)="form.get('1').get('documentNumber').patchValue('')">
+                <mat-option value="">Seleccione una opción</mat-option>
+                <mat-option *ngFor="let item of identityList" [value]="item.typeDocId">{{item.typeDocName}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-md-3">
+            <mat-form-field appearance="outline">
+              <mat-label>Numero de documento</mat-label>
+              <ng-container *ngIf="typeDocument.value === 1; else passport;">
+                <input type="text" matInput formControlName="documentNumber" readonly="false" [maxLength]="10"
+                onKeypress="if (event.keyCode < 45 || event.keyCode > 57) event.returnValue = false;">
+              </ng-container>
+              <ng-template #passport>
+                <input type="text" matInput formControlName="documentNumber" readonly="false">
+              </ng-template>
+            </mat-form-field>
+          </div>
+          <div class="col-md-3"></div>
+          <div class="col-md-3"></div>
+        </div>
+        <div class="row">
+          <div class="col-md-3">
+            <mat-form-field appearance="outline">
+              <mat-label>Nombres</mat-label>
+              <input type="text" matInput formControlName="firstName">
+            </mat-form-field>
+          </div>
+          <div class="col-md-3">
+            <mat-form-field appearance="outline">
+              <mat-label>Apellido Paterno</mat-label>
+              <input type="text" matInput formControlName="surname">
+            </mat-form-field>
+          </div>
+          <div class="col-md-3">
+            <mat-form-field appearance="outline">
+              <mat-label>Apellido Materno</mat-label>
+              <input type="text" matInput formControlName="secondSurname">
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label><small>Nacionalidad</small></mat-label>
+              <mat-select formControlName="nationalityID">
+                <mat-option value="">Seleccione una opción</mat-option>
+                <mat-option *ngFor="let item of nationalityList"
+                  [value]="item.countryID">{{item.nationality_1}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-md-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label><small>Fecha Nacimiento</small></mat-label>
+              <input type="date" formControlName="birthday" #birthday matInput (click)="birthday.showPicker()">
+              <mat-icon style="cursor: pointer;" matSuffix (click)="birthday.showPicker()">calendar_month</mat-icon>
+              <mat-hint>dd/mm/aaaa</mat-hint>
+              <mat-error></mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-md-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label><small>Pais de Nacimiento</small></mat-label>
+              <mat-select formControlName="countryID">
+                <mat-option value="">Seleccione una opción</mat-option>
+                <mat-option *ngFor="let item of countriesList"
+                  [value]="item.countryID">{{item.countryName}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <enrollment-combo *ngIf="checkIfShowCombo" (parishOut)="getParish( $event,1 )"
+          (provinceOut)="getCanton( $event,1 )" (cantonOut)="getProvince( $event,1 )"
+          (getStatusForm)="getStatusForm($event,1)" [province]="province" [canton]="canton"
+          [parish]="parish">
+        </enrollment-combo>
+        <div class="row">
+          <div class="col-md-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label><small>Estado Civil</small></mat-label>
+              <mat-select formControlName="civilStatusID">
+                <mat-option value="">Seleccione una opción</mat-option>
+                <mat-option *ngFor="let item of civilList"
+                  [value]="item.civilStatusID">{{item.civilStatusDesc}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-md-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label><small>Tipo de Sangre</small></mat-label>
+              <mat-select formControlName="bloodTypeID">
+                <mat-option value="">Seleccione una opción</mat-option>
+                <mat-option *ngFor="let item of bloodList"
+                  [value]="item.bloodTypeID">{{item.bloodTypeName}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-md-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label><small>Género</small></mat-label>
+              <mat-select formControlName="genderID">
+                <mat-option value="">Seleccione una opción</mat-option>
+                <mat-option *ngFor="let item of genderList" [value]="item.genderID">{{item.genderDesc}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-md-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label><small>Sexo</small></mat-label>
+              <mat-select formControlName="sexID">
+                <mat-option value="">Seleccione una opción</mat-option>
+                <mat-option *ngFor="let item of sexList" [value]="item.sexID">{{item.sexDesc}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label><small>Grupo Cultural</small></mat-label>
+              <mat-select formControlName="ethnicityID" (selectionChange)="changeEtnia($event.value)">
+                <mat-option value="">Seleccione una opción</mat-option>
+                <mat-option *ngFor="let item of etniaList"
+                  [value]="item.ethnicityID">{{item.ethnicityDesc}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-md-3">
+            <mat-form-field class="width" appearance="outline" *ngIf="nationalTownsList.length > 0">
+              <mat-label><small>Pueblos y Nacionalidades</small></mat-label>
+              <mat-select formControlName="nationalTownID">
+                <mat-option value="">Seleccione una opción</mat-option>
+                <mat-option>--</mat-option>
+                <mat-option *ngFor="let item of nationalTownsList"
+                  [value]="item.nationalTownID">{{item.nationalTownDesc}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-md-3"></div>
+          <div class="col-md-3"></div>
+        </div>
+      </form>
+
+      <div class="d-flex justify-content-end">
+        <button mat-raised-button (click)="sendForm(1);" class="blue-button">Guardar y Avanzar</button>
+      </div>
+    </mat-step>
+
+    <mat-step>
+
+      <ng-template matStepLabel><span class="step-label">CONTACTO PERSONAL</span></ng-template>
+      <form [formGroup]="form | stepFormGroup : 2">
+        <div class="row">
+          <div class="col-2">
+            <button mat-raised-button type="button" class="green-button" (click)="buildContactPhoneFormArray();">
+              <mat-icon>add</mat-icon>
+              Añadir Contacto
+            </button>
+          </div>
+          <div class="col-2" *ngIf="contactPhoneStudent.controls.length > 0">
+            <button mat-raised-button class="blue-button" type="button" (click)="postContacts()">Guardar contactos</button>
+          </div>
+          <div class="col-2" *ngIf="contactPhoneStudent.controls.length > 0">
+            <button mat-raised-button class="blue-button" type="button" (click)="removeContactPhoneFormArray()">Remover último contacto</button>
+          </div>
+        </div>
+        <div formArrayName="contactPhone">
+          <ng-container *ngFor="let item of contactPhoneStudent.controls; let index = index; let first = first;">
+            <div class="row mt-4" [formGroupName]="index">
+              <div class="col-md-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label><small>Operadora Telefónica</small></mat-label>
+                  <mat-select formControlName="operatorID">
+                    <mat-option value="">Seleccione una opción</mat-option>
+                    <mat-option *ngFor="let item of operatorsList"
+                      [value]="item.operatorID">{{item.operatorName}}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-md-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label><small>Celular</small></mat-label>
+                  <input matInput formControlName="cellPhone" [patterns]="phone" #celular maxlength="10" mask="S*">
+                </mat-form-field>
+              </div>
+              <div class="col-md-3">
+                <mat-form-field appearance="outline">
+                  <mat-label><small>Telefono Convencional</small></mat-label>
+                  <input matInput formControlName="numberConventional" [patterns]="phone" #conventional maxlength="10"
+                    mask="S*">
+                </mat-form-field>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </form>
+      <br>
+      <form [formGroup]="form | stepFormGroup : 6">
+        <div class="row">
+          <div class="col-2">
+            <button mat-raised-button type="button" class="green-button" (click)="buildEmailStudentFormArray();">
+              <mat-icon>add</mat-icon>
+              Añadir Email
+            </button>
+          </div>
+          <div class="col-2" *ngIf="emailsStudent.controls.length > 0">
+            <button mat-raised-button class="blue-button" type="button" (click)="postEmails()">Guardar emails</button>
+          </div>
+          <div class="col-2" *ngIf="emailsStudent.controls.length > 0">
+            <button mat-raised-button class="blue-button" type="button" (click)="removeEmailStudentFormArray()">Remover último email</button>
+          </div>
+        </div>
+        <div formArrayName="emails">
+          <div class="row mt-4">
+            <ng-container *ngFor="let item of emailsStudent.controls; let index = index; let first = first;">
+              <div [formGroupName]="index">
+                <div class="col">
+                  <mat-form-field class="width" appearance="outline">
+                    <mat-label><small>Correo Electronico</small></mat-label>
+                    <input matInput formControlName="emailDesc" type="mail">
+                  </mat-form-field>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </form>
+      <form [formGroup]="form | stepFormGroup : 3">
+        <div class="row ml-1">
+          <h3 class="text-center" style="color: black;">Datos Domicilo Actual</h3>
+        </div>
+        <div class="row">
+          <div class="col-md-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label><small>Pais</small></mat-label>
+              <mat-select formControlName="countryID">
+                <mat-option value="">Seleccione una opción</mat-option>
+                <mat-option *ngFor="let item of countriesList"
+                  [value]="item.countryID">{{item.countryName}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+        <enrollment-combo *ngIf="showParishContact" (parishOut)="getParish( $event ,3)" (provinceOut)="getCanton( $event,3 )"
+          (cantonOut)="getProvince( $event,3 )" (getStatusForm)="getStatusForm($event,3)" [province]="provinceContact"
+          [canton]="cantonContact" [parish]="parishContact">
+        </enrollment-combo>
+        <div class="row">
+          <div class="col-md-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label><small>Calle Principal</small></mat-label>
+              <input matInput formControlName="mainStreet">
+            </mat-form-field>
+          </div>
+          <div class="col-md-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label><small>Numero de Casa</small></mat-label>
+              <input matInput formControlName="numberAddress">
+            </mat-form-field>
+          </div>
+          <div class="col-md-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label><small>Calle Secundaria 1</small></mat-label>
+              <input matInput formControlName="secondaryStreet_1">
+            </mat-form-field>
+          </div>
+          <div class="col-md-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label><small>Calle Secundaria 2</small></mat-label>
+              <input matInput formControlName="secondaryStreet_2">
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <mat-form-field appearance="outline">
+              <mat-label><small> Referencia</small> </mat-label>
+              <textarea formControlName="addressReferences" matInput placeholder="Referencia"></textarea>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <mat-form-field appearance="outline">
+              <mat-label><small> Descripcion</small> </mat-label>
+              <textarea formControlName="description" matInput placeholder="Descripcion"></textarea>
+            </mat-form-field>
+          </div>
+        </div>
+      </form>
+      <div class="d-flex justify-content-end">
+        <button mat-raised-button (click)="sendContactInfo();" class="blue-button">Guardar y Avanzar</button>
+      </div>
+    </mat-step>
+
+    <mat-step>
+      <ng-template matStepLabel><span class="step-label">INFORMACIÓN DE EMERGENCIA</span></ng-template>
+      <form [formGroup]="form | stepFormGroup : 7">
+        <div class="row">
+          <button mat-raised-button type="button" class="green-button" (click)="buildContacEmergencyFormArray();">
+            <mat-icon>add</mat-icon>
+            Añadir Contacto
+          </button>
+        </div>
+        <div formArrayName="emergencyContacts">
+          <ng-container *ngFor="let item of contactEmergencyFormArray.controls; let index = index; let first = first;">
+            <div [formGroupName]="index">
+              <div class="row mt-4">
+                <div class="col-md-3">
+                  <mat-form-field class="width" appearance="outline">
+                    <mat-label><small>Persona a llamar</small></mat-label>
+                    <input matInput formControlName="contactFullName">
+                  </mat-form-field>
+                </div>
+                <div class="col-md-3">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Parentesco</mat-label>
+                    <mat-select formControlName="relationShipID">
+
+                      <ng-container>
+                        <mat-option value="">Yo Mismo</mat-option>
+                        <mat-option *ngFor="let relationship of relationships" [value]="relationship.relationShipID">
+                          {{ relationship.relationName }}
+                        </mat-option>
+                      </ng-container>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div class="col-md-3">
+
+                  <mat-form-field class="width" appearance="outline">
+                    <mat-label><small>Celular</small></mat-label>
+                    <input matInput formControlName="contactPhone" [patterns]="phone" #celular maxlength="10" mask="S*">
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Direccion</mat-label>
+                    <textarea formControlName="contactAddress" matInput placeholder="Direccion"></textarea>
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </form>
+      <div class="d-flex justify-content-end">
+        <button mat-raised-button (click)="sendForm(7);" class="blue-button">Guardar y Avanzar</button>
+      </div>
+    </mat-step>
+
+    <mat-step>
+      <ng-template matStepLabel><span class="step-label">OTROS</span></ng-template>
+      <form [formGroup]="form | stepFormGroup : 5">
+        <div class="row" >
+          <div class="col">
+            <mat-checkbox (change)="addDisability($event.checked)" class="example-margin" [checked]="hasDisability">¿Tiene algun tipo de discapacidad?
+            </mat-checkbox>
+          </div>
+        </div>
+        <div formArrayName="disability">
+          <ng-container *ngFor="let item of disabilityFormArray.controls; let index = index; let first = first;">
+        <div *ngIf="hasDisability" [formGroupName]="index">
+          <div class="row">
+            <div class="col-md-4">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label><small>Tipo de discapacidad</small></mat-label>
+                <mat-select formControlName="disabilityID">
+                  <mat-option value="">Seleccione uno</mat-option>
+                  <mat-option *ngFor="let item of disabilityList"
+                    [value]="item.disabilityID">{{item.disabilityName}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-md-4">
+              <mat-form-field appearance="outline">
+                <mat-label>Porcentaje de discapacidad</mat-label>
+                <input formControlName="percentageDisability" matInput maxlength="3" matInput mask="S*"
+                [patterns]="phone"/>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <mat-form-field appearance="outline">
+                <mat-label>Descripcion de la discapacidad</mat-label>
+                <textarea formControlName="commentary" matInput placeholder="Descripcion"></textarea>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+      </form>
+
+        <div class="row">
+          <div class="col">
+            <mat-checkbox class="example-margin" (change)="addForeingTitle($event.checked)" [checked]="hasForeingTitle">¿Tiene titulo extranjero?
+            </mat-checkbox>
+          </div>
+        </div>
+
+      <div class="d-flex justify-content-end">
+        <button mat-raised-button (click)="sendForm(5);" class="blue-button">Guardar y Avanzar</button>
+      </div>
+    </mat-step>
+  </mat-stepper>
+</div>

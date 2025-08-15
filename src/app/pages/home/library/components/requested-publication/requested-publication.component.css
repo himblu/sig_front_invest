@@ -1,0 +1,153 @@
+:host mat-cell {
+	font-size: 90%;
+	line-height: normal;
+}
+
+:host .mat-mdc-row {
+	height: 41px;
+	min-height: 41px;
+}
+
+:host mat-header-row {
+	height: 44px;
+	min-height: 44px;
+}
+
+:host mat-header-cell {
+	line-height: normal;
+}
+
+:host ::ng-deep .mat-mdc-menu-content {
+	padding: 0 !important;
+}
+
+:host ::ng-deep .mat-mdc-menu-item {
+	font-size: 95%;
+	letter-spacing: 0;
+}
+
+mat-table, mat-paginator {
+	background: transparent;
+}
+
+mat-header-row {
+	background: #004899;
+	color: white;
+}
+
+::ng-deep .mat-mdc-menu-content {
+	padding: 0 !important;
+}
+
+::ng-deep .mat-mdc-menu-item {
+	min-height: 36px !important;
+}
+
+::ng-deep .mat-drawer-backdrop.mat-drawer-shown {
+	background-color: transparent !important;
+}
+
+:host ::ng-deep .mat-mdc-select-value-text {
+	font-size: 14px;
+	letter-spacing: 0;
+}
+
+:host ::ng-deep div.mat-mdc-select-panel {
+	padding: 0 !important;
+}
+
+:host ::ng-deep .mat-mdc-tab .mdc-tab__text-label {
+	letter-spacing: 0;
+	font-size: 14px;
+}
+
+.item {
+	font-size: 14px;
+	letter-spacing: 0;
+}
+
+.cell-content {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: block; /* Asegura que se aplique correctamente en las celdas */
+	max-width: 100%; /* Limita el ancho al tamaño del contenedor */
+}
+
+.cell-content:hover {
+	cursor: pointer; /* Indica que hay un contenido adicional al pasar el ratón */
+}
+
+/* Código */
+.dewey-code-column {
+	flex: 1 1 15%; /* Ajusta el ancho */
+	max-width: 8%;
+	text-align: left;
+}
+
+/* Título */
+.title-column {
+	flex: 2 2 30%;
+	max-width: 22%;
+	/*min-width: 25%;*/
+	text-align: left;
+}
+
+/* Edición */
+.edition-column {
+	flex: 1 1 10%;
+	max-width: 10%;
+	text-align: center;
+}
+
+/* ISBN */
+.isbn-column {
+	flex: 1 1 15%;
+	max-width: 15%;
+	text-align: center;
+}
+
+/* Año de publicación */
+.year-column {
+	flex: 1 1 10%;
+	max-width: 10%;
+	text-align: center;
+}
+
+/* Fecha de solicitud */
+.date-request-column {
+	flex: 1.5 1.5 15%;
+	max-width: 15%;
+	text-align: center;
+}
+
+/* Fecha de entrega */
+.date-delivery-column {
+	flex: 1.5 1.5 15%;
+	max-width: 15%;
+	text-align: center;
+}
+
+/* Estado */
+.status-column {
+	flex: 1 1 10%;
+	max-width: 10%;
+	text-align: center;
+}
+
+/* Acciones */
+.actions-column {
+	flex: 0.5 0.5 5%;
+	max-width: 5%;
+	text-align: center;
+}
+
+/* General alignment for header and cells */
+mat-header-cell, mat-cell {
+	display: flex;
+	align-items: center;
+	padding: 8px;
+	box-sizing: border-box;
+}
+
+

@@ -1,0 +1,150 @@
+mat-option {
+	font-size: 95%;
+	letter-spacing: 0;
+	line-height: 14px;
+}
+
+h2 {
+	font-size: 16px;
+	font-weight: 500;
+}
+
+h3 {
+	font-size: 14px;
+	font-weight: 500;
+}
+
+mat-list-option, mat-list-item {
+	height: 36px !important;
+	padding: 0 !important;
+}
+
+:host ::ng-deep .mdc-list-item__primary-text {
+	font-size: 14px !important;
+	padding-left: 19px !important;
+	display: flex;
+	justify-content: space-between;
+}
+
+fieldset {
+	padding: 0;
+	border: solid 1px grey;
+	border-radius: 4px;
+}
+
+fieldset p {
+	padding: 0 18px;
+}
+
+legend {
+	width: auto;
+	color: grey;
+	font-size: 14px;
+	letter-spacing: 0;
+	padding: 0 5px 0 5px;
+}
+
+::ng-deep .mat-mdc-menu-content {
+	padding: 0 !important;
+}
+
+::ng-deep .mat-mdc-menu-item {
+	font-size: 95%;
+	letter-spacing: 0;
+}
+
+.more-vert {
+	border-radius: 100%;
+	cursor: pointer;
+	margin-right: 47px;
+	background: white;
+}
+
+.delete {
+	border-radius: 100%;
+	cursor: pointer;
+}
+
+.item {
+	font-size: 14px;
+	letter-spacing: 0;
+}
+
+.options {
+	position: absolute;
+	top: -2px;
+	display: flex;
+	width: 100%;
+	justify-content: end;
+}
+
+.h-400px {
+	max-height: 400px;
+	overflow: auto;
+}
+
+.sticky-option {
+	top: 0;
+	position: sticky;
+	background: #f5f7f5;
+	z-index: 1;
+}
+
+ul {
+	width: 100%;
+}
+
+ul li {
+	height: 36px;
+	max-height: 36px;
+	display: flex;
+	justify-content: space-between;
+}
+
+ul li:hover {
+	background: #f5f7f5;
+}
+
+.evaluator-name {
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	-webkit-line-clamp: 1;
+	box-decoration-break: clone;
+}
+
+/*.evaluator-container {*/
+/*	padding-top: 20px;*/
+/*	background: #f5f7f5;*/
+/*	border-radius: 4px;*/
+/*}*/
+
+.evaluator-container {
+	display: grid;
+	/*grid-gap: 15px;*/
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.evaluator-container > div {
+	margin: 0 19px 19px 19px;
+}
+
+.evaluator-container > div > div {
+	padding-top: 15px;
+	padding-bottom: 1px;
+	/*background: #f5f7f5;*/
+	border-radius: 4px;
+	border: solid 1px #dadada;
+	/*margin-left: 19px;*/
+	/*margin-right: 19px;*/
+}
+
+.evaluator-options {
+	padding: 0 18px 0 18px;
+}
+
+.send-form-button {
+	background: #014898;
+	color: white !important;
+	letter-spacing: 0;
+}

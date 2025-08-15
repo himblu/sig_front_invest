@@ -1,0 +1,156 @@
+<div class="row animated fadeIn fast" *ngIf="cargando">
+    <div class="col-md-12">
+        <div class="alert alert-info text-center">
+            <h4 class="alert-heading">Cargando</h4>
+            <i class="fa fa-spin fa-refresh fa-3x"></i>
+            <p class="mb-0">Por favor esperar...</p>
+        </div>
+    </div>
+</div>
+<div class="row animated fadeIn fast" *ngIf="!cargando">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+              <div class="row pl-2 pr-2">
+                <div class="col-md-3"><components-input-search [label]="'Búsqueda por Edificio'" (return)="searchBuilding($event)"></components-input-search></div>
+                <div class="col-md-9" style="text-align: right;"><button type="button" mat-raised-button class="styleButton_sml" style="width: 142px;" data-toggle="modal" data-target="#buildingModal" (click)="openModal(0)">Agregar</button></div>
+              </div>
+              <div>
+                <div class="table-responsive">
+                    <div id="add-contact" class="modal fade in" tabindex="-1" role="dialog"
+                        aria-labelledby="myModalLabel" aria-hidden="true">
+                    </div>
+                    <table id="demo-foo-addrow"
+                        class="table m-t-0 table-hover no-wrap contact-list footable-loaded footable"
+                        data-page-size="5">
+                        <thead style="background-color: #004899; color: white;">
+                            <tr>
+                                <th class="footable-sortable">
+                                    Edificio
+                                    <span class="footable-sort-indicator"></span>
+                                </th>
+                                <th class="footable-sortable">
+                                  Descripción
+                                  <span class="footable-sort-indicator"></span>
+                                </th>
+                                <th class="footable-sortable">
+                                  Campus
+                                  <span class="footable-sort-indicator"></span>
+                                </th>
+                                <th class="footable-sortable">
+                                  Número de pisos
+                                  <span class="footable-sort-indicator"></span>
+                                </th>
+                                <th class="footable-sortable" style="text-align: center;">
+                                  Acciones
+                                  <span class="footable-sort-indicator"></span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of buildingList" class="footable-even">
+                                <td>{{item.buildingName | uppercase}}</td>
+                                <td>{{item.buildingDesc | uppercase}}</td>
+                                <td>{{item.campusName | uppercase}}</td>
+                                <td>{{item.floorNro}}</td>
+                                <td style="text-align: center;">
+                                  <a type="button"
+                                    matTooltipPosition="above"
+                                    matTooltip="Editar"
+                                    style="cursor: pointer; color: green;" data-toggle="modal" data-target="#buildingModal" (click)="openModal(1, item)"><i class="fa fa-pencil" aria-hidden="true"></i>
+                                  </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+              </div>
+            <components-button-arrow [actual]="actualBuilding" [totalPage]="totalPageBuilding" [count]="countBuilding" (result)="changePageBuilding($event)"></components-button-arrow>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="buildingModal" tabindex="-1" aria-labelledby="buildingModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="height: 40px;">
+        <div class="col-md-4">
+          <h3 class="modal-title" id="buildingModalLabel"><br>{{title}}</h3>
+        </div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12">
+          <div class="card">
+              <div class="card-body">
+              <form [formGroup]="buildingForm"
+                      (submit)="onSubmitBuilding()"
+                      autocomplete="off">
+                  <div class="row">
+                      <div class="col-md-12">
+                          <mat-form-field class="width" appearance="outline">
+                              <mat-label>Sede</mat-label>
+                              <mat-select formControlName="campusID">
+                                  <mat-option value="">Seleccione una sede</mat-option>
+                                  <mat-option *ngFor="let item of campuses" [value]="item.campusID">{{item.campusName}}</mat-option>
+                              </mat-select>
+                              <mat-error>
+                                  Sede es <strong>requerido</strong>
+                              </mat-error>
+                          </mat-form-field>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-md-9">
+                        <mat-form-field class="width" appearance="outline">
+                          <mat-label>Nombre</mat-label>
+                          <input type="text" matInput formControlName="buildingName">
+                          <mat-error>
+                            Nombre es <strong>requerido</strong>
+                          </mat-error>
+                      </mat-form-field>
+                      </div>
+                      <div class="col-md-3">
+                          <mat-form-field class="width" appearance="outline">
+                          <mat-label>N° Pisos</mat-label>
+                          <input type="number" matInput formControlName="floorNro">
+                          <mat-error>
+                              Pisos es <strong>requerido</strong>
+                          </mat-error>
+                      </mat-form-field>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-md-12">
+                          <mat-form-field class="width" appearance="outline">
+                              <mat-label>Descripción</mat-label>
+                              <textarea type="text" matInput formControlName="buildingDesc"></textarea>
+                              <mat-error>
+                                  Descripción es <strong>requerido</strong>
+                              </mat-error>
+                          </mat-form-field>
+                      </div>
+                  </div>
+                  <br>
+                  <div class="row">
+                      <div class="col-md-3">
+                        <button type="submit" mat-raised-button class="styleButton_sml" style="width: 100px;">
+                          Guardar
+                        </button>
+                      </div>
+                      <div class="col-md-3">
+                        <button type="button" mat-raised-button class="styleButton_gray" style="width: 100px;" #modalClose data-dismiss="modal">Cerrar</button>
+                      </div>
+                  </div>
+              </form>
+              </div>
+          </div>
+      </div>
+      </div>
+    </div>
+  </div>
+</div>

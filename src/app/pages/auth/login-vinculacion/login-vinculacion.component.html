@@ -1,0 +1,85 @@
+<!-- ============================================================== -->
+<!-- Main wrapper - style you can find in pages.scss -->
+<!-- ============================================================== -->
+<section id="wrapper" class="login-register login-sidebar" style="background-image:url(../../../../assets/images/ITCA_Mesa2.png);">
+  <div class="login-box card" style="background-image:url(../../../../assets/images/Degradado_final2.png); background-size: cover; border-radius: 0 !important;">
+      <div class="card-body">
+          <form class="form-horizontal form-material" *ngIf="showForms===1"
+                  id="loginform"
+                  [formGroup]="loginForm"
+                  (ngSubmit)="onSubmit();"
+                  autocomplete="off">
+              <br><br><br><br><br><br><br><br><br><br><br><br>
+              <div class="form-group">
+                  <label style="color: white; padding-left: 10px; margin-top: 40px;">Usuario</label>
+                  <div class="input-group">
+                      <input type="email" class="form-control" formControlName="p_userName" style="background-color: white; border-radius: 15px; padding-left: 10px; color: black;" placeholder="Ingrese el usuario">
+                  </div>
+              </div>
+              <div class="form-group">
+                  <label style="color: white; padding-left: 10px;">Contraseña</label>
+                  <div class="input-group">
+                      <input type="password" class="form-control" formControlName="p_userPassword" style="background-color: white; border-radius: 15px; padding-left: 10px; color: black;" placeholder="Ingrese la contraseña">
+
+                  </div>
+              </div>
+              <div class="form-group row">
+                  <div class="col-md-12">
+                      <div class="checkbox checkbox-primary pull-left p-t-0">
+                          <input id="checkbox-signup" type="checkbox" formControlName="remember" class="filled-in chk-col-light-blue">
+                          <label for="checkbox-signup" class="color" style="color: white;"> Recuérdame</label>
+                      </div>
+                      <!--<a routerLink="/autenticacion/recupera-clave" class="text-dark pull-right">
+                          <i class="fa fa-lock m-r-5" style="color: aliceblue;"  ></i>
+                          <small style="color: aliceblue;" >Recordar Contraseña</small>
+                      </a>-->
+                  </div>
+              </div>
+              <div class="form-group text-center m-t-20">
+                  <div class="col-xs-12">
+                      <button type="submit" mat-raised-button class="width" style="padding: 25px; border-radius: 25px; border: 3px solid #9ac12d;"><strong>INGRESAR</strong></button>
+                  </div>
+              </div>
+              <!-- <div class="form-group m-b-0">
+                  <div class="col-sm-12 text-center">
+                      <h3 style="color: white;">¿Deseas registrarse? <a routerLink="/autenticacion/registro" class="text-info m-l-5"><b style="color: white;">Registrarte</b></a></h3>
+                  </div>
+              </div> -->
+          </form>
+          <!-- FORMULARIO CAMBIO DE CONTRASEÑA -->
+          <form class="form-horizontal form-material" *ngIf="showForms===2"
+                  id="loginform"
+                  [formGroup]="paswordForm"
+                  (ngSubmit)="validUpdatePassword();"
+                  autocomplete="off">
+              <br><br><br><br><br><br><br><br><br><br><br><br>
+              <div class="form-group">
+                  <label style="color: white; padding-left: 10px; margin-top: 40px;">Contraseña</label>
+                  <div class="input-group">
+                    <input type="password" class="form-control" formControlName="p_userPassword1" style="background-color: white; border-radius: 15px; padding-left: 10px; color: black;" placeholder="Ingrese la contraseña">
+                  </div>
+              </div>
+              <div class="form-group">
+                  <label style="color: white; padding-left: 10px;">Repetir contraseña</label>
+                  <div class="input-group">
+                      <input type="password" class="form-control" formControlName="p_userPassword2" style="background-color: white; border-radius: 15px; padding-left: 10px; color: black;" placeholder="Ingrese la contraseña">
+
+                  </div>
+              </div>
+              <div class="form-group text-center m-t-20">
+                  <div class="col-xs-12">
+                      <button type="submit" mat-raised-button class="width" style="padding: 25px; border-radius: 25px; border: 3px solid #9ac12d;"><strong>INGRESAR</strong></button>
+                  </div>
+              </div>
+              <!-- <div class="form-group m-b-0">
+                  <div class="col-sm-12 text-center">
+                      <h3 style="color: white;">¿Deseas registrarse? <a routerLink="/autenticacion/registro" class="text-info m-l-5"><b style="color: white;">Registrarte</b></a></h3>
+                  </div>
+              </div> -->
+          </form>
+      </div>
+  </div>
+</section>
+<!-- ============================================================== -->
+<!-- End Wrapper -->
+<!-- ============================================================== -->

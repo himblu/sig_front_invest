@@ -1,0 +1,49 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<div class="row animated fadeIn fast" *ngIf="!charging">
+  <div class="col-md-12">
+    <div class="row pl-3 pr-3">
+      <ng-container *ngFor="let item of subjectsList; let i=index">
+        <div class="col-3-5">
+          <div class="card">
+            <div class="card-body">
+              <div class="row" style="height: 100px;">
+                <div class="col-12">
+                  <h4>{{item.courseName}} ({{item.parallelCode}})<br><small style="font-size: 12px;">{{item.levelDesc}}</small></h4>
+                </div>
+              </div>
+              <div class="row" style="height: 80px;">
+                <div class="col-12">
+                  <label style="color: #014898;">{{item.courseCode}}</label>
+                </div>
+                <div class="col-12">
+                  <p>
+                    <label style="color: #014898;">Docente: &nbsp;</label>
+                    <label>{{item.teacher}}</label>
+                  </p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12" style="text-align: right;">
+                  <button type="button" mat-raised-button class="styleButton_sml" style="width: 100px;" (click)="sendSubject(item)">
+                    Abrir
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <br>
+        </div>
+        <div class="col-0-5"></div>
+      </ng-container>
+    </div>
+  </div>
+</div>

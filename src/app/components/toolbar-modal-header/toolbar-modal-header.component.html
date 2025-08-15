@@ -1,0 +1,13 @@
+<mat-toolbar
+	role="toolbar"
+	[ngStyle]="{ backgroundColor: cssToolbar.backgroundColor, color: cssToolbar.color }">
+	<span class="toolbar-title">{{ title }}</span>
+	<span class="fx-spacer"></span>
+	<button
+		class="custom-close-button"
+		[ngStyle]="{ backgroundColor: cssCloseButton.backgroundColor, color: cssCloseButton.color }"
+		[mat-dialog-close]="false"
+		mat-raised-button>
+		<mat-icon>close</mat-icon>
+	</button>
+</mat-toolbar>

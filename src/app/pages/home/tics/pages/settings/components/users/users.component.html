@@ -1,0 +1,115 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<div class="row animated fadeIn fast" *ngIf="!charging">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-body">
+        <section [formGroup]="filtersForm">
+          <div class="row pl-3 pr-3">
+            <div class="col-3">
+              <mat-form-field appearance="outline">
+                <mat-label>Rol</mat-label>
+                <mat-select formControlName="rolID" (selectionChange)="getUsers()">
+                  <mat-option *ngFor="let item of roles" [value]="item.rolId">{{item.RolName}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-3">
+              <mat-form-field appearance="outline">
+                <mat-label>Buscar por nombre o cédula</mat-label>
+                <input matInput formControlName="search" autocomplete="off" (keyup)="getUsers()">
+                <mat-icon matSuffix>search</mat-icon>
+              </mat-form-field>
+            </div>
+            <div class="col-2"></div>
+            <div class="col-3" style="text-align: right;">
+              <button type="button" mat-raised-button class="styleButton_sml" style="max-width: 125px;"
+              (click)="openPersonDialog();">
+                Agregar Personas
+              </button>
+            </div>
+            <div class="col-1" style="text-align: right;">
+              <button type="button" mat-raised-button class="styleButton_sml" style="max-width: 125px;"
+              (click)="openUserDialog();">
+                Crear
+              </button>
+            </div>
+          </div>
+        </section>
+        <div class="table-responsive">
+          <table class="table">
+            <thead style="background-color: #004899; color: white;">
+              <th>Documento identidad</th>
+              <th>Nombres</th>
+              <th>Fecha nacimiento</th>
+              <th>Correo Electrónico</th>
+              <th>N° Celular</th>
+              <th>Estado</th>
+              <th style="text-align: center;">Acciones</th>
+            </thead>
+            <tr style="text-align: center;" *ngIf="!users?.length">
+              <td colspan="6">Seleccione un rol</td>
+            </tr>
+            <tr style="color: black;" *ngFor="let item of users; let i=index;">
+              <td>{{item.PersonDocumentNumber}}</td>
+              <td>{{item.PersonFullName}}</td>
+              <td>{{item.birthday}}</td>
+              <td>{{item.recoveryEmail}}</td>
+              <td>{{item.numberPhone}}</td>
+              <td>{{item.stateName}}</td>
+              <td style="text-align: center;">
+                <a style="cursor: pointer;"
+                  *ngIf="!item.statusID"
+                  matTooltipPosition="above"
+                  matTooltip="Activar"
+                  (click)="changeUserState(item, 1)">
+                  <i style="color: red;" class="fa fa-toggle-off" aria-hidden="true"></i>
+                </a>
+                <a style="cursor: pointer;"
+                  *ngIf="item.statusID"
+                  matTooltipPosition="above"
+                  matTooltip="Inactivar"
+                  (click)="changeUserState(item, 0)">
+                  <i style="color: blue;" class="fa fa-toggle-on" aria-hidden="true"></i>
+                </a>
+                &nbsp;
+                <a style="cursor: pointer;" [matMenuTriggerFor]="menu">
+                  <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                </a>
+                <mat-menu #menu="matMenu">
+                  <button mat-menu-item (click)="editUser(item)">
+                    <span><i style="color: green;" class="fa fa-pencil" aria-hidden="true">&nbsp;</i> Editar</span>
+                  </button>
+                  <button mat-menu-item (click)="openPermissionDialog(item);">
+                    <span><i style="color: blue;" class="fa fa-check-square-o" aria-hidden="true">&nbsp;</i> Asignar Permisos</span>
+                  </button>
+                  <button mat-menu-item (click)="getPdf(item.personID,item.rolID);">
+                    <span><i style="color: red;" class="fa fa-file-pdf-o" aria-hidden="true">&nbsp;</i> Ficha PDF</span>
+                  </button>
+                  <button mat-menu-item (click)="restorePassword(item);">
+                    <span><i style="color: black;" class="fa fa-unlock-alt" aria-hidden="true">&nbsp;</i> Reestablecer <br>contraseña</span>
+                  </button>
+                </mat-menu>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <mat-paginator
+          #paginator
+          [length]="length"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions"
+          (page)="pageEvent = changePage($event)">
+        </mat-paginator>
+      </div>
+    </div>
+  </div>
+</div>

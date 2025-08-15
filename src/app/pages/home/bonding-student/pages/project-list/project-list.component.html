@@ -1,0 +1,73 @@
+<div class="row animated fadeIn fast" *ngIf="loading">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<div class="row animated fadeIn fast" *ngIf="!loading">
+  <div class="col-md-12">
+    <h2 style="text-align: center; color: #004899;">LISTADO DE PROYECTOS</h2>
+    <div class="card" style="border-radius: 15px;">
+      <div class="card-body">
+        <section [formGroup]="filtersForm">
+          <div class="row pl-2 pr-2">
+            <div class="col-4">
+              <mat-form-field appearance="outline">
+                <mat-label>Buscar nombre de proyecto o código de proyecto</mat-label>
+                <input matInput autocomplete="off" formControlName='search' (input)="getProjectPractices();">
+                <mat-icon matSuffix>search</mat-icon>
+              </mat-form-field>
+            </div>
+          </div>
+        </section>
+        <div class="table-responsive">
+          <table class="table">
+            <thead style="background-color: #004899; color: white;">
+            <tr>
+              <th>Modalidad</th>
+              <th>Carrera</th>
+              <th>Nombre</th>
+              <th>Fecha inicio - fin</th>
+              <th style="text-align: center;">Acciones</th>
+            </tr>
+            </thead>
+            <tbody style="color: black;">
+              <tr *ngFor="let item of projectPractices; let i=index;">
+                <td>{{item.modalityName}}</td>
+                <td>{{item.careerName}}</td>
+                <td class="single-line"
+                  matTooltipPosition="above"
+                  matTooltip="{{item.nameProyect}}">
+                  {{item.nameProyect}}
+                </td>
+                <td>{{item.initdateEstimated | date: 'dd/MM/yyyy' :'UTC'}} - {{item.enddateEstimated | date: 'dd/MM/yyyy' :'UTC'}}</td>
+                <td style="text-align: center;">
+                  <a style="cursor: pointer;"
+                    matTooltipPosition="above"
+                    matTooltip="Descargar Excel"
+                    (click)="getProjectPracticesExcelContent(item);">
+                    <i style="color: green;" class="fa fa-file-excel-o" aria-hidden="true"></i>
+                  </a>
+                </td>
+              </tr>
+              <tr *ngIf="!projectPractices.length">
+                <td colspan="6" style="text-align: center;">No se han encontrado registros</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <mat-paginator
+          #paginator
+          [length]="length"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions"
+          (page)="pageEvent = getPaginator($event)">
+        </mat-paginator>
+      </div>
+    </div>
+  </div>
+</div>

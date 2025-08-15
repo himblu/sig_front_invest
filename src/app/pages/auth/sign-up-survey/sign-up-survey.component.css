@@ -1,0 +1,34 @@
+.bg-left {
+	background-image: url('assets/images/bg-absorcion.png');
+	background-size: cover;
+	background-position: center;
+	min-height: 100vh;
+}
+
+.bg-right {
+	background-image: url('assets/images/itca_sidebar_2.png');
+	background-size: cover;
+	background-position: center;
+	min-height: 100vh;
+}
+
+.firma-img {
+	width: 100%;
+	max-width: 300px;
+	height: auto;
+}
+
+@media (max-width: 768px) {
+	.bg-left {
+		display: none;
+	}
+
+	.bg-right {
+		width: 100%;
+
+	}
+}
+
+mat-label {
+	color: white;
+}

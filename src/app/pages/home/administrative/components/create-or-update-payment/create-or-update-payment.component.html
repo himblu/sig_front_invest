@@ -1,0 +1,244 @@
+<div style="display: flex; justify-content: end; align-items: center; background: transparent;" class="p-2">
+  <mat-icon style="cursor: pointer; color: red;" [matDialogClose]="false" class="red-icon" matRipple>close</mat-icon>
+</div>
+
+
+<mat-dialog-content>
+  <div *ngIf="isLoading; else form;">
+    <spinner-loader></spinner-loader>
+  </div>
+
+  <ng-template #form>
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12" style="text-align: center;">
+            <h3 style="color: #014898;">
+              Opción de pago
+            </h3>
+          </div>
+        </div>
+        <form [formGroup]="formPayment">
+          <div class="row">
+            <div class="col-md-4">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Periodo</mat-label>
+                <mat-select (selectionChange)="changePeriod()" formControlName="periodID">
+                  <mat-option [disabled]="isUpdating" *ngFor="let period of listPeriod" [value]="period.periodID"
+                    (onSelectionChange)="getDates(period, $event.isUserInput)">
+                    {{period.periodName}}
+                  </mat-option>
+                </mat-select>
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-md-4">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Tipo de matrícula</mat-label>
+                <mat-select formControlName="enrollTypeID"
+                  (selectionChange)="onEnrollTypeChange($event.value)">
+                  <mat-option *ngFor="let enrollmentType of listEnrollmentType"
+                    [value]="enrollmentType.enrollTypeID">
+                    {{enrollmentType.enrollTypeDesc}}
+                  </mat-option>
+                </mat-select>
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-md-4">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Opción de pago</mat-label>
+                <textarea formControlName="paymentOptionDesc" type="text" matInput rows="1" cols="1"></textarea>
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="row" *ngIf="showArrastre">
+            <div class="col-md-4">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Carrera</mat-label>
+                <mat-select
+                  formControlName="careerID"
+                  (selectionChange)="onCareerChange($event.value)">
+                  <mat-option *ngFor="let item of careers" [value]="item.careerID">
+                    {{ item.careerName }}
+                  </mat-option>
+                </mat-select>
+                <mat-error>Campo requerido!</mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-md-4">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Malla Curricular</mat-label>
+                <mat-select
+                  formControlName="studyPlanID"
+                  (selectionChange)="onStudyPlanChange($event.value)">
+                  <mat-option *ngFor="let item of studyPlans" [value]="item.studyPlanID">
+                    {{ item.studyPlanDesc }}
+                  </mat-option>
+                </mat-select>
+                <mat-error>Campo requerido!</mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-md-4">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Nivel</mat-label>
+                <mat-select formControlName="cycleID">
+                  <mat-option *ngIf="!isGettingNotes" [value]="0" >Todos</mat-option>
+                  <mat-option *ngFor="let item of cycles" [value]="item.cycleID">{{item.cycleName}}</mat-option>
+                </mat-select>
+                <mat-error>Campo requerido!</mat-error>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Fecha Inicio</mat-label>
+                <input type="date" formControlName="startDate" #startDate matInput [min]="minDate" [max]="maxDate"
+                (click)="!isUpdating || data.item?.flgEdit ? startDate.showPicker() : false">
+                <mat-icon *ngIf="!isUpdating || data.item?.flgEdit" style="cursor: pointer;" matSuffix (click)="startDate.showPicker()">calendar_month</mat-icon>
+                <mat-hint>dd/mm/aaaa</mat-hint>
+              </mat-form-field>
+            </div>
+            <div class="col-md-4">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Fecha Fin</mat-label>
+                <input type="date" formControlName="endDate" #endDate matInput [min]="startDate.value" [max]="maxDate"
+                (click)="endDate.showPicker()">
+                <mat-icon style="cursor: pointer;" matSuffix (click)="endDate.showPicker()">calendar_month</mat-icon>
+                <mat-hint>dd/mm/aaaa</mat-hint>
+              </mat-form-field>
+            </div>
+            <div class="col-md-4">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>No Cuotas</mat-label>
+                <input (blur)="filledArrayQuota()" formControlName="quotaNumber" type="number" matInput [readonly]="isUpdating"
+                  onKeypress="if (event.keyCode < 47 || event.keyCode > 57) event.returnValue = false;">
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-2 text-right">
+              <mat-label>Descuento</mat-label>
+            </div>
+            <div class="col-md-2">
+              <mat-slide-toggle [disabled]="isUpdating" [checked]="isChecked" class="example-margin" color="primary" (click)="getStatus(); isChecked = !isChecked"></mat-slide-toggle>
+            </div>
+            <div class="col-md-4">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Valor Matrícula</mat-label>
+                <input type="number" (blur)="blurCalcAmount()" matInput formControlName="amountEnroll"
+                  onKeypress="if (event.keyCode < 45 || event.keyCode > 57) event.returnValue = false;">
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-md-4">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Valor Arancel</mat-label>
+                <input (blur)="blurCalcAmount()" type="number" matInput formControlName="tariff"
+                  onKeypress="if (event.keyCode < 45 || event.keyCode > 57) event.returnValue = false;">
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-8" *ngIf="!isChecked"></div>
+            <ng-container *ngIf="isChecked">
+              <div class="col-md-4">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Condiciones de pago</mat-label>
+                  <mat-select formControlName="conditions">
+                    <mat-option value="T">Matrícula y cuotas</mat-option>
+                    <mat-option value="C">Cuotas</mat-option>
+                    <mat-option value="M">Matrícula</mat-option>
+                  </mat-select>
+                  <mat-error>Campo requerido</mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-md-4">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Valor % Descuento</mat-label>
+                  <input type="number" (blur)="blurCalcAmount()" matInput formControlName="discount" min=0
+                    max=99 onKeypress="if (event.keyCode < 45 || event.keyCode > 57) event.returnValue = false;">
+                  <mat-error>Campo requerido</mat-error>
+                </mat-form-field>
+              </div>
+            </ng-container>
+            <div class="col-md-4">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Costo Final del Nivel</mat-label>
+                <input type="number" matInput formControlName="totalAmount"
+                  onKeypress="if (event.keyCode < 45 || event.keyCode > 57) event.returnValue = false;">
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+          </div>
+        </form>
+        <ng-container>
+          <div *ngIf="formPayment.get('quotaNumber')?.value > 0">
+            <form [formGroup]="quotaNumbers">
+              <div formArrayName="quota">
+                <ng-container *ngFor="let fee of quotaNumbersForm.controls; let i = index">
+
+                  <div class="row" [formGroupName]="i">
+                    <div class="col-md-4">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Valor Cuota {{i+1}}</mat-label>
+                        <input name="amount" type="number" matInput formControlName="amount"
+                          onKeypress="if (event.keyCode < 45 || event.keyCode > 57) event.returnValue = false;">
+                      </mat-form-field>
+                    </div>
+                    <div class="col-md-4">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Fecha de vencimiento</mat-label>
+                        <input type="date" formControlName="expirationDate" #expirationDate matInput [min]="minDate" [max]="maxDate"
+                        (click)="!isUpdating || data.item?.flgEdit ? expirationDate.showPicker() : false">
+                        <mat-icon *ngIf="!isUpdating || data.item?.flgEdit" style="cursor: pointer;" matSuffix (click)="expirationDate.showPicker()">
+                          calendar_month
+                        </mat-icon>
+                        <mat-hint>dd/mm/aaaa</mat-hint>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </ng-container>
+
+              </div>
+            </form>
+          </div>
+        </ng-container>
+        <div class="row" *ngIf="valid === false">
+          <div class="col-md-8">
+            <mat-label style="color: red; font-size: 13px;">
+              La suma de las cuotas no coincide con el costo del arancel.
+            </mat-label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <div class="d-flex no-block w-100 justify-content-between">
+    <div class="pl-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="warn"
+        [mat-dialog-close]="false">
+        Cerrar
+      </button>
+    </div>
+    <div class="pr-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="primary"
+        (click)="onSubmit();">
+        {{isUpdating ? 'Actualizar' : 'Guardar'}}
+      </button>
+    </div>
+  </div>
+</mat-dialog-actions>

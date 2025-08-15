@@ -1,0 +1,186 @@
+<div class="animated fadeIn fast">
+  <form #personalInfoForm="ngForm">
+    <div class="row">
+      <div class="col-md-12 mb-3">
+        <div class="card m-0 p-0">
+          <div class="card-body pl-4 p-2">
+            <div class="form-row">
+              <div class="col-8 font-xl">
+                <i class="fa fa-user-circle mr-1"></i>Información Personal
+              </div>
+              <div class="col-4">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-row">
+          <div class="col-md-12">
+            <div class="card">
+              <div class="card-body">
+                <div class="form-row">
+                  <div class="col-md-12">
+                    <div class="form-row" *ngIf="editBasicInfo">
+                      <div class="col-6">
+                        <label for="documentType">Tipo de Documento</label>
+                        <select disabled name="documentType" (change)="selectDocumentType()" [(ngModel)]="personalInfo.documentType" class="form-control" required>
+                          <option [ngValue]="undefined">--SELECCIONE--</option>
+                          <option *ngFor="let i of documentTypes" [ngValue]="i.typeDocId">{{i.typeDocName}}</option>
+                        </select>
+                      </div>
+                      <div class="col-6">
+                        <label for="documentNumber">Número de Documento</label>
+                        <input type="text" maxlength="{{personalInfo.typeDocLong}}" disabled name="documentNumber" [(ngModel)]="personalInfo.documentNumber" (keypress)="onlyNumbers($event)" class="form-control" required>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-12">
+                    <div class="form-row" *ngIf="editBasicInfo">
+                      <div class="col-12">
+                        <label for="personFirstName">Nombres</label>
+                        <input type="text" [disabled]="existsPostulation" name="personFirstName" [(ngModel)]="personalInfo.personFirstName" class="form-control" required>
+                      </div>
+                      <div class="col-6">
+                        <label for="personMiddleName">Apellido Paterno</label>
+                        <input type="text" [disabled]="existsPostulation" name="personMiddleName" [(ngModel)]="personalInfo.personMiddleName" (keypress)="onlyLetters($event)" class="form-control" required>
+                      </div>
+                      <div class="col-6">
+                        <label for="personLastName">Apellido Materno</label>
+                        <input type="text" [disabled]="existsPostulation" name="personLastName" [(ngModel)]="personalInfo.personLastName" (keypress)="onlyLetters($event)" class="form-control" required>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <div class="form-row">
+              <div class="col-12">
+                <label for="civilStatusID">Estado Civil</label>
+                <select [disabled]="existsPostulation" name="civilStatusID" [(ngModel)]="personalInfo.civilStatusID" class="form-control" required>
+                  <option [ngValue]="undefined">--SELECCIONE--</option>
+                  <option *ngFor="let i of civilStatuses" [ngValue]="i.civilStatusID">{{i.civilStatusDesc | uppercase}}</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <label for="genderID">Género</label>
+                <select [disabled]="existsPostulation" name="genderID" [(ngModel)]="personalInfo.genderID" class="form-control" required>
+                  <option [ngValue]="undefined">--SELECCIONE--</option>
+                  <option *ngFor="let i of genders" [ngValue]="i.genderID">{{i.genderDesc | uppercase}}</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <label for="sexID">Sexo</label>
+                <select [disabled]="existsPostulation" name="sexID" [(ngModel)]="personalInfo.sexID" class="form-control" required>
+                  <option [ngValue]="undefined">--SELECCIONE--</option>
+                  <option *ngFor="let i of sexs" [ngValue]="i.sexID">{{i.sexDesc | uppercase}}</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <label for="bloodTypeID">Tipo de Sangre</label>
+                <select [disabled]="existsPostulation" name="bloodTypeID" [(ngModel)]="personalInfo.bloodTypeID" class="form-control" required>
+                  <option [ngValue]="undefined">--SELECCIONE--</option>
+                  <option *ngFor="let i of bloodTypes" [ngValue]="i.bloodTypeID">{{i.bloodTypeDesc}}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <div class="form-row">
+              <div class="col-12">
+                <label for="nationalityID">Nacionalidad</label>
+                <select [disabled]="existsPostulation" name="nationalityID" [(ngModel)]="personalInfo.nationalityID" class="form-control" required>
+                  <option [ngValue]="undefined">--SELECCIONE--</option>
+                  <option *ngFor="let i of nationalities" [ngValue]="i.countryID">{{i.nationality_1 | uppercase}}</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <label for="birthday">Fecha de Nacimiento</label>
+                <input type="date" [disabled]="existsPostulation" name="birthday" [(ngModel)]="personalInfo.birthday" [max]="currentDate" class="form-control" required>
+              </div>
+              <div class="col-12">
+                <label for="countryID">País</label>
+                <select [disabled]="existsPostulation" name="countryID" [(ngModel)]="personalInfo.countryID" class="form-control" required>
+                  <option [ngValue]="undefined">--SELECCIONE--</option>
+                  <option *ngFor="let i of countries" [ngValue]="i.countryID">{{i.countryName | uppercase}}</option>
+                </select>
+              </div>
+              <ng-container *ngIf="personalInfo.countryID === 59">
+                <div class="col-12">
+                  <label for="provinceID">Provincia</label>
+                  <select [disabled]="existsPostulation" name="provinceID" (change)="selectProvince()" [(ngModel)]="personalInfo.provinceID" class="form-control" required>
+                    <option [ngValue]="undefined">--SELECCIONE--</option>
+                    <option *ngFor="let i of provinces" [ngValue]="i.provinceID">{{i.provinceName}}</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <label for="cantonID">Cantón</label>
+                  <select [disabled]="existsPostulation" name="cantonID" [(ngModel)]="personalInfo.cantonID" class="form-control" required>
+                    <option [ngValue]="undefined">--SELECCIONE--</option>
+                    <option *ngFor="let i of cantons" [ngValue]="i.cantonID">{{i.cantonName}}</option>
+                  </select>
+                </div>
+              </ng-container>
+              <div class="col-12">
+                <label for="ethnicityID">Grupo Cultural</label>
+                <select [disabled]="existsPostulation" name="ethnicityID" [(ngModel)]="personalInfo.ethnicityID" class="form-control" required>
+                  <option [ngValue]="undefined">--SELECCIONE--</option>
+                  <option *ngFor="let i of culturalGroups" [ngValue]="i.ethnicityID">{{i.ethnicityDesc}}</option>
+                </select>
+              </div>
+              <div class="col-12" *ngIf="personalInfo.ethnicityID === 1">
+                <label for="nationalTownID">Pueblo Nacionalidad</label>
+                <select [disabled]="existsPostulation" name="nationalTownID" [(ngModel)]="personalInfo.nationalTownID" class="form-control" required>
+                  <option [ngValue]="undefined">--SELECCIONE--</option>
+                  <option *ngFor="let i of nationalityTows" [ngValue]="i.nationalTownID">{{i.nationalTownDesc}}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 pt-3 text-left" *ngIf="!canChoiseDataAcademic">
+        <!-- <a class="btn btn-info" [routerLink]="['../../../autenticacion/registro']">
+          Volver
+        </a> -->
+      </div>
+      <div class="col-6 pt-3 text-right" *ngIf="!canChoiseDataAcademic">
+        <button class="btn bg-primary-color text-white" [disabled]="personalInfoForm.invalid" (click)="saveAndContinue()">
+          <i class="fa fa-chevron-right mr-1"></i>Continuar
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div bsModal #instructionModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name2">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body" style="height: 600px; overflow: auto;">
+        <div class="form-row">
+          <div class="col-9 pt-1">
+          </div>
+          <div class="col-3 text-right">
+            <button type="button" class="btn btn-sm btn-light text-danger" aria-label="Close" (click)="toggleInstructions()">
+              <span aria-hidden="true"><i class="fa fa-times mr-1"></i>Cerrar</span>
+            </button>
+          </div>
+          <div class="col-12 mt-3 text-center">
+            <iframe width="100%" style="height: 500px;" src="assets/videos/etapa1.mp4" title="TERMINE LA PARTIDA EN SOLO 4 SEGUNDOS!!" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            <!-- <iframe src="https://www.youtube.com/embed/AGlQnXgSiRY" frameborder="0"></iframe> -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

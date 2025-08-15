@@ -1,0 +1,100 @@
+<div style="display: flex; justify-content: end; align-items: center; background: transparent;" class="p-2">
+  <mat-icon style="cursor: pointer; color: red;" [matDialogClose]="false" class="red-icon" matRipple>close</mat-icon>
+</div>
+
+<mat-dialog-content>
+  <div *ngIf="isLoading; else form;">
+    <spinner-loader></spinner-loader>
+  </div>
+
+  <ng-template #form>
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12" style="text-align: center;">
+            <h3 style="color: #014898;">
+              Nueva institución Educativa
+            </h3>
+          </div>
+        </div>
+        <div class="row" [formGroup]="instituteForm">
+          <div class="col-6">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>País</mat-label>
+              <mat-select formControlName="countryID">
+                <mat-option *ngFor="let item of countries" [value]="item.countryID">{{item.countryName}}</mat-option>
+              </mat-select>
+              <mat-error>Campo requerido</mat-error>
+            </mat-form-field>
+          </div>
+          <ng-container *ngIf="!data.type; else college;">
+            <div class="col-6">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Tipo</mat-label>
+                <mat-select formControlName="institutionTypeID">
+                  <mat-option *ngFor="let item of institutionTypes" [value]="item.institutionTypeID">{{item.institutionTypeName}}</mat-option>
+                </mat-select>
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-6">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Sector</mat-label>
+                <mat-select formControlName="sectorID">
+                  <mat-option *ngFor="let item of sectorList" [value]="item.sectorID">{{item.sectorName}}</mat-option>
+                </mat-select>
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+          </ng-container>
+          <ng-template #college>
+            <div class="col-6">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Tipo</mat-label>
+                <mat-select formControlName="collegeTypeID">
+                  <mat-option *ngFor="let item of collegeTypes" [value]="item.collegeTypeID">{{item.collegeTypeName}}</mat-option>
+                </mat-select>
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+          </ng-template>
+          <div class="col-6">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Nombre</mat-label>
+              <ng-container *ngIf="!data.type; else name;">
+                <input type="text" matInput formControlName="institutionName">
+              </ng-container>
+              <ng-template #name>
+                <input type="text" matInput formControlName="collegeName">
+              </ng-template>
+              <mat-error>Campo requerido</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <div class="d-flex no-block w-100 justify-content-between">
+    <div class="pl-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="warn"
+        [mat-dialog-close]="false">
+        Cerrar
+      </button>
+    </div>
+    <div class="pr-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="primary"
+        (click)="onSubmit();">
+        Guardar
+      </button>
+    </div>
+  </div>
+</mat-dialog-actions>

@@ -1,0 +1,96 @@
+<div class="row">
+    <div class="col text-center">
+        <h2> Distributivo Aulas</h2>
+    </div>
+</div>
+
+<div class="card">
+    <form [formGroup]="formFilters">
+        <div class="row mt-4">
+            <div class="col"></div>
+            <div class="col-md-2">
+                <mat-form-field class="width" appearance="outline">
+                    <mat-label>Periodo Academico</mat-label>
+                    <mat-select formControlName="periodID">
+                        <mat-option value="">Seleccione una opción</mat-option>
+                        <mat-option [value]="period.periodID"
+                            *ngFor="let period of periods">{{period.periodName}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="col-md-2">
+                <mat-form-field class="width" appearance="outline">
+                    <mat-label>Edificio</mat-label>
+                    <mat-select (selectionChange)="changeBuild($event)" formControlName="buildID">
+                        <mat-option value="">Seleccione una opción</mat-option>
+                        <mat-option [value]="build.buildingID"
+                            *ngFor="let build of builds">{{build.buildingName}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="col-md-2">
+                <mat-form-field class="width" appearance="outline">
+                    <mat-label>Aula</mat-label>
+                    <mat-select formControlName="classroomID">
+                        <mat-option value="">Seleccione una opción</mat-option>
+                        <mat-option [value]="class.classroomID"
+                            *ngFor="let class of classRooms">{{class.classroomName}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="col-md-2">
+                <button (click)="searchScheduleDetail()" mat-raised-button color="primary"
+                    style="background: #014898;">Buscar</button>
+            </div>
+            <div class="col"></div>
+        </div>
+    </form>
+</div><br>
+<div class="card p-5">
+    <div class="row">
+        <table class="w-100 mat-elevation-z8">
+            <tbody>
+                <tr>
+                    <ng-container *ngFor="let head of scheduleHeader">
+
+                        <th>
+                            {{ head }}
+                        </th>
+
+                    </ng-container>
+                </tr>
+                <ng-container *ngFor="let config of distributiveSchedule">
+                    <tr>
+                        <td>
+                            {{ config.startTime }}
+                        </td>
+                        <td>
+                            {{ config.endTime }}
+                        </td>
+                        <td>
+                            {{ config.lun }}
+                        </td>
+                        <td>
+                            {{ config.mar }}
+                        </td>
+                        <td>
+                            {{ config.mie }}
+                        </td>
+                        <td>
+                            {{ config.jue }}
+                        </td>
+                        <td>
+                            {{ config.vie }}
+                        </td>
+                        <td>
+                            {{ config.sab }}
+                        </td>
+                        <td>
+                            {{ config.dom }}
+                        </td>
+                    </tr>
+                </ng-container>
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,9 @@
+table, thead, th {
+  border: 1px solid black;
+}
+
+.smallerTd {
+	display: flex;
+	width: 30px;
+	height: 30px;
+}

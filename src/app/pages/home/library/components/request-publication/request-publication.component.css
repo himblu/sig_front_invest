@@ -1,0 +1,24 @@
+.applicant-info div p span {
+	font-weight: 500;
+	font-size: 14px;
+	letter-spacing: 0;
+}
+
+.applicant-info div p {
+	font-size: 14px;
+}
+
+h3 {
+	text-transform: uppercase;
+	font-weight: 500;
+}
+
+:host ::ng-deep .mat-mdc-text-field-wrapper {
+	height: 36px !important;
+}
+
+:host ::ng-deep .mat-mdc-icon-button.mat-mdc-button-base {
+	height: 36px !important;
+	width: 36px !important;
+	padding: 0 !important;
+}

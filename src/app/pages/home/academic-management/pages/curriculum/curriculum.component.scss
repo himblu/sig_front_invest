@@ -1,0 +1,369 @@
+.curriculum-buttons {
+
+  .button {
+    font-size: 12px;
+    letter-spacing: 1px;
+    font-weight: 400;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .add-button {
+    color: white;
+    background: #014898;
+  }
+
+  .delete-button {
+    color: white;
+    background: #BE102AAA;
+  }
+}
+
+.input-container {
+  padding: 2px;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.border-1 {
+  border: 1px solid #ccc;
+}
+
+.border-right-1 {
+  border-right: 1px solid #ccc;
+}
+
+.border-left-1 {
+  border-left: 1px solid #ccc;
+}
+
+.border-top-1 {
+  border-top: 1px solid #ccc;
+}
+
+.border-bottom-1 {
+  border-bottom: 1px solid #ccc;
+}
+
+.input-container, input[type="text"], input[type="number"] {
+  width: 100%;
+  text-align: center;
+}
+
+.input[type="text"] {
+
+}
+
+.invalid-input {
+  border-color: red;
+}
+
+//.curriculum-column {
+//  flex: 1;
+//  padding: 8px;
+//  border: 1px solid #ccc;
+//}
+
+.scrollable {
+  overflow-x: auto;
+  flex: 1;
+}
+
+//input[type="number"] {
+//  height: 26px;
+//  -moz-appearance: textfield;
+//  text-align: center;
+//}
+
+//.cell {
+//  border: 1px solid #ccc;
+//}
+
+.curriculum-container {
+  //overflow-x: auto;
+  display: block;
+
+  .curriculum-header {
+    line-height: 14px;
+    height: 60px;
+    display: flex;
+    font-size: 12px;
+    background: #014898;
+    color: white;
+
+    .curriculum-organization-unit-header {
+      width: 150px;
+      min-width: 150px;
+      display: flex;
+      align-self: center;
+
+      > div {
+        text-align: center;
+        display: flex;
+        align-self: center;
+      }
+    }
+
+    .learning-activities-header {
+      width: 150px;
+      min-width: 150px;
+      display: flex;
+      align-self: center;
+
+      > div {
+        text-align: center;
+        display: flex;
+        align-self: center;
+      }
+    }
+
+    .period-header {
+      width: 183px;
+      max-width: 183px;
+
+      .period-name-header {
+        height: 30px;
+        display: flex;
+        justify-content: center;
+
+        .period-name {
+          display: flex;
+          align-self: center;
+        }
+      }
+
+      .period-subject-header {
+        height: 30px;
+        display: flex;
+
+        .period-subject-name-header {
+          width: 113px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        .period-subject-hours-header {
+          width: 69px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+      }
+    }
+
+    .period-hours-header {
+      width: 58px;
+      display: flex;
+      align-self: center;
+      //position: sticky;
+      //right: -1px;
+			//background: #014898;
+			//z-index: 999;
+
+      > div {
+        text-align: center;
+        display: flex;
+        align-self: center;
+      }
+    }
+  }
+
+  .curriculum-resume {
+    line-height: 14px;
+    height: 30px;
+    display: flex;
+    font-size: 12px;
+    background: #014898;
+    color: white;
+
+    .curriculum-resume-header {
+      width: 300px;
+      min-width: 300px;
+      display: flex;
+      align-self: center;
+      justify-content: center;
+
+      > div {
+        text-align: center;
+        display: flex;
+        align-self: center;
+      }
+    }
+
+    .period-header {
+      width: 183px;
+      .period-name-header {
+        height: 30px;
+        display: flex;
+        justify-content: center;
+
+        .period-name {
+          display: flex;
+          align-self: center;
+        }
+      }
+    }
+
+    .period-hours-header {
+      width: 58px;
+      display: flex;
+      align-self: center;
+      justify-content: center;
+      > div {
+        text-align: center;
+        display: flex;
+        align-self: center;
+      }
+    }
+  }
+
+
+  // body
+
+  .curriculum-resume-body {
+    line-height: 14px;
+    height: 30px;
+    display: flex;
+    font-size: 12px;
+    color: black;
+
+    .curriculum-resume-header-body {
+      width: 300px;
+      min-width: 300px;
+      display: flex;
+      align-self: center;
+      justify-content: center;
+
+      > div {
+        text-align: center;
+        display: flex;
+        align-self: center;
+      }
+    }
+
+    .hours-header {
+      width: 183px;
+      .hours {
+        height: 30px;
+        display: flex;
+        justify-content: center;
+
+        .name {
+          display: flex;
+          align-self: center;
+        }
+      }
+    }
+
+    .period-hours-header {
+      width: 58px;
+      display: flex;
+      align-self: center;
+      justify-content: center;
+      > div {
+        text-align: center;
+        display: flex;
+        align-self: center;
+      }
+    }
+  }
+
+  .unit-container {
+    .learning-activities-container {
+      width: 150px;
+      height: 120px;
+      font-size: 12px;
+
+      .learning-activity {
+        height: 30px;
+        display: flex;
+        align-items: center;
+
+        &:last-child {
+          font-weight: 500;
+        }
+      }
+    }
+
+    .subject-container {
+      &:hover {
+        background: #e0e0e0;
+      }
+    }
+  }
+}
+
+.custom-scroll {
+	overflow-x: auto;
+	overflow-y: hidden;
+	&::-webkit-scrollbar {
+		height: 10px;
+	}
+
+	&::-webkit-scrollbar-thumb {
+		background: #c1c1c1;
+	}
+}
+
+ul.course-list {
+	&::-webkit-scrollbar {
+		width: 10px;
+	}
+
+	&::-webkit-scrollbar-thumb {
+		background: #c1c1c1;
+	}
+
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    height: 40px;
+    padding: 14px;
+    font-size: 12px;
+    letter-spacing: normal;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    cursor: move;
+    color: #014898;
+
+    &:hover {
+      background: #e0e0e0;
+    }
+  }
+}
+
+
+::ng-deep .mat-mdc-menu-content {
+  padding: 0 !important;
+}
+
+.mat-mdc-menu-item {
+  min-height: 41px !important;
+}
+
+::ng-deep .mdc-button__label {
+  letter-spacing: 0 !important;
+}
+
+::ng-deep .mat-mdc-menu-item-text {
+  letter-spacing: 0 !important;
+  font-size: 14px !important;
+  color: black;
+}
+
+table, th, td {
+  border: 1px solid #dddd;
+  border-collapse: collapse;
+}
+
+.trow{
+	height: 5px;
+}

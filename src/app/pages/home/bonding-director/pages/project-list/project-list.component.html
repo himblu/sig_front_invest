@@ -1,0 +1,131 @@
+<div class="row animated fadeIn fast" *ngIf="loading">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<div class="row animated fadeIn fast" *ngIf="!loading">
+  <div class="col-md-12">
+    <h2 style="text-align: center; color: #004899;">LISTA DE PROYECTOS</h2>
+    <div class="card" style="border-radius: 15px;">
+      <div class="card-body">
+        <section [formGroup]="filtersForm">
+          <div class="row pl-2 pr-2">
+            <div class="col-4">
+              <mat-form-field appearance="outline">
+                <mat-label>Buscar por proyecto</mat-label>
+                <input matInput autocomplete="off" formControlName='search'>
+                <mat-icon matSuffix>search</mat-icon>
+              </mat-form-field>
+            </div>
+            <div class="col-3">
+              <mat-form-field appearance="outline">
+                <mat-label>Periodo académico</mat-label>
+                <mat-select formControlName='periodID' (selectionChange)="getProjectPractices();">
+                  <mat-option [value]="0">TODOS</mat-option>
+                  <mat-option *ngFor="let item of periods" [value]="item.periodID">{{item.periodName}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-3">
+              <mat-form-field appearance="outline">
+                <mat-label>Estado</mat-label>
+                <mat-select formControlName='state' (selectionChange)="getProjectPractices();">
+                  <mat-option [value]="0">TODOS</mat-option>
+                  <mat-option *ngFor="let item of states" [value]="item.stateProjectID">{{item.stateDesc}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-2" style="text-align: right;">
+              <a type="button"
+                mat-raised-button
+                class="styleButton_sml"
+                style="max-width: 100px;"
+                href="/vinculacion-director/proyecto-pre-profesional">
+                CREAR
+              </a>
+            </div>
+          </div>
+          <div class="row pl-2 pr-2">
+            <div class="col-8"></div>
+            <div class="col-2">
+              <button
+                class="download-button"
+                mat-raised-button
+                (click)="getProjectStatusReport()">
+                Descargar Excel
+                <mat-icon class="green-icon">assignment</mat-icon>
+              </button>
+            </div>
+            <div class="col-2" style="text-align: right;">
+              <a
+                style="background-color: rgb(84, 158, 77);
+                color: white;"
+                mat-raised-button
+                matTooltipPosition="above"
+                matTooltip="Descargar"
+                href="https://tecnologicoitcaeduec-my.sharepoint.com/personal/encuba_itca_edu_ec/_layouts/15/onedrive.aspx?ga=1&id=%2Fpersonal%2Fencuba%5Fitca%5Fedu%5Fec%2FDocuments%2FCONTRATO%20SISTEMA%20INFORM%C3%81TICO%20DE%20GESTI%C3%93N%20%28SIG%29%20%2D%20ENCUBA%2FMANUALES%20DE%20USUARIO%20%28SIG%29%2FVINCULACI%C3%93N%2F11%5FMU%5FPROCESO%5FPROYECTOS%20GENERALES%5FROL%20DIRECTOR%20DE%20VINCULACI%C3%93N%2Epdf&parent=%2Fpersonal%2Fencuba%5Fitca%5Fedu%5Fec%2FDocuments%2FCONTRATO%20SISTEMA%20INFORM%C3%81TICO%20DE%20GESTI%C3%93N%20%28SIG%29%20%2D%20ENCUBA%2FMANUALES%20DE%20USUARIO%20%28SIG%29%2FVINCULACI%C3%93N"
+                target="_blank">
+                <small>Manual Usuario</small>
+              </a>
+            </div>
+          </div>
+          <br>
+        </section>
+        <div class="table-responsive">
+          <table class="table">
+            <thead style="background-color: #004899; color: white;">
+            <tr>
+              <th>Modalidad</th>
+              <th>Carrera</th>
+              <th>Proyecto General</th>
+              <th>Fecha inicio - fin</th>
+              <th>Estado</th>
+              <th style="text-align: center;">Acciones</th>
+            </tr>
+            </thead>
+            <tbody style="color: black;">
+              <tr *ngFor="let item of projectPractices">
+                <td>{{item.modalityName}}</td>
+                <td>{{item.careerName}}</td>
+                <td class="single-line"
+                  matTooltipPosition="above"
+                  matTooltip="{{item.nameProyect}}">
+                  {{item.nameProyect}}
+                </td>
+                <td>{{item.initdateEstimated | date: 'dd/MM/yyyy' :'UTC'}} - {{item.enddateEstimated | date: 'dd/MM/yyyy' :'UTC'}}</td>
+                <td>{{item.stateDesc}}</td>
+                <td style="text-align: center;">
+                  <a type="button"
+                    matTooltipPosition="above"
+                    matTooltip="Editar"
+                    style="cursor: pointer; color: green;"
+                    href="/vinculacion-director/proyecto-pre-profesional/{{item.periodID}}/{{item.projectPracticasID}}/{{item.careerID}}/{{item.studyPlanID}}">
+                    <i class="fa fa-pencil" aria-hidden="true"></i>
+                  </a>&nbsp;
+                  <a style="cursor: pointer;"
+                    matTooltipPosition="above"
+                    matTooltip="Proyectos Específicos"
+                    (click)="microProjectsView(item);">
+                    <i style="color: blue;" class="fa fa-list" aria-hidden="true"></i>
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <mat-paginator
+          #paginator
+          [length]="length"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions"
+          (page)="pageEvent = getPaginator($event)">
+        </mat-paginator>
+      </div>
+    </div>
+  </div>
+</div>

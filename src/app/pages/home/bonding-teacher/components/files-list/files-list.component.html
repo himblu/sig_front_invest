@@ -1,0 +1,89 @@
+
+<div style="display: flex; justify-content: end; align-items: center; background: transparent;" class="p-2">
+  <mat-icon style="cursor: pointer; color: red;" [matDialogClose]="false" class="red-icon" matRipple>close</mat-icon>
+</div>
+
+<mat-dialog-content>
+  <div *ngIf="isLoading; else form">
+    <spinner-loader></spinner-loader>
+  </div>
+
+  <ng-template #form>
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-12">
+              <label>{{data.item.fullName}}</label>
+            </div>
+            <div class="col-12">
+              <div class="table-responsive" [formGroup]="filesForm">
+                <table class="table" formArrayName="files">
+                  <thead style="background-color: #004899; color: white;">
+                    <tr>
+                      <th><small>Nombre</small></th>
+                      <th><small>Observación</small></th>
+                      <th style="text-align: center;"><small>Archivo</small></th>
+                      <th><small>Estado</small></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of files; let i=index;" [formGroupName]="i">
+                      <td><small>{{item.fileTypeName}}</small></td>
+                      <td>
+                        <div style="height: 30px; max-width: 150px;">
+                          <mat-form-field>
+                            <input type="text" matInput formControlName="commentary">
+                          </mat-form-field>
+                        </div>
+                      </td>
+                      <td style="text-align: center;">
+                        <a style="cursor: pointer; color: #004899;"
+                          (click)="openFile(item.urlFile);"
+                          matTooltip="Visualizar archivo">
+                          <i class="fa fa-file" aria-hidden="true"></i>
+                        </a>
+                      </td>
+                      <td>
+                        <div style="height: 30px; max-width: 125px;">
+                          <mat-form-field>
+                            <mat-select formControlName="statusFileID">
+                              <mat-option *ngFor="let item of fileStates" [value]="item.statusFileID">
+                                {{item.statusFileDesc}}
+                              </mat-option>
+                            </mat-select>
+                          </mat-form-field>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  </ng-template>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <div class="d-flex no-block w-100 justify-content-between">
+    <div class="pl-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="warn"
+        [mat-dialog-close]="false">
+        Cerrar
+      </button>
+    </div>
+    <div class="pr-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="primary"
+        (click)="onSubmit();">
+        Guardar
+      </button>
+    </div>
+  </div>
+</mat-dialog-actions>

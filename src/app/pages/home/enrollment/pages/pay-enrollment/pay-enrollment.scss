@@ -1,0 +1,43 @@
+table {
+  width: 100%;
+  background: white;
+  tbody {
+    tr {
+      //display: flex;
+      //flex-direction: row;
+      //width: 100%;
+      th {
+        line-height: 14px;
+        height: 60px;
+        font-size: 12px;
+        background: #014898;
+        color: white;
+        flex: 1;
+        //width: 150px;
+        text-align: center;
+        border: 1px solid #ccc;
+      }
+
+      td {
+        line-height: 14px;
+        min-height: 68px;
+        height: 68px;
+        max-height: 68px;
+        font-size: 12px;
+        color: black;
+        width: 150px;
+        text-align: center;
+        border: 1px solid #ccc;
+      }
+    }
+  }
+}
+
+small {
+  color: darkred;
+}
+
+mat-label {
+  font-size: 85%;
+  letter-spacing: 0;
+}

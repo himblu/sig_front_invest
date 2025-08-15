@@ -1,0 +1,284 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+      <div class="alert alert-info text-center">
+          <h4 class="alert-heading">Cargando</h4>
+          <i class="fa fa-spin fa-refresh fa-3x"></i>
+          <p class="mb-0">Por favor esperar...</p>
+      </div>
+  </div>
+</div>
+
+<div class="row animated fadeIn fast" *ngIf="!charging">
+  <div class="col-12">
+    <div class="card" style="border-radius: 15px;">
+      <div class="card-body">
+        <div class="row pl-3 pr-3" [formGroup]="filtersForm">
+          <div class="col-4">
+            <mat-form-field appearance="outline">
+              <mat-label>Buscar por escuela o carrera...</mat-label>
+              <input matInput formControlName="search" autocomplete="off" (keyup)="getSettingModulePeriod()">
+              <mat-icon matSuffix>search</mat-icon>
+            </mat-form-field>
+          </div>
+          <div class="col-md-8" style="text-align: right;">
+            <button type="submit" mat-raised-button class="styleButton_sml" style="width: 150px;" data-toggle="modal" data-target="#confgModal"
+            matTooltipPosition="above"
+            matTooltip="Agregar configuración por periodo o módulos.">
+              Agregar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-12">
+        <div class="table-responsive">
+          <table id="demo-foo-addrow"
+                class="table m-t-0 table-hover no-wrap contact-list footable-loaded footable"
+                data-page-size="5">
+            <thead style="background-color: #004899; color: white;">
+            <tr>
+              <th class="footable-sortable">
+                Escuela
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Carrera
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Malla Curricular
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Tipo
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Fecha Inicio/Fin
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Semanas
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable" style="text-align: center;">
+                Acciones
+                <span class="footable-sort-indicator"></span>
+              </th>
+            </tr>
+            </thead>
+            <tbody style="color: black;">
+            <tr *ngFor="let item of settings" class="footable-even">
+              <td>{{item.schoolName}}</td>
+              <td>{{item.careerName}}</td>
+              <td>{{item.studyPlanDesc}}</td>
+              <td>{{item.modulePeriod}}</td>
+              <td>{{item.startDate}}/{{item.endDate}}</td>
+              <td>{{item.numberWeek}}</td>
+              <td style="text-align: center;">
+                <a type="button"
+                  matTooltipPosition="above"
+                  matTooltip="Editar"
+                  (click)="openDialog(item);"
+                  style="cursor: pointer; color: green;"><i class="fa fa-pencil" aria-hidden="true"></i>
+                </a>
+                &nbsp;
+                <a type="button"
+                    matTooltipPosition="above"
+                    matTooltip="Activar"
+                    style="cursor: pointer; color: red;" *ngIf="item.statusID === 0"><i class="fa fa-toggle-off" aria-hidden="true"></i>
+                </a>
+                <a type="button"
+                    matTooltipPosition="above"
+                    matTooltip="Inactivar"
+                    style="cursor: pointer; color: blue;" *ngIf="item.statusID === 1"><i class="fa fa-toggle-on" aria-hidden="true"></i>
+                </a>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <mat-paginator
+        #paginator
+        [length]="length"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="pageEvent = changePageSettings($event)">
+      </mat-paginator>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade bd-example-modal-lg" id="confgModal" tabindex="-1" aria-labelledby="confgModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="height: 40px;">
+        <div class="col-md-6">
+          <h3 class="modal-title" id="confgModalLabel"><br>Agregar Configuración</h3>
+        </div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" #modalClose>
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12">
+          <div class="row">
+            <div class="card col-6">
+              <div class="card-body">
+                <form [formGroup]="academicForm"
+                      autocomplete="off">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Sede</mat-label>
+                        <mat-select formControlName="branchID">
+                          <mat-option value="">Seleccione una Sede</mat-option>
+                          <mat-option *ngFor="let branch of branches" [value]="branch.campusID" (click)="getPeriods(branch.campusID)">
+                            {{branch.campusName}}</mat-option>
+                        </mat-select>
+                        <mat-error>Seleccione una Sede</mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-md-6">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Periodo académico</mat-label>
+                        <mat-select formControlName="periodID">
+                          <mat-option *ngFor="let period of periods" [value]="period.periodID" (click)="clickPeriod(period)">
+                            {{period.periodName}}</mat-option>
+                        </mat-select>
+                        <mat-error>Seleccione un periodo</mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-md-6">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Modalidad</mat-label>
+                        <mat-select formControlName="modalityID">
+                          <mat-option value="">Seleccione una modalidad</mat-option>
+                          <mat-option *ngFor="let modality of modalities" [value]="modality.modalityID" (click)="getSchools(modality.modalityID)">
+                            {{modality.modalityName}}</mat-option>
+                        </mat-select>
+                        <mat-error>Seleccione una modalidad</mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-md-6">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Escuela</mat-label>
+                        <mat-select formControlName="schoolID">
+                          <mat-option value="">Seleccione una escuela</mat-option>
+                          <mat-option *ngFor="let school of schools" [value]="school.schoolID" (click)="getCareers(school.schoolID)">
+                            {{school.schoolName}}</mat-option>
+                        </mat-select>
+                        <mat-error>Seleccione una escuela</mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-md-6">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Carrera</mat-label>
+                        <mat-select formControlName="careerID">
+                          <mat-option value="">Seleccione una carrera</mat-option>
+                          <mat-option *ngFor="let career of careers" [value]="career.careerID" (click)="getStudyPlan(career.careerID)">
+                            {{career.careerName}}</mat-option>
+                        </mat-select>
+                        <mat-error>Seleccione una carrera</mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-md-6">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Malla curricular</mat-label>
+                        <mat-select formControlName="studyPlanID">
+                          <mat-option value="">Seleccione una malla</mat-option>
+                          <mat-option *ngFor="let study of study_plan" [value]="study.studyPlanID">
+                            {{study.studyPlanDesc}}</mat-option>
+                        </mat-select>
+                        <mat-error>Seleccione una malla</mat-error>
+                        <mat-error></mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-md-6">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Tipos</mat-label>
+                        <mat-select formControlName="typeSettingPeriod" (selectionChange)="selectType($event)">
+                          <mat-option [value]=null>Seleccione un tipo</mat-option>
+                          <mat-option [value]=1>Módulo</mat-option>
+                          <mat-option [value]=0>Periodo Académico</mat-option>
+                        </mat-select>
+                        <mat-error>Seleccione un tipo</mat-error>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div class="card col ml-1" *ngIf="selectedType === 1 || selectedType === 0">
+              <div class="card-body">
+                <form [formGroup]="moduleForm"
+                      autocomplete="off"
+                      (submit)="onSubmit()">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <h3 style="text-align: center;">{{title}}</h3>
+                    </div>
+                  </div>
+                  <div formArrayName="modules">
+                    <div class="row" *ngFor="let item of getModulesRow().controls; let i=index" [formGroupName]="i">
+                      <div class="col-8" style="text-align: left;">
+                        <label>{{subtitle}} {{i+1}}</label>
+                      </div>
+                      <div class="col-4">
+                        <label *ngIf="getModulesRow().controls[i].get('numberWeek')?.value > 0">
+                          {{getModulesRow().controls[i].get('numberWeek')?.value}}
+                          {{getModulesRow().controls[i].get('numberWeek')?.value === 1 ? 'Semana' : 'Semanas'}}
+                        </label>
+                      </div>
+                      <div class="col-6">
+                        <!-- <mat-form-field class="width" appearance="outline">
+                          <mat-label>Fecha:</mat-label>
+                          <mat-date-range-input [rangePicker]="module" [max]="maxPeriodDate" [min]="minPeriodDate">
+                            <input matStartDate readonly="true" placeholder="Fecha Inicio" formControlName="startDate" required>
+                            <input matEndDate readonly="true" placeholder="Fecha Fin" formControlName="endDate" required (dateChange)="weeksBetween(i)">
+                          </mat-date-range-input>
+                          <mat-hint>DD/MM/AAAA</mat-hint>
+                          <mat-datepicker-toggle matIconSuffix [for]="module"></mat-datepicker-toggle>
+                          <mat-date-range-picker #module></mat-date-range-picker>
+                          <mat-error>
+                            Fecha es <strong>requerida</strong>
+                          </mat-error>
+                        </mat-form-field> -->
+                        <mat-form-field class="width" appearance="outline">
+                          <mat-label><small>Fecha Inicio</small></mat-label>
+                          <input type="date" formControlName="startDate" #startDate matInput (click)="startDate.showPicker()"
+                          (change)="weeksBetween(i)" [max]="maxPeriodDate" [min]="minPeriodDate">
+                          <mat-icon style="cursor: pointer;" matSuffix (click)="startDate.showPicker()">calendar_month</mat-icon>
+                          <mat-hint>dd/mm/aaaa</mat-hint>
+                          <mat-error><small>Fecha es requerida</small></mat-error>
+                        </mat-form-field>
+                      </div>
+                      <div class="col-6">
+                        <mat-form-field class="width" appearance="outline">
+                          <mat-label><small>Fecha Fin</small></mat-label>
+                          <input type="date" formControlName="endDate" #endDate matInput (click)="endDate.showPicker()"
+                          (change)="weeksBetween(i)" [max]="maxPeriodDate" [min]="startDate.value">
+                          <mat-icon style="cursor: pointer;" matSuffix (click)="endDate.showPicker()">calendar_month</mat-icon>
+                          <mat-hint>dd/mm/aaaa</mat-hint>
+                          <mat-error><small>Fecha es requerida</small></mat-error>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-9"></div>
+                      <div class="col-md-3" style="text-align: right;">
+                        <button type="submit" mat-raised-button class="styleButton">Agregar</button>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

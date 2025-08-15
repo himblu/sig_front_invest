@@ -1,0 +1,261 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<div class="row animated fadeIn fast" *ngIf="!charging">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="row pl-2 pr-2">
+          <ng-container [formGroup]="filtersForm">
+            <div class="col-4">
+              <mat-form-field appearance="outline">
+                <mat-label>Periodo de Creación</mat-label>
+                <mat-select formControlName="periodID">
+                  <mat-option *ngFor="let item of periods" [value]="item.periodID">{{item.periodName}}</mat-option>
+                </mat-select>
+                <mat-error>Requerido!</mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-4">
+              <mat-form-field appearance="outline">
+                <mat-label>Nombre de Evaluación</mat-label>
+                <input matInput type="text" formControlName="evaluationName">
+                <mat-error>Requerido!</mat-error>
+              </mat-form-field>
+            </div>
+            <!--<div class="col-4">
+              <mat-form-field appearance="outline">
+                <mat-label>Tipo Evaluación</mat-label>
+                <mat-select formControlName="typeEvaluationInstrumentID">
+                  <mat-option *ngFor="let item of instrumentEvaluationTypes" [value]="item.typeEvaluationInstrumentID"
+                  (onSelectionChange)="showComponentsActivities(item, $event);">
+                  {{item.typeEvaluationDesc}}
+                </mat-option>
+                </mat-select>
+                <mat-error>Requerido!</mat-error>
+              </mat-form-field>
+            </div>-->
+            <div class="col-4">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Seguimiento / Evaluación</mat-label>
+                <mat-select formControlName="evaluationOrFollowup" (selectionChange)="getEvaluationInstrumentsReport(); isActivitiesActive=0; isComponentsActive=0;">
+                  <mat-option [value]="0">SEGUIMIENTO DOCENTE</mat-option>
+                  <mat-option [value]="1">EVALUACIÓN DOCENTE</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-4">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Instrumentos</mat-label>
+                <mat-select formControlName="typeEvaluationInstrumentID">
+                  <mat-option *ngFor="let item of evaluationInstrumentsReport" [value]="item.typeEvaluationInstrumentID"
+                  (onSelectionChange)="showComponentsActivities(item, $event);">{{item.typeEvaluationDesc}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-4" *ngIf="isActivitiesActive">
+              <mat-form-field appearance="outline">
+                <mat-label>Actividades</mat-label>
+                <mat-select formControlName="activityID">
+                  <mat-option *ngFor="let item of instrumentEvaluationActivities" [value]="item.activityID">{{item.activityDesc}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-4" *ngIf="isComponentsActive">
+              <mat-form-field appearance="outline">
+                <mat-label>Componentes</mat-label>
+                <mat-select formControlName="componentID">
+                  <mat-option *ngFor="let item of instrumentEvaluationComponents" [value]="item.componentID">{{item.componentDesc}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-4">
+              <mat-form-field appearance="outline">
+                <mat-label>Modalidad</mat-label>
+                <mat-select formControlName="modalityID">
+                  <mat-option [value]="0">Todos</mat-option>
+                  <mat-option *ngFor="let item of modalities" [value]="item.modalityID">{{item.modalityName}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-12">
+              <mat-form-field appearance="outline">
+                <mat-label>Indicaciones</mat-label>
+                <textarea matInput type="text" formControlName="indications"></textarea>
+                <mat-error>Requerido!</mat-error>
+              </mat-form-field>
+            </div>
+          </ng-container>
+        </div>
+        <div class="row pl-2 pr-2">
+          <div class="col-12">
+            <div class="table-responsive" [formGroup]="scalesForm">
+              <table class="table" style="border: solid 1px; border-color: black;">
+                <thead style="background-color: #004899; color: white;">
+                  <tr>
+                    <th>#</th>
+                    <th>Escala de valoración</th>
+                    <th>Equivalencia</th>
+                    <th>Descripción<th>
+                  </tr>
+                </thead>
+                <tbody style="color: black;" formArrayName="rows">
+                  <tr *ngFor="let row of getScalesRow().controls; let i=index" [formGroupName]="i">
+                    <td>{{i+1}}</td>
+                    <td>
+                      <div style="max-width: 150px; height: 30px;">
+                        <mat-form-field appearance="outline">
+                          <input matInput type="text" formControlName="ratingName">
+                        </mat-form-field>
+                      </div>
+                    </td>
+                    <td>
+                      <div style="max-width: 100px; height: 30px;">
+                        <mat-form-field appearance="outline">
+                          <input matInput type="number" formControlName="equivalence" [min]="0" [max]="10">
+                        </mat-form-field>
+                      </div>
+                    </td>
+                    <td>
+                      <div style="min-width: 350px; height: 30px;">
+                        <mat-form-field appearance="outline">
+                          <input matInput type="text" formControlName="equivalenceDesc">
+                        </mat-form-field>
+                      </div>
+                    </td>
+                    <td>
+                      <a style="cursor: pointer;"
+                        *ngIf="i > 0"
+                        matTooltipPosition="above"
+                        matTooltip="Eliminar"
+                        (click)="deleteScalesRow(i);">
+                        <i class="fa fa-minus-circle" aria-hidden="true" style="color: red;"></i>
+                      </a>
+                      <a style="cursor: pointer;"
+                        *ngIf="i === 0"
+                        matTooltipPosition="above"
+                        matTooltip="Agregar"
+                        (click)="addScalesRow();">
+                        <i class="fa fa-plus-circle" aria-hidden="true" style="color: blue"></i>
+                      </a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="row pl-2 pr-2" [formGroup]="elementsForm">
+          <ng-container *ngFor="let element of getElementsForm(); let index=index;" [formGroupName]="element">
+            <div class="col-12">
+              <h3>{{element}}&nbsp;
+                <a style="cursor: pointer;"
+                  matTooltipPosition="above"
+                  matTooltip="Eliminar"
+                  (click)="deleteElementsArray(element);">
+                  <i class="fa fa-minus-circle" aria-hidden="true" style="color: red;"></i>
+                </a>
+              </h3>
+            </div>
+            <div class="col-3" style="display: flex;">
+              <mat-form-field appearance="outline">
+                <mat-label>Valoraciones</mat-label>
+                <mat-select formControlName="typeOptionsID" (selectionChange)="setTypeOptionsID(element, index);">
+                  <mat-option *ngFor="let item of types" [value]="item.typeOptionsID">{{item.typeOptionsDesc}}</mat-option>
+                </mat-select>
+              </mat-form-field>&nbsp;
+              <a style="cursor: pointer;"
+                *ngIf="getTypeOptionsID(element) !== 1"
+                matTooltipPosition="above"
+                matTooltip="Agregar"
+                (click)="addOptionsRow(element, index)">
+                <i class="fa fa-plus-circle" aria-hidden="true" style="color: blue"></i>
+              </a>
+            </div>
+            <ng-container formArrayName="options" *ngIf="!isCreating">
+              <ng-container>
+                <div class="col-3" style="display: flex;" *ngFor="let option of getOptionsRow(element).controls; let $index=index;" [formGroupName]="$index">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Opción {{$index+1}}</mat-label>
+                    <input matInput type="text" formControlName="assessmentDesc">
+                    <mat-error>Requerido!</mat-error>
+                  </mat-form-field>&nbsp;
+                  <a style="cursor: pointer;"
+                  *ngIf="$index > 0"
+                  matTooltipPosition="above"
+                  matTooltip="Eliminar"
+                  (click)="deleteOptionsRow($index, element);">
+                  <i class="fa fa-minus-circle" aria-hidden="true" style="color: red;"></i>
+                </a>
+                </div>
+              </ng-container>
+            </ng-container>
+            <div class="col-12">
+              <ol formArrayName="elements">
+                <ng-container *ngFor="let item of getElementsRow(element).controls; let i=index;" [formGroupName]="i">
+                  <li>
+                    <div class="row">
+                      <div class="col-11">
+                        <mat-form-field appearance="outline">
+                          <mat-label>Ingresar la pregunta</mat-label>
+                          <input matInput type="text" formControlName="questionsDesc">
+                          <mat-error>Requerido!</mat-error>
+                        </mat-form-field>
+                      </div>
+                      <div class="col-1">
+                        <a style="cursor: pointer;"
+                          *ngIf="i > 0"
+                          matTooltipPosition="above"
+                          matTooltip="Eliminar"
+                          (click)="deleteElementsRow(i, element);">
+                          <i class="fa fa-minus-circle" aria-hidden="true" style="color: red;"></i>
+                        </a>
+                        <a style="cursor: pointer;"
+                          *ngIf="i === 0"
+                          matTooltipPosition="above"
+                          matTooltip="Agregar"
+                          (click)="addElementsRow(element);">
+                          <i class="fa fa-plus-circle" aria-hidden="true" style="color: blue"></i>
+                        </a>
+                      </div>
+                    </div>
+                  </li>
+                </ng-container>
+              </ol>
+            </div>
+          </ng-container>
+        </div>
+        <div class="row pl-2 pr-2">
+          <div class="col-3">
+            <h3>Crear criterios (Contenido)</h3>
+          </div>
+          <div class="col-5">
+            <mat-form-field appearance="outline">
+              <mat-label>Ingresar el nombre</mat-label>
+              <input matInput type="text" #name>
+                <mat-icon matSuffix
+                *ngIf="name.value"
+                style="cursor: pointer;"
+                (click)="addElementsArray(name.value, name);"
+                matTooltipPosition="above"
+                matTooltip="Agregar">
+                library_add
+              </mat-icon>
+            </mat-form-field>
+          </div>
+          <div class="col-2"></div>
+          <div class="col-2">
+            <button type="button" mat-raised-button class="styleButton_sml" style="max-width: 150px;" (click)="postEvaluationInstrument()">Guardar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

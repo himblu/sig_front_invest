@@ -1,0 +1,103 @@
+<div class="row animated fadeIn fast" *ngIf="loading">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<div class="row animated fadeIn fast" *ngIf="!loading">
+  <div class="col-md-12">
+    <div class="card" style="border-radius: 15px;">
+      <div class="card-body">
+        <section [formGroup]="filtersForm">
+          <div class="row pl-2 pr-2">
+            <div class="col-4">
+              <mat-form-field appearance="outline">
+                <mat-label>Buscar por nombre</mat-label>
+                <input matInput autocomplete="off" formControlName="search" (input)="getAllBusiness();">
+                <mat-icon matSuffix>search</mat-icon>
+              </mat-form-field>
+            </div>
+            <div class="col-2">
+              <a
+                style="background-color: rgb(84, 158, 77);
+                color: white;"
+                mat-raised-button
+                matTooltipPosition="above"
+                matTooltip="Descargar"
+                href="https://tecnologicoitcaeduec-my.sharepoint.com/personal/encuba_itca_edu_ec/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fencuba%5Fitca%5Fedu%5Fec%2FDocuments%2FCONTRATO%20SISTEMA%20INFORM%C3%81TICO%20DE%20GESTI%C3%93N%20%28SIG%29%20%2D%20ENCUBA%2FMANUALES%20DE%20USUARIO%20%28SIG%29%2FVINCULACI%C3%93N%2F9%5FMU%5FPROCESO%5FCREAR%20EMPRESAS%5FROL%20COORDINADOR%20DE%20CARRERA%2Epdf&parent=%2Fpersonal%2Fencuba%5Fitca%5Fedu%5Fec%2FDocuments%2FCONTRATO%20SISTEMA%20INFORM%C3%81TICO%20DE%20GESTI%C3%93N%20%28SIG%29%20%2D%20ENCUBA%2FMANUALES%20DE%20USUARIO%20%28SIG%29%2FVINCULACI%C3%93N"
+                target="_blank">
+                <small>Manual Usuario</small>
+              </a>
+            </div>
+            <div class="col-4"></div>
+            <div class="col-2" style="text-align: right;">
+              <button type="button" mat-raised-button class="styleButton_sml" style="max-width: 100px;" (click)="postOrPutAgreement(false);">
+                CREAR
+              </button>
+            </div>
+          </div>
+        </section>
+        <div>
+          <table class="table">
+            <thead class="header">
+              <tr>
+                <th class="footable-sortable">
+                  Tipo Empresa
+                  <span class="footable-sort-indicator"></span>
+                </th>
+                <th>
+                  Razón Social
+                </th>
+                <th class="footable-sortable">
+                  Representante Legal
+                  <span class="footable-sort-indicator"></span>
+                </th>
+                <th>
+                  N° Contacto
+                </th>
+                <th class="footable-sortable" style="text-align: center;" >
+                  Acciones
+                  <span class="footable-sort-indicator"></span>
+                </th>
+              </tr>
+            </thead>
+            <tbody style="color: black;">
+              <tr *ngFor="let item of business; let i=index;">
+                <td>{{item.typeBusiness}}</td>
+                <td>{{item.bussinesName}}</td>
+                <td>{{item.legalRepresentative}}</td>
+                <td>{{item.businessPhone}}</td>
+                <td style="text-align: center;">
+                  <a type="button"
+                    matTooltipPosition="above"
+                    matTooltip="Editar"
+                    style="cursor: pointer; color: green;"
+                    (click)="postOrPutAgreement(true, item);">
+                    <i class="fa fa-pencil" aria-hidden="true"></i>
+                  </a>&nbsp;
+                  <a type="button"
+                    matTooltipPosition="above"
+                    matTooltip="Descargar"
+                    style="cursor: pointer; color: red;"
+                    (click)="getProfileBusinessPdfContent(item);">
+                    <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <mat-paginator
+          #paginator
+          [length]="length"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions"
+          (page)="pageEvent = getBusinessPaginator($event)">
+        </mat-paginator>
+    </div>
+  </div>
+</div>

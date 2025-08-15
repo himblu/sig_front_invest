@@ -1,0 +1,69 @@
+<div class="row animated fadeIn fast mb-2">
+    <div class="col text-center">
+        <h2 class=""> Distributivo Docente</h2>
+    </div>
+</div>
+
+<div class="card">
+    <form [formGroup]="formFilters">
+
+        <div class="row mt-4">
+            <div class="col-md-2"></div>
+            <div class="col-md-3">
+                <mat-form-field class="width" appearance="outline">
+                    <mat-label>Periodo Academico</mat-label>
+                    <mat-select formControlName="periodID">
+                        <mat-option value="">Seleccione una opción</mat-option>
+                        <mat-option [value]="period.periodID"
+                            *ngFor="let period of periods">{{period.periodName}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="width" appearance="outline">
+                    <mat-label>Especialidad</mat-label>
+                    <mat-select formControlName="courseID">
+                        <mat-option value="0">Seleccione una opción</mat-option>
+                        <mat-option [value]="course.courseID"
+                            *ngFor="let course of courses">{{course.courseName}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="col-md-1">
+                <button (click)="searchTeachersProgram(1)" mat-raised-button color="primary"
+                    style="background: #014898;">Buscar</button>
+            </div>
+            <div class="col-md-1">
+              <button (click)="generateReport()" mat-raised-button color="primary" style="background: #014898;" class="ml-1">
+                  <mat-icon class="green-icon m-0">description</mat-icon>
+              </button>
+          </div>
+            <div class="col-md-2"></div>
+        </div>
+
+    </form>
+</div>
+
+<br>
+<div class="card">
+    <div class="container p-4">
+        <ng-container *ngFor="let teacher of teachers">
+            <div class="row align-items-center" id="container-1">
+                <div class="col-md-4 mr-4">
+                    <mat-label> {{ teacher.teacher }}</mat-label>
+                </div>
+                <div class="col-md-6">
+                    <mat-slider class="custom-slider" min="0" #slider [max]="teacher.timePrograma" step="1"
+                        disabled="true" showTickMarks discrete [displayWith]="formatLabel" color="secondary">
+                        <input matSliderThumb [value]="teacher.timeBusy">
+                    </mat-slider>
+                </div>
+                <div class="col">
+                    {{ teacher.timeBusy }} / {{ teacher.timePrograma }} (horas)
+                </div>
+            </div>
+
+        </ng-container>
+        <components-button-arrow [actual]="actualTeachers" [totalPage]="totalPageTeachers" [count]="countTeachers" (result)="changePageTeachers($event)"></components-button-arrow>
+    </div>
+</div>

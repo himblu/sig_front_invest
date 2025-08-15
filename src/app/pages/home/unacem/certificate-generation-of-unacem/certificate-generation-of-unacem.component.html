@@ -1,0 +1,125 @@
+<div class="animated fadeIn fast">
+  <div class="form-row">
+    <div class="col-12 p-3">
+      <div class="card">
+        <div class="card-header">
+          <i class="fa fa-cog mr-1"></i>Generación de Certificados
+        </div>
+        <div class="card-body">
+          <form class="mb-4" #filterForm="ngForm">
+            <div class="form-row">
+              <div class="form-group col-md-2">
+                <label for="periodID">Periodo</label>
+                <select id="periodID" name="periodID" (change)="selectPeriod()" [(ngModel)]="filter.periodID" class="form-control" required>
+                  <option [ngValue]="undefined">--PERIODO--</option>
+                  <option *ngFor="let p of periods" [ngValue]="p.periodID">{{p.periodID}}</option>
+                </select>
+              </div>
+              <div class="form-group col-md-3">
+                <label for="courseID">Curso</label>
+                <select id="courseID" [disabled]="!filter.periodID" (change)="selectCourse()" name="courseID" [(ngModel)]="filter.courseID" class="form-control" required>
+                  <option [ngValue]="undefined">--SELECCIONE CURSO--</option>
+                  <option *ngFor="let c of courses" [ngValue]="c.extensionCoursesID">{{c.courseName | uppercase}}
+                  </option>
+                </select>
+              </div>
+              <div class="form-group col-md-3">
+                <label for="startDate">Fecha de Inicio y Fin</label>
+                <select name="dates" id="dates" [disabled]="!filter.courseID || !dates.length" (change)="changeDate()" [(ngModel)]="filter.dates" class="form-control" required>
+                  <option [ngValue]="undefined">--SELECCIONE FECHAS--</option>
+                  <option *ngFor="let d of dates" [ngValue]="d">{{d.startDate}} - {{d.endDate}}</option>
+                </select>
+              </div>
+              <div class="form-group col-md-4">
+                <label for="teacherID">Docente</label>
+                <select id="teacherID" name="teacherID" (change)="selectTeacher()" [disabled]="!filter.dates" [(ngModel)]="filter.teacherID" class="form-control" required>
+                  <option [ngValue]="undefined">--SELECCIONE--</option>
+                  <option *ngFor="let i of instructors" [ngValue]="i.teacherID">{{i.teacherName | uppercase}}</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="col-4">
+                <div class="form-group">
+                  <label for="schedules">Horarios</label>
+                  <select id="schedules" [disabled]="!filter.teacherID || !schedules.length" name="schedules" [(ngModel)]="filter.classSectionNumber" class="form-control" required>
+                    <option [ngValue]="undefined">--SELECCIONE HORARIO--</option>
+                    <option *ngFor="let s of schedules" [ngValue]="s.classSectionNumber">{{s.hourSchedule || s.classSectionNumber}}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-2 pt-3">
+                <div class="form-group">
+                  <button class="btn btn-sm btn-block bg-primary-color mt-3" [disabled]="filterForm.invalid || !schedules.length" (click)="listStudents()">
+                    <i class="fa fa-search mr-1"></i>Buscar participantes
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+          <div class="form-row">
+            <ng-container *ngIf="!searched">
+              <div class="col-12 text-center text-secondary" *ngIf="!searching">
+                <i class="fa fa-search fa-3x"></i><br>
+                Realiza tu búsqueda con los filtros determinados.
+              </div>
+              <div class="col-12 text-center" *ngIf="searching">
+                <div class="spinner-grow text-primary" role="status">
+                  <span class="sr-only">Loading...</span>
+                </div>
+                <div class="spinner-grow text-secondary" role="status">
+                  <span class="sr-only">Loading...</span>
+                </div>
+                <div class="spinner-grow text-success" role="status">
+                  <span class="sr-only">Loading...</span>
+                </div><br>
+                Buscando
+              </div>
+            </ng-container>
+            <ng-container *ngIf="searched">
+              <div class="col-12 text-center text-secondary" *ngIf="!students.length">
+                <i class="fa fa-times fa-3x"></i><br>
+                No se tienen resultados con los filtros seleccionados.
+              </div>
+              <ng-container *ngIf="students.length">
+                <div class="col-8"></div>
+                <div class="col-4 text-right">
+                  <!-- <button type="button" class="btn bg-primary-color">
+                    <i class="fa fa-download mr-1"></i>Descargar
+                  </button> -->
+                </div>
+                <div class="col-12">
+                  <table class="table table-bordered table-sm" *ngIf="searched && students.length">
+                    <thead class="thead-light bg-primary-color">
+                      <tr>
+                        <th class="">Nro de Documento</th>
+                        <th class="">Nombres Completos</th>
+                        <th class="text-center">Estado</th>
+                        <!-- <th class="text-center">Fecha de 1ra Generación</th> -->
+                        <th class="text-right">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let s of students">
+                        <td style="vertical-align: middle;" class="p-0 pl-2">{{s.documentNumber}}</td>
+                        <td style="vertical-align: middle;" class="p-0 pl-2">{{s.fullName | uppercase}}</td>
+                        <td style="vertical-align: middle;" class="p-0 text-center">{{s.stateGrade || 'Evaluación Pendiente'}}</td>
+                        <!-- <td style="vertical-align: middle;" class="p-0 text-center">{{s.firstGenerationDate}}</td> -->
+                        <td style="vertical-align: middle;" class="p-0" class="text-right">
+                          <button class="btn btn-light text-primary-color btn-sm mr-2" *ngIf="s.stateGrade" (click)="generateCertificate(s)">
+                            <i class="fa fa-copy mr-1"></i>Generar
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </ng-container>
+            </ng-container>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

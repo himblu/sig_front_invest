@@ -1,0 +1,120 @@
+<div class="row animated fadeIn fast" *ngIf="loading">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+<div class="animated fadeIn fast" *ngIf="!loading">
+  <div class="card">
+    <div class="card-body" *ngIf="instrument">
+      <div class="row pl-2 pr-2">
+        <div class="col-12" style="text-align: center;">
+          <h3>{{instrument.evaluationName}}</h3>
+        </div>
+      </div>
+      <div class="row pl-2 pr-2">
+        <div class="col-12">
+          <h4>Docente: {{instrument.teacher}}</h4>
+        </div>
+      </div>
+      <div class="row pl-2 pr-2">
+        <div class="col-12">
+          <h4>Indicaciones</h4>
+        </div>
+        <div class="col-12">
+          <label>{{instrument.indications}}</label>
+        </div>
+      </div>
+      <div class="row pl-2 pr-2">
+        <div class="col-12">
+          <h4>Escala de Valoración</h4>
+        </div>
+        <div class="col-12">
+          <ul *ngIf="instrument.scaleEquivalences">
+            <li *ngFor="let scale of instrument.scaleEquivalences | filterEquivalences">{{scale.equivalence}}: {{scale.ratingName}} - {{scale.equivalenceDesc}}</li>
+          </ul>
+        </div>
+      </div>
+      <div class="row pl-2 pr-2">
+        <div class="col-12" [formGroup]="questionsForm">
+          <table class="table table-striped" *ngFor="let content of instrument.contents; let value=index;" formArrayName="news">
+            <ng-container [formGroupName]="value">
+              <thead style="background-color: #004899; color: white;">
+                <tr>
+                  <th colspan="2" style="text-align: center;">{{content.contentDesc}}</th>
+                  <th style="text-align: center; text-transform: uppercase;"
+                    *ngFor="let assessment of content.assessments">
+                    {{assessment.assessmentDesc}}
+                  </th>
+                  <th style="text-align: center;">OBSERVACIÓN</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let question of content.questions; let i=index;">
+                  <td>{{i+1}}</td>
+                  <td width="99%">{{question.questionsDesc}}</td>
+                  <ng-container *ngFor="let assessment of content.assessments; let ind=index;" formArrayName="{{ind}}">
+                    <ng-container formArrayName="{{i}}" *ngIf="instrument.scaleEquivalences">
+                      <mat-radio-group color="primary" formControlName="scaleEquivalenceID" *ngIf="content.assessments.length === 1; else selects">
+                        <td *ngFor="let scale of instrument.scaleEquivalences | filterEquivalences" >
+                          <div class="smallerTd">
+                            <mat-label><small>{{scale.equivalence}}</small></mat-label>
+                            <mat-radio-button [value]="scale.scaleEquivalenceID"
+                            matTooltipPosition="above"
+                            matTooltip="{{scale.ratingName}}">
+                            </mat-radio-button>
+                          </div>
+                        </td>
+                      </mat-radio-group>
+                    </ng-container>
+                    <ng-template #selects>
+                      <td formArrayName="{{i}}" *ngIf="instrument.scaleEquivalences">
+                        <div style="height: 30px; max-width: 65px;">
+                          <mat-form-field class="width" appearance="outline">
+                            <mat-select formControlName="scaleEquivalenceID">
+                              <mat-option *ngFor="let scale of instrument.scaleEquivalences | filterEquivalences"
+                                [value]="scale.scaleEquivalenceID"
+                                matTooltipPosition="above"
+                                matTooltip="{{scale.ratingName}}">
+                                {{scale.equivalence}}
+                              </mat-option>
+                            </mat-select>
+                            <mat-error></mat-error>
+                          </mat-form-field>
+                        </div>
+                      </td>
+                    </ng-template>
+                  </ng-container>
+                  <td formArrayName="0">
+                    <div style="height: 30px; width: 150px; display: inline-block;" formArrayName="{{i}}">
+                      <mat-form-field class="width" appearance="outline">
+                        <input matInput #input
+                        formControlName="commentary"
+                        matTooltipPosition="above"
+                        matTooltip="{{input.value}}">
+                        <mat-error></mat-error>
+                      </mat-form-field>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </ng-container>
+          </table>
+        </div>
+      </div>
+      <div class="row pl-2 pr-2">
+        <div class="col-10"></div>
+        <div class="col-2">
+          <button mat-button class="styleButton"
+            (click)="onSubmit();">
+            <i class="fa fa-save"></i>&nbsp;
+            Guardar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

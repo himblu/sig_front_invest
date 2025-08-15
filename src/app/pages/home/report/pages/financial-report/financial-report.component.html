@@ -1,0 +1,317 @@
+<div class="animated fadeIn fast">
+  <div class="container-fluid">
+    <section [formGroup]="filtersForm">
+      <div class="row pl-2 pr-2">
+        <div class="col-3">
+          <mat-form-field appearance="outline">
+            <mat-label>Periodo Académico</mat-label>
+            <mat-select (selectionChange)="getITCAStudents(); getCareerByID(); getFileBecaTypes();" formControlName="period" placeholder="Filtrar por Periodo Académico">
+              <mat-option value="">Todos</mat-option>
+              <mat-option *ngFor="let period of periods; trackBy: trackByPeriodId;" [value]="period.periodID">
+                {{ period.periodName }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col-3">
+          <mat-form-field appearance="outline">
+            <mat-label>Carrera</mat-label>
+            <mat-select (selectionChange)="getITCAStudents();" formControlName="career" placeholder="Filtrar por Carrera">
+              <mat-option value="">Todos</mat-option>
+              <mat-option *ngFor="let career of careers;" [value]="career.careerID">
+                {{ career.careerName }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col-4">
+          <mat-form-field appearance="outline">
+            <mat-label>Buscar por Estudiante, Documento...</mat-label>
+            <input matInput formControlName="search" autocomplete="off">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <div class="col-2">
+          <mat-form-field appearance="outline">
+            <mat-label>Estado</mat-label>
+            <mat-select (selectionChange)="getITCAStudents();" formControlName="status" placeholder="Filtrar por Estado">
+              <mat-option value="">Todos</mat-option>
+              <mat-option *ngFor="let status of fileStatuses; trackBy: trackByFileStatusId" [value]="status.statusFileID">
+                {{ status.statusFileDesc }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col-10">
+          <div class="d-flex no-block">
+<!--            <div class="d-flex align-items-center">-->
+<!--              <mat-menu #totalEnrolledStudents="matMenu">-->
+<!--                <ng-template matMenuContent>-->
+<!--                  <button [disabled]="!filtersForm.get('period')?.value" mat-menu-item (click)="buildReport('enroll/reports/total');">-->
+<!--                    <mat-icon class="red-icon">picture_as_pdf</mat-icon>-->
+<!--                    <span class="item">Descargar PDF</span>-->
+<!--                  </button>-->
+<!--&lt;!&ndash;                  <button mat-menu-item>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <mat-icon class="green-icon">description</mat-icon>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <span class="item">Descargar Excel</span>&ndash;&gt;-->
+<!--&lt;!&ndash;                  </button>&ndash;&gt;-->
+<!--                </ng-template>-->
+<!--              </mat-menu>-->
+<!--              -->
+<!--              <button class="download-button" mat-raised-button [matMenuTriggerFor]="totalEnrolledStudents">-->
+<!--                Matriculados-->
+<!--                <mat-icon>arrow_drop_down</mat-icon>-->
+<!--              </button>-->
+<!--            </div>-->
+
+            <div class="d-flex">
+              <button
+                [disabled]="!filtersForm.get('period')?.value"
+                (click)="buildReport('enroll/reports/by-status-financiero', filtersFormValue.status);"
+                class="download-button"
+                mat-raised-button
+                matTooltipPosition="above"
+                matTooltip="Descargar PDF">
+                Reporte por Estado
+                <mat-icon class="red-icon">picture_as_pdf</mat-icon>
+              </button>
+            </div>
+
+            <div class="pl-2 d-flex">
+              <button
+                [disabled]="!filtersForm.get('period')?.value"
+                (click)="buildReport('file/reports/enrollments/financiero');"
+                class="download-button"
+                mat-raised-button
+                matTooltipPosition="above"
+                matTooltip="Descargar Excel">
+                Reporte Excel
+                <mat-icon class="green-icon">description</mat-icon>
+              </button>
+            </div>
+
+            <div class="pl-2 d-flex align-items-center">
+              <!--              <mat-form-field hidden="hidden">-->
+              <!-- <mat-date-range-input hidden="hidden" [formGroup]="range" [rangePicker]="picker">
+                <input matStartDate formControlName="startDate">
+                <input matEndDate formControlName="endDate">
+              </mat-date-range-input>
+              <mat-date-range-picker #picker touchUi="true">
+                <mat-datepicker-actions>
+                  <div class="d-block w-100">
+                    <p style="font-size: 85%;" class="pt-2 pl-2">Selecciona un rango de fechas para descargar los comprobantes de pago.</p>
+                    <div class="d-flex no-block justify-content-between">
+                      <button mat-raised-button style="letter-spacing: 0;" color="warn" matDatepickerCancel>Cerrar</button>
+                      <button mat-raised-button style="letter-spacing: 0;" color="primary" matDatepickerApply (click)="downloadProofPayments();">Descargar</button>
+                    </div>
+                  </div>
+                </mat-datepicker-actions>
+              </mat-date-range-picker> -->
+              <!--              </mat-form-field>-->
+              <ng-template #componentsDialog [formGroup]="range">
+                <div class="col-12">
+                  <div style="display: flex; justify-content: end; align-items: center; background: transparent;" class="p-2">
+                    <mat-icon style="cursor: pointer; color: red;" [matDialogClose]="false" class="red-icon" matRipple>close</mat-icon>
+                  </div><br>
+                  <div class="row pl-4 pr-4">
+                    <div class="col-6">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label><small>Fecha Inicio</small></mat-label>
+                        <input type="date" formControlName="startDate" #startDate matInput (click)="startDate.showPicker()">
+                        <mat-icon style="cursor: pointer;" matSuffix (click)="startDate.showPicker()">calendar_month</mat-icon>
+                        <mat-hint>dd/mm/aaaa</mat-hint>
+                        <mat-error>Fecha Inicio requerida</mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-6">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label><small>Fecha Fin</small></mat-label>
+                        <input type="date" formControlName="endDate" #endDate matInput (click)="endDate.showPicker()">
+                        <mat-icon style="cursor: pointer;" matSuffix (click)="endDate.showPicker()">calendar_month</mat-icon>
+                        <mat-hint>dd/mm/aaaa</mat-hint>
+                        <mat-error>Fecha Fin requerida</mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-6">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Tipo</mat-label>
+                        <mat-select formControlName="becaType">
+                          <mat-option [value]="0">NO BECADOS</mat-option>
+                          <mat-option *ngFor="let item of becaTypes" [value]="item.id">{{item.name}}</mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                  </div><br>
+                  <div class="d-flex no-block justify-content-between">
+                    <button mat-raised-button style="letter-spacing: 0;" color="warn" [matDialogClose]="false">Cerrar</button>
+                    <button mat-raised-button style="letter-spacing: 0;" color="primary" (click)="downloadProofPayments();">Descargar</button>
+                  </div>
+                </div>
+              </ng-template>
+              <button
+                mat-raised-button
+                [disabled]="!filtersForm.get('period')?.value"
+                (click)="resetRangeValue(); openComponentsDialog();" class="download-button">
+                Comprobantes De Pago
+                <mat-icon class="blue-icon">today</mat-icon>
+              </button>
+            </div>
+
+            <div class="pl-2 d-flex">
+              <button
+                [disabled]="!filtersForm.get('period')?.value"
+                (click)="buildReport('file/reports-becas/financiero');"
+                class="download-button"
+                mat-raised-button
+                matTooltipPosition="above"
+                matTooltip="Descargar Excel">
+                Becas a Cobrar
+                <mat-icon class="green-icon">description</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-2">
+          <a
+            style="background-color: rgb(84, 158, 77);
+            color: white;"
+            mat-raised-button
+            matTooltipPosition="above"
+            matTooltip="Descargar"
+            href="https://acortar.link/7WtLhx"
+            target="_blank">
+              <small>Manual Usuario</small>
+          </a>
+        </div>
+      </div>
+    </section>
+    <br>
+    <div style="position: relative;">
+      <spinner-loader [absolute]="true" *ngIf="loadingStudentsDetail"></spinner-loader>
+      <mat-table
+        [dataSource]="dataSource" matSort (matSortChange)="getITCAStudents($event);">
+
+        <!-- document -->
+        <ng-container matColumnDef="documentNumber">
+          <mat-header-cell *matHeaderCellDef mat-sort-header>Documento</mat-header-cell>
+          <mat-cell *matCellDef="let row; let i = index;"> <small>{{ row.documentNumber }}</small> </mat-cell>
+        </ng-container>
+
+        <!-- studentNames -->
+        <ng-container matColumnDef="student">
+          <mat-header-cell *matHeaderCellDef mat-sort-header>Estudiante</mat-header-cell>
+          <mat-cell *matCellDef="let row;"> <small>{{ row.student }}</small> </mat-cell>
+        </ng-container>
+
+        <!-- Career -->
+        <ng-container matColumnDef="career">
+          <mat-header-cell *matHeaderCellDef>Carrera</mat-header-cell>
+          <mat-cell *matCellDef="let row"> <small>{{ row.career }}</small> </mat-cell>
+        </ng-container>
+
+        <!-- Modality -->
+        <ng-container matColumnDef="modality">
+          <mat-header-cell *matHeaderCellDef style="max-width: 100px;">Modalidad</mat-header-cell>
+          <mat-cell *matCellDef="let row" style="max-width: 100px;"> <small>{{ row.modality }}</small> </mat-cell>
+        </ng-container>
+
+        <!-- Level -->
+        <ng-container matColumnDef="levelID">
+          <mat-header-cell *matHeaderCellDef mat-sort-header style="max-width: 100px;">Nivel</mat-header-cell>
+          <mat-cell *matCellDef="let row" style="text-transform: uppercase; max-width: 100px;"> <small>{{ row.levelDesc }}</small> </mat-cell>
+        </ng-container>
+
+        <!-- Parallel -->
+        <ng-container matColumnDef="parallel">
+          <mat-header-cell *matHeaderCellDef style="max-width: 75px;">Paralelo</mat-header-cell>
+          <mat-cell *matCellDef="let row" style="max-width: 75px;"> <small>{{ row.parallelCode }}</small> </mat-cell>
+        </ng-container>
+
+        <!-- enrollmentDate -->
+        <ng-container matColumnDef="enrollDate">
+          <mat-header-cell *matHeaderCellDef mat-sort-header style="max-width: 100px;">Fecha Matrícula</mat-header-cell>
+          <mat-cell *matCellDef="let row" style="max-width: 100px;"> <small>{{ row.enrollDate | date: 'dd/MM/yy' }}</small> </mat-cell>
+        </ng-container>
+
+        <!-- period -->
+        <ng-container matColumnDef="period">
+          <mat-header-cell *matHeaderCellDef>Opciones de pago</mat-header-cell>
+          <mat-cell *matCellDef="let row"> <small>{{ row.paymentOptionDesc }}</small> </mat-cell>
+        </ng-container>
+
+        <!-- state -->
+        <ng-container matColumnDef="state">
+          <mat-header-cell *matHeaderCellDef>Estado</mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <span *ngIf="row.commentary"
+              style="cursor: pointer;"
+              matTooltip="{{row.commentary}}"
+              class="badge"
+              [style.color]="row.fontColor"
+              [style.background-color]="row.backgroundColor">{{ row.statusFileDesc }}
+            </span>
+            <span *ngIf="!row.commentary"
+              class="badge"
+              [style.color]="row.fontColor"
+              [style.background-color]="row.backgroundColor">{{ row.statusFileDesc }}
+            </span>
+          </mat-cell>
+        </ng-container>
+
+        <!-- actions -->
+        <ng-container matColumnDef="actions">
+          <mat-header-cell *matHeaderCellDef><span>Acciones</span></mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <button
+              class="blue-icon"
+              mat-icon-button
+              (click)="$event.stopPropagation();" [matMenuTriggerFor]="menu" #menuTrigger="matMenuTrigger">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu [xPosition]="'before'" #menu="matMenu">
+<!--              <button mat-menu-item (click)="menuTrigger.closeMenu();">-->
+<!--                <mat-icon class="red-icon">picture_as_pdf</mat-icon>-->
+<!--                <span class="item">Pase De Nivel</span>-->
+<!--              </button>-->
+
+<!--              <button mat-menu-item (click)="menuTrigger.closeMenu();">-->
+<!--                <mat-icon class="purple-icon">picture_as_pdf</mat-icon>-->
+<!--                <span class="item">Certificado</span>-->
+<!--              </button>-->
+
+              <button mat-menu-item (click)="validatePayment(row);">
+                <mat-icon class="green-icon">price_check</mat-icon>
+                <span class="item">Validar Pago</span>
+              </button>
+            </mat-menu>
+          </mat-cell>
+          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+        </ng-container>
+
+        <!-- noData -->
+        <ng-container matColumnDef="noData">
+          <mat-footer-cell *matFooterCellDef>
+            <p *ngIf="!studentsDetail.length">No hay resultados que coincidan con los términos de búsqueda</p>
+          </mat-footer-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row matRipple *matRowDef="let row; columns: displayedColumns;" class="mat-row"></mat-row>
+        <mat-footer-row *matFooterRowDef="['noData']" [ngClass]="{'hide': !studentsDetail.length }"></mat-footer-row>
+      </mat-table>
+
+      <mat-paginator
+        #paginator
+        [length]="length"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="pageEvent = getStudentsDetailFromPaginator($event)">
+      </mat-paginator>
+    </div>
+  </div>
+</div>

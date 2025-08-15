@@ -1,0 +1,59 @@
+/* Contenedor principal en horizontal */
+.horizontal-list-container {
+	display: flex;
+	flex-wrap: nowrap; /* Evita que las tarjetas salten de línea */
+	overflow-x: auto; /* Scroll horizontal */
+	gap: 20px;
+	padding-bottom: 10px;
+	justify-content: flex-start;
+}
+
+/* Tarjetas */
+.list-container {
+	min-width: 45%;
+	padding: 15px;
+	border-radius: 8px;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+	background: white;
+}
+
+/* Título */
+mat-card-title {
+	text-align: center;
+	font-weight: bold;
+	margin-bottom: 10px;
+}
+
+/* Input de búsqueda */
+mat-form-field {
+	width: 100%;
+	margin-bottom: 10px;
+}
+
+/* Lista de selección */
+mat-selection-list {
+	max-height: 200px;
+	overflow-y: auto;
+}
+
+/* Icono de usuario */
+.user-icon {
+	margin-right: 10px;
+	color: #0072ff;
+}
+
+
+.truncate-text {
+	display: inline-block;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 200px; /* Ajusta este valor según el diseño */
+	vertical-align: middle;
+}
+
+
+.mdc-tooltip__surface {
+	/*background: red !important;*/
+	min-width: 600px !important;
+}

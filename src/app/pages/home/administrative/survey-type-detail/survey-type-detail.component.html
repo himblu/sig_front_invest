@@ -1,0 +1,203 @@
+<div class="animated fadeIn fast">
+  <div class="form-row" *ngIf="surveyTypeSelected">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <div class="form-row">
+            <div class="col-1">
+              <button class="btn btn-sm btn-light text-danger" (click)="back()">
+                <i class="fa fa-arrow-left mr-1"></i>Volver
+              </button>
+            </div>
+            <div class="col-8 pt-1">
+              <span *ngIf="isNew">
+                <i class="fa fa-detail mr-1"></i>Nuevo Tipo de Formulario <small></small>
+              </span>
+              <span *ngIf="!isNew">
+                <i class="fa fa-detail mr-1"></i>Detalle de Tipo de Formulario: <small>{{surveyTypeSelected.name | uppercase}}</small>
+              </span>
+            </div>
+            <div class="col-3 text-right">
+              <div class="alert alert-info text-center m-0 p-1">
+                <i class="fa fa-info-circle mr-1"></i>Todas las acciones se guardan automaticamente.
+              </div>
+              <!-- <button class="btn btn-sm btn-primary" (click)="saveChanges()">
+                <i class="fa fa-save mr-1"></i>Guardar Cambios
+              </button> -->
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="col-12">
+              <tabset>
+                <tab heading="Configuración">
+                  <ng-template #itemTemplate let-item="item" let-index="index">
+                    <div class="card-body p-1" [attr.data-questionOrder]="item.value.questionID" id="{{item.value.questionID}}">
+                      <div class="form-row">
+                        <div class="col-9">
+                          <small>
+                            {{item.value.questionOrder}}. {{item.value.question | uppercase}}
+                            <small class="badge badge-success ml-3" *ngIf="!item.value.isChild && item.value.multipleAssign">Asignación Multiple</small>
+                          </small>
+                        </div>
+                        <div class="col-3 text-right">
+                          <button class="btn btn-sm bg-primary-color mr-1 rounded-circle" *ngIf="!item.value.inChild" (click)="toggleQuestion(item.value)">
+                            <i class="fa fa-edit"></i>
+                          </button>
+                          <button class="btn btn-sm btn-danger rounded-circle" *ngIf="!item.value.inChild" (click)="deleteQuestion(item.value)">
+                            <i class="fa fa-trash"></i>
+                          </button>
+                          <button class="btn btn-sm btn-danger rounded-circle" *ngIf="item.value.inChild" (click)="deleteOfChild(item.value, index)">
+                            <i class="fa fa-trash"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </ng-template>
+                  <div class="row mt-2">
+                    <div class="col-4" style="max-height: 450px; overflow: auto;">
+                      <button class="btn btn-light btn-block text-primary-color mb-2" (click)="toggleQuestion()">
+                        <i class="fa fa-plus mr-1"></i>Agregar Pregunta
+                      </button>
+                      <bs-sortable
+                        [(ngModel)]="questions"
+                        [itemTemplate]="itemTemplate"
+                        itemClass="sortable-item card mb-2"
+                        itemActiveClass="bg-sky-primary-color"
+                        placeholderItem=""
+                        placeholderClass="placeholderStyle"
+                        wrapperClass="sortable-wrapper"
+                      ></bs-sortable>
+                    </div>
+                    <!-- <div class="col-4">
+
+                    </div> -->
+                    <div class="col-8">
+                      <div class="form-row">
+                        <div class="col-6" *ngFor="let g of groupRepresentations">
+                          <small class="text-primary-color">
+                            {{g.analysisCategoryName | uppercase}} - {{g.vocationalInterestsName | uppercase}}
+                          </small>
+                          <hr>
+                          <bs-sortable
+                            [(ngModel)]="g.questions"
+                            [itemTemplate]="itemTemplate"
+                            itemClass="sortable-item card mb-2"
+                            itemActiveClass="bg-sky-primary-color"
+                            placeholderItem="Arrastre aqui"
+                            placeholderClass="placeholderStyle text-center"
+                            wrapperClass="sortable-wrapper"
+                            (drop)="dropInChild($event, g)"
+                          ></bs-sortable>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </tab>
+              </tabset>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div bsModal #questionModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name2">
+  <div class="modal-dialog modal-nm">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="col-9 pt-1">
+            <i class="fa fa-comment mr-1"></i>{{newQuestion.editing ? 'Editar' : 'Nueva'}}&nbsp;Pregunta
+          </div>
+          <div class="col-3 text-right">
+            <button class="btn btn-sm btn-light text-danger" (click)="toggleQuestion()">
+              <i class="fa fa-times mr-1"></i>Cerrar
+            </button>
+          </div>
+          <div class="col-12">
+            <form #questionForm="ngForm">
+              <div class="form-row">
+                <div class="col-12">
+                  <label for="question">Pregunta</label>
+                  <textarea name="question" rows="3" class="form-control form-control-sm" [(ngModel)]="newQuestion.question"></textarea>
+                </div>
+                <div class="col-12">
+                  <label for="questionType">Tipo</label>
+                  <select name="questionType" [(ngModel)]="newQuestion.questionType" class="form-control form-control-sm">
+                    <option [ngValue]="undefined">--SELECCIONE--</option>
+                    <option *ngFor="let t of questionTypes" [ngValue]="t.questionTypeID">{{t.name | uppercase}}</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <label for="questionOrder">Orden</label>
+                  <input type="number" class="form-control form-control-sm" [min]="newQuestion.questionOrderMin" name="questionOrder" [(ngModel)]="newQuestion.questionOrder">
+                </div>
+                <div class="col-12 mt-2">
+                  <label for="multipleAssign">Asignación a multiples categorias</label> <br>
+                  <button class="btn btn-sm" [ngClass]="{'bg-primary-color text-white': newQuestion.multipleAssign, 'btn-light text-primary-color': !newQuestion.multipleAssign}" (click)="toggleMultipleAssign()">
+                    {{newQuestion.multipleAssign ? 'SE ASIGNARÁ A MULTIPLES CATEGORIAS' : 'NO SE ASIGNA A MÚLTIPLES CATEGORIAS'}}
+                  </button>
+                  <!-- <label for="multipleAssign">Asignación Multiple</label>
+                  button.btn.bt
+                  <input type="number" class="form-control form-control-sm" [min]="newQuestion.multipleAssignMin" name="multipleAssign" [(ngModel)]="newQuestion.multipleAssign"> -->
+                </div>
+                <div class="col-12 text-center mt-3">
+                  <button class="btn btn-sm bg-primary-color" [disabled]="questionForm.invalid" (click)="saveQuestion()">
+                    <i class="fa mr-1" [ngClass]="{'fa-save': newQuestion.editing, 'fa-edit': !newQuestion.editing}"></i>{{newQuestion.editing ? 'Guardar Cambios' : 'Crear Pregunta'}}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div bsModal #configGroupQuestionModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name2">
+  <div class="modal-dialog modal-nm">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="col-9 pt-1">
+            <i class="fa fa-comment mr-1"></i>Asignación de Pregunta a Grupo
+          </div>
+          <div class="col-3">
+            <button class="btn btn-sm btn-light text-danger" (click)="toggleConfigGroupQuestion()"></button>
+          </div>
+          <div class="col-12">
+            <hr>
+          </div>
+          <div class="col-12">
+            <form #questionForm="ngForm">
+              <div class="form-row">
+                <div class="col-12">
+                  <ul class="list-group">
+                    <caption>SELECCIONE UNA ALTERNATIVA</caption>
+                    <li class="list-group-item p-2" *ngFor="let a of alternatives" [ngClass]="{'list-group-item-success': a.selected}" (click)="toggleSelectAlternative(a)">
+                      <small>{{a.notation | uppercase}}</small>
+                      <i class="fa fa-check-circle float-right" *ngIf="a.selected"></i>
+                    </li>
+                  </ul>
+                </div>
+                <div class="col-12">
+                  <label for="alternativeValue">Valor de la Alternativa</label>
+                  <input type="text" class="form-control form-control-sm" name="alternativeValue" [(ngModel)]="newConfigGroupQuestion.alternativeValue">
+                </div>
+                <div class="col-12 text-center mt-3">
+                  <button class="btn btn-sm bg-primary-color" [disabled]="questionForm.invalid" (click)="saveConfigGroupQuestion()">
+                    <i class="fa mr-1" [ngClass]="{'fa-save': newConfigGroupQuestion.editing, 'fa-edit': !newConfigGroupQuestion.editing}"></i>Guardar
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

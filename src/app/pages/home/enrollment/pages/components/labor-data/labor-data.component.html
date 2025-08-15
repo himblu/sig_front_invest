@@ -1,0 +1,75 @@
+<div class="animated fadeIn fast">
+        <div class="card">
+            <div class="card-body">
+                <form [formGroup]="workingForm"
+                        autocomplete="off">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <mat-card class="result">
+                                <mat-card-content>
+                                    <section class="example-section">
+                                    <mat-checkbox
+                                        style="margin: 0 10px;"
+                                        formControlName="currentJob"
+                                        [labelPosition]="labelPosition">
+                                        <span>Actualmente ud cuenta con trabajo estable</span>
+                                    </mat-checkbox>
+                                    </section>
+                                </mat-card-content>
+                            </mat-card>
+                        </div>
+                    </div>
+                    <mat-card class="result mt-2" *ngIf="valid">
+                        <mat-card-content>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Empresa que labora</mat-label>
+                                        <input formControlName="company" type="text" matInput>
+                                        <mat-error *ngIf="isValidField('company')">{{getFielError('company')}}</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-6">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Dirección de la empresa</mat-label>
+                                        <input formControlName="companyAddress" type="text" matInput>
+                                        <mat-error *ngIf="isValidField('companyAddress')">{{getFielError('companyAddress')}}</mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Cargo que ocupa</mat-label>
+                                        <input formControlName="positionWork" type="text" matInput>
+                                        <mat-error *ngIf="isValidField('positionWork')">{{getFielError('positionWork')}}</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Teléfono empresa</mat-label>
+                                        <input formControlName="phone" type="text" matInput>
+                                        <mat-error *ngIf="isValidField('phone')">{{getFielError('phone')}}</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Tiempo que labora en meses</mat-label>
+                                        <input formControlName="serviceTime" type="text" matInput>
+                                        <mat-error *ngIf="isValidField('serviceTime')">{{getFielError('serviceTime')}}</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Horario de trabajo</mat-label>
+                                        <input formControlName="workingHours" type="text" matInput>
+                                        <mat-error *ngIf="isValidField('workingHours')">{{getFielError('workingHours')}} Ej. 8:00 - 17:00</mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </mat-card-content>
+                    </mat-card>
+                </form>
+            </div>
+        </div>
+</div>

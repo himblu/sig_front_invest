@@ -1,0 +1,447 @@
+<mat-drawer-container autosize [hasBackdrop]="true">
+  <mat-drawer #drawer mode="over" position="end" [opened]="false" style="width: 300px; background: #f4f6f9;">
+    <div class="d-block h-100 leading-publications-container p-relative">
+      <div class="d-flex justify-content-end pt-1 pr-1 mb-2">
+        <div>
+          <mat-icon style="cursor: pointer" class="red-icon" (click)="drawer.close().then();">close</mat-icon>
+        </div>
+      </div>
+
+      <div class="pl-2 pr-2 w-100 mb-3">
+        <button class="w-100" mat-raised-button color="primary" style="background: #014898" (click)="requestSelectedPublications();">
+          <span style="font-size: 12px; letter-spacing: 0; line-height: 0">
+            <!-- {{ user.rolName === ROL.ADMIN || user.rolName === ROL.LIBRARIAN || user.rolName === ROL.TEACHER ? 'Prestar Documentos' : 'Solicitar Documentos' }} -->
+            {{ isAllowedRole() ? 'Prestar Documentos' : 'Solicitar Documentos' }}
+          </span>
+        </button>
+      </div>
+      <div>
+        <div *ngIf="!publicationsToBeLending.length else reservedPublications">
+          <p class="mb-0 pl-2">Añade las publicaciones a prestar.</p>
+        </div>
+        <ng-template #reservedPublications>
+          <div class="d-block">
+            <ul class="mb-0 pl-0">
+              <li class="d-flex" *ngFor="let publication of publicationsToBeLending; let index = index;" style="list-style: none; padding-left: 0;">
+                <div class="d-flex align-items-center mr-1 ml-2">
+                  <mat-icon (click)="removeSelectedPublication(index);" class="red-icon" style="cursor: pointer;">delete</mat-icon>
+                </div>
+                <div>
+                  <h4 class="mb-0" style="font-size: 12px;">{{ publication?.title }}</h4>
+                  <p class="mb-0" style="font-size: 12px;">{{ publication?.edition }}</p>
+                  <p class="mb-0 font-10">Año del Documento: {{ publication?.publicationYear }}</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </mat-drawer>
+
+  <div class="animated fadeIn fast" style="background: #f4f6f9;">
+    <div class="container-fluid">
+      <!--      <h2 class="text-center mt-3">BIBLIOTECA</h2>-->
+      <!-- <div class="d-flex justify-content-center" *ngIf="user.rolName !== ROL.ADMIN && user.rolName !== ROL.LIBRARIAN && user.rolName !== ROL.TEACHER"> -->
+      <div class="d-flex justify-content-center" *ngIf="!isAllowedRole()">
+        <img src="assets/images/biblioteca.png" alt="Biblioteca ITCA" style="width: 100%;">
+      </div>
+      <mat-tab-group animationDuration="0" mat-stretch-tabs="false" mat-align-tabs="start" (selectedTabChange)="onTabChange($event)">
+        <mat-tab label="Catálogo Bibliográfico">
+          <ng-container [ngTemplateOutlet]="publicationTemplate"></ng-container>
+        </mat-tab>
+
+        <!-- <mat-tab label="Documentos Solicitados" *ngIf="user.rolName !== ROL.ADMIN && user.rolName !== ROL.LIBRARIAN  && user.rolName !== ROL.TEACHER" > -->
+        <mat-tab label="Documentos Solicitados" *ngIf="!isAllowedRole()" >
+          <section class="mt-3">
+            <app-requested-publication></app-requested-publication>
+          </section>
+        </mat-tab>
+
+        <!-- <mat-tab label="Documentos Solicitados" *ngIf="user.rolName === ROL.ADMIN || user.rolName === ROL.LIBRARIAN || user.rolName === ROL.TEACHER" > -->
+        <mat-tab label="Documentos Solicitados" *ngIf="isAllowedRole()" >
+          <section class="mt-3">
+            <app-borrowed-publication></app-borrowed-publication>
+          </section>
+        </mat-tab>
+      </mat-tab-group>
+      <ng-template #publicationTemplate>
+        <section [formGroup]="form" class="mt-3">
+          <div class="row">
+            <div class="col-12 col-md-6 col-lg-3">
+              <mat-form-field>
+                <mat-label>Buscar por Título, Autor, Edición,ISBN...</mat-label>
+                <input type="text" formControlName="search" matInput>
+              </mat-form-field>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-3">
+              <mat-form-field>
+                <mat-label>Categoría <small>DEWEY</small></mat-label>
+                <mat-select formControlName="deweyCategory" (selectionChange)="getDeweySubcategories($event.value)">
+                  <mat-option value="">Todas</mat-option>
+                  <mat-option *ngFor="let category of deweyCategories" [value]="category.deweyCategoryID">
+                    {{ category.name }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-3">
+              <mat-form-field>
+                <mat-label>Subcategoría <small>DEWEY</small></mat-label>
+                <mat-select formControlName="deweySubcategory" (selectionChange)="getPublications();">
+                  <mat-option value="">Todas</mat-option>
+                  <mat-option *ngFor="let subcategory of deweySubcategories" [value]="subcategory.deweySubCategoryID">
+                    {{ subcategory.deweyDesc }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-12 col-md-6 col-lg-3">
+              <mat-form-field>
+                <mat-label>Área de Conocimiento <small>(UNESCO)</small></mat-label>
+                <mat-select formControlName="knowledgeArea" (selectionChange)="getKnowledgeSubareas($event.value)">
+                  <mat-option value="">Todas</mat-option>
+                  <mat-option *ngFor="let area of knowledgeAreas" [value]="area.knowledgeAreaID">
+                    {{ area.knowledgeAreaDesc }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-3">
+              <mat-form-field>
+                <mat-label>Subárea de Conocimiento <small>(UNESCO)</small></mat-label>
+                <mat-select formControlName="knowledgeSubarea" (selectionChange)="getKnowledgeSpecificSubareas($event.value)">
+                  <mat-option value="">Todas</mat-option>
+                  <mat-option *ngFor="let subarea of knowledgeSubareas" [value]="subarea.subAreaKnowledgeID">
+                    {{ subarea.subAreaKnowledgeDesc }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-3">
+              <mat-form-field>
+                <mat-label>Subárea Específica de Conocimiento <small>(UNESCO)</small></mat-label>
+                <mat-select formControlName="knowledgeSpecificSubarea" (selectionChange)="getPublications();">
+                  <mat-option value="">Todas</mat-option>
+                  <mat-option *ngFor="let specificSubarea of knowledgeSpecificSubareas" [value]="specificSubarea.specificSubareaKnowledgeID">
+                    {{ specificSubarea.specificSubAreaKnowledgeDesc }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-12 col-md-6 col-lg-3">
+              <mat-form-field>
+                <mat-label>Carreras</mat-label>
+                <mat-select formControlName="majors" (selectionChange)="getPublications();">
+                    <mat-option value="">Buscar por todas las carreras</mat-option>
+                    <mat-option  *ngFor="let career of careers" [value]="career.careerID">
+                      {{ career.careerName }}
+                    </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-3">
+              <mat-form-field>
+                <mat-label>Tipo de Documento</mat-label>
+                <mat-select formControlName="publicationType" (selectionChange)="getPublications();">
+                  <mat-option value="">Todos</mat-option>
+                  <mat-option *ngFor="let publicationType of publicationTypes" [value]="publicationType.publicationTypeID">
+                    {{ publicationType.publicationTypeDesc }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="col-12 col-md-3">
+              <button mat-raised-button color="primary" style="background: #014898" (click)="drawer.toggle();">
+              <span style="letter-spacing: 0; font-size: 12px">
+                Documentos Seleccionados ({{ publicationsToBeLending.length }})
+              </span>
+              </button>
+            </div>
+
+            <div class="col">
+              <button mat-raised-button color="primary" style="background: #014898; width: 100%;" [matMenuTriggerFor]="reportTypes" *ngIf="isAllowedRole()">
+                <span style="letter-spacing: 0; font-size: 12px">Reportes</span>
+              </button>
+            </div>
+
+            <div class="col">
+              <a
+                style="background-color: rgb(84, 158, 77); color: white; width: 100%;"
+                mat-raised-button
+                matTooltipPosition="above"
+                matTooltip="Descargar"
+                target="_blank"
+                href="https://tecnologicoitcaeduec-my.sharepoint.com/:b:/g/personal/encuba_itca_edu_ec/EYGRDcCTLLpDiDtvM6o_TvwBP1F0txNw-hPXjGIagwqoYw?e=wVNEoS">
+                <span style="letter-spacing: 0; font-size: 12px;"><small>Manual Usuario</small></span>
+              </a>
+            </div>
+
+            <mat-menu #reportTypes="matMenu">
+              <button mat-menu-item [matMenuTriggerFor]="incomesMenu" [matMenuTriggerData]="{ type: 'income' }">
+                <mat-icon class="red-icon">picture_as_pdf</mat-icon>
+                <span class="item">REPORTE DE INGRESOS</span>
+              </button>
+              <button mat-menu-item [matMenuTriggerFor]="requestsMenu" [matMenuTriggerData]="{ type: 'request' }">
+                <mat-icon class="red-icon">picture_as_pdf</mat-icon>
+                <span class="item">REPORTE DE SOLICITUDES</span>
+              </button>
+              <button mat-menu-item [matMenuTriggerFor]="borrowsMenu" [matMenuTriggerData]="{ type: 'borrow' }">
+                <mat-icon class="red-icon">picture_as_pdf</mat-icon>
+                <span class="item">REPORTE DE PRÉSTAMOS </span>
+              </button>
+              <button mat-menu-item (click)="openFile('api/library-reports/report/general-report');">
+                <mat-icon class="red-icon">picture_as_pdf</mat-icon>
+                <span class="item">REPORTE INVENTARIO GENERAL</span>
+              </button>
+            </mat-menu>
+
+            <mat-menu #incomesMenu="matMenu">
+              <ng-template matMenuContent let-type="type">
+                <button mat-menu-item [matMenuTriggerFor]="entityMenu" [matMenuTriggerData]="{ filterBy: 'career', type }">
+                  <span class="item">INGRESOS POR CARRERA </span>
+                </button>
+                <button mat-menu-item [matMenuTriggerFor]="entityMenu" [matMenuTriggerData]="{ filterBy: 'modality', type }">
+                  <span class="item">INGRESOS POR MODALIDAD</span>
+                </button>
+                <button mat-menu-item [matMenuTriggerFor]="entityMenu" [matMenuTriggerData]="{ filterBy: 'school', type }">
+                  <span class="item">INGRESOS POR ESCUELA</span>
+                </button>
+                <button mat-menu-item [matMenuTriggerFor]="entityMenu" [matMenuTriggerData]="{ filterBy: 'period', type }">
+                  <span class="item">INGRESOS POR PERIODO ACADÉMICO</span>
+                </button>
+              </ng-template>
+            </mat-menu>
+
+            <mat-menu #requestsMenu="matMenu">
+              <ng-template matMenuContent let-type="type">
+                <button mat-menu-item [matMenuTriggerFor]="entityMenu" [matMenuTriggerData]="{ filterBy: 'career', type }">
+                  <span class="item">SOLICITUDES POR CARRERA</span>
+                </button>
+                <button mat-menu-item [matMenuTriggerFor]="entityMenu" [matMenuTriggerData]="{ filterBy: 'modality', type }">
+                  <span class="item">SOLICITUDES POR MODALIDAD</span>
+                </button>
+                <button mat-menu-item [matMenuTriggerFor]="entityMenu" [matMenuTriggerData]="{ filterBy: 'school', type }">
+                  <span class="item">SOLICITUDES POR ESCUELA</span>
+                </button>
+                <button mat-menu-item [matMenuTriggerFor]="entityMenu" [matMenuTriggerData]="{ filterBy: 'period', type }">
+                  <span class="item">SOLICITUDES POR PERIODO ACADÉMICO</span>
+                </button>
+              </ng-template>
+            </mat-menu>
+
+            <mat-menu #borrowsMenu="matMenu">
+              <ng-template matMenuContent let-type="type">
+                <button mat-menu-item [matMenuTriggerFor]="entityMenu" [matMenuTriggerData]="{ filterBy: 'career', type }">
+                  <span class="item">PRÉSTAMOS POR CARRERA</span>
+                </button>
+                <button mat-menu-item [matMenuTriggerFor]="entityMenu" [matMenuTriggerData]="{ filterBy: 'modality', type }">
+                  <span class="item">PRÉSTAMOS POR MODALIDAD</span>
+                </button>
+                <button mat-menu-item [matMenuTriggerFor]="entityMenu" [matMenuTriggerData]="{ filterBy: 'school', type }">
+                  <span class="item">PRÉSTAMOS POR ESCUELA</span>
+                </button>
+                <button mat-menu-item [matMenuTriggerFor]="entityMenu" [matMenuTriggerData]="{ filterBy: 'period', type }">
+                  <span class="item">PRÉSTAMOS POR PERIODO ACADÉMICO</span>
+                </button>
+                <button mat-menu-item [matMenuTriggerFor]="publicationStatusMenu" [matMenuTriggerData]="{ filterBy: 'bookTitle', type }">
+                  <span class="item">PRÉSTAMOS POR TÍTULO</span>
+                </button>
+                <button mat-menu-item [matMenuTriggerFor]="publicationStatusMenu" [matMenuTriggerData]="{ filterBy: 'deweyCategory', type }">
+                  <span class="item">PRÉSTAMOS POR CATEGORÍA DEWEY</span>
+                </button>
+                <button mat-menu-item [matMenuTriggerFor]="periodsMenu" [matMenuTriggerData]="{ filterBy: 'deweyCategory', type }">
+                  <span class="item">REPORTES GENERALES</span>
+                </button>
+              </ng-template>
+            </mat-menu>
+
+            <!-- Entidades -->
+            <mat-menu #entityMenu="matMenu">
+              <ng-template matMenuContent let-filterBy="filterBy" let-type="type">
+                <button mat-menu-item [matMenuTriggerFor]="type === 'income' ? periodsMenu : publicationStatusMenu" [matMenuTriggerData]="{ filterBy, type, entity: 1 }">
+                  <span class="item">ESTUDIANTE</span>
+                </button>
+                <button mat-menu-item [matMenuTriggerFor]="type === 'income' ? periodsMenu : publicationStatusMenu" [matMenuTriggerData]="{ filterBy, type, entity: 2 }">
+                  <span class="item">DOCENTE</span>
+                </button>
+                <button mat-menu-item [matMenuTriggerFor]="type === 'income' ? periodsMenu : publicationStatusMenu" [matMenuTriggerData]="{ filterBy, type, entity: 3 }">
+                  <span class="item">TODOS</span>
+                </button>
+              </ng-template>
+            </mat-menu>
+
+            <!-- Estado de publicaciones -->
+            <mat-menu #publicationStatusMenu="matMenu">
+              <ng-template matMenuContent let-filterBy="filterBy" let-type="type" let-entity="entity">
+                <button
+                  mat-menu-item
+                  [matMenuTriggerFor]="periodsMenu"
+                  [matMenuTriggerData]="{ filterBy, type, entity, status: 0 }">
+                  <span class="item">TODOS</span>
+                </button>
+                <button
+                  mat-menu-item
+                  [matMenuTriggerFor]="periodsMenu"
+                  [matMenuTriggerData]="{ filterBy, type, entity, status: item.requestStatusID }"
+                  *ngFor="let item of publicationStatuses; trackBy: trackByPublicationStatus;">
+                  <span class="item">{{ item.requestStatusName }}</span>
+                </button>
+              </ng-template>
+            </mat-menu>
+
+            <!-- Periodos -->
+            <mat-menu #periodsMenu="matMenu">
+              <ng-template matMenuContent let-filterBy="filterBy" let-type="type" let-entity="entity" let-status="status">
+                <button
+                  (click)="downloadReport(type, filterBy, entity, item.periodID, status)"
+                  mat-menu-item
+                  *ngFor="let item of periods; trackBy: trackByPeriod;">
+                  <span class="item">{{ item.periodName }}</span>
+                </button>
+              </ng-template>
+            </mat-menu>
+          </div>
+        </section>
+        <section>
+          <div style="position: relative;">
+            <spinner-loader [absolute]="true" *ngIf="isLoadingPublications"></spinner-loader>
+            <mat-table
+              [dataSource]="dataSource" matSort (matSortChange)="getPublications(true,$event);">
+              <!-- deweyCodeInternal -->
+              <ng-container matColumnDef="deweyCodeInternal">
+                <mat-header-cell *matHeaderCellDef>Código</mat-header-cell>
+                <mat-cell *matCellDef="let row; let i = index;"> {{ row.deweyCodeInternal }} </mat-cell>
+              </ng-container>
+
+              <!-- title -->
+              <ng-container matColumnDef="title">
+                <mat-header-cell *matHeaderCellDef mat-sort-header>Título</mat-header-cell>
+                <mat-cell *matCellDef="let row; let i = index;"> {{ row.title }} </mat-cell>
+              </ng-container>
+
+              <!-- edition -->
+              <ng-container matColumnDef="edition">
+                <mat-header-cell *matHeaderCellDef>Edición</mat-header-cell>
+                <mat-cell *matCellDef="let row;"> {{ row.edition }} </mat-cell>
+              </ng-container>
+
+              <!-- codeISBN -->
+              <ng-container matColumnDef="codeISBN">
+                <mat-header-cell *matHeaderCellDef>ISBN/ISSN</mat-header-cell>
+                <mat-cell *matCellDef="let row">{{ row.codeISBN || 'N/A' }}</mat-cell>
+              </ng-container>
+
+              <!-- publicationYear -->
+              <ng-container matColumnDef="publicationYear">
+                <mat-header-cell *matHeaderCellDef>Año Publicación</mat-header-cell>
+                <mat-cell *matCellDef="let row">{{ row.publicationYear }}</mat-cell>
+              </ng-container>
+
+              <!-- stock -->
+              <ng-container matColumnDef="stock">
+                <mat-header-cell *matHeaderCellDef>Stock</mat-header-cell>
+                <mat-cell *matCellDef="let row">{{ row.stock || 0 }}</mat-cell>
+              </ng-container>
+
+              <!-- status -->
+              <ng-container matColumnDef="statusID">
+                <mat-header-cell *matHeaderCellDef mat-sort-header>Estado</mat-header-cell>
+                <mat-cell *matCellDef="let row">{{ row.statusID === 1 ? 'Activada' : 'Desactivada' }}</mat-cell>
+              </ng-container>
+
+              <!--              &lt;!&ndash; deweySubcategory &ndash;&gt;-->
+              <!--              <ng-container matColumnDef="deweySubcategory">-->
+              <!--                <mat-header-cell *matHeaderCellDef>Subcategoría Dewey</mat-header-cell>-->
+              <!--                <mat-cell *matCellDef="let row">{{ row.deweySubcategory }}</mat-cell>-->
+              <!--              </ng-container>-->
+
+              <!--              &lt;!&ndash; specificSubAreaKnowledgeDesc &ndash;&gt;-->
+              <!--              <ng-container matColumnDef="specificSubAreaKnowledgeDesc">-->
+              <!--                <mat-header-cell *matHeaderCellDef>AEC</mat-header-cell>-->
+              <!--                <mat-cell *matCellDef="let row">{{ row.specificSubAreaKnowledgeDesc }}</mat-cell>-->
+              <!--              </ng-container>-->
+
+              <!-- actions -->
+              <ng-container matColumnDef="actions">
+                <mat-header-cell *matHeaderCellDef><span>Acciones</span></mat-header-cell>
+                <mat-cell *matCellDef="let row">
+                  <button
+                    class="blue-icon"
+                    mat-icon-button
+                    (click)="$event.stopPropagation();" [matMenuTriggerFor]="menu" #menuTrigger="matMenuTrigger">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                  <mat-menu [xPosition]="'before'" #menu="matMenu">
+                    <!-- <button [routerLink]="['/biblioteca/editar-publicacion/', row.publicationID]" mat-menu-item *ngIf="user.rolName === ROL.ADMIN || user.rolName === ROL.LIBRARIAN || user.rolName === ROL.TEACHER"> -->
+                    <button [routerLink]="['/biblioteca/editar-publicacion/', row.publicationID]" mat-menu-item *ngIf="isAllowedRole()">
+                      <mat-icon class="blue-icon">edit</mat-icon>
+                      <span class="item">Editar</span>
+                    </button>
+
+                    <!-- <button mat-menu-item *ngIf="user.rolName === ROL.ADMIN || user.rolName === ROL.LIBRARIAN || user.rolName === ROL.TEACHER" (click)="changeStatus(row);"> -->
+                    <button mat-menu-item *ngIf="isAllowedRole()" (click)="changeStatus(row);">
+                      <mat-icon [ngClass]="{ 'green-icon' : row.statusID === 0, 'red-icon' : row.statusID === 1 }">{{ row.statusID === 0 ? 'toggle_on' : 'toggle_off' }}</mat-icon>
+                      <span class="item">{{ row.statusID === 0 ? 'Activar' : 'Desactivar' }}</span>
+                    </button>
+
+                    <button mat-menu-item (click)="addToSelectedPublications(row);" *ngIf="row.statusID === 1 && row.stock && row.stock > 0">
+                      <mat-icon class="blue-icon">add</mat-icon>
+                      <span class="item">Agregar a Préstamo</span>
+                    </button>
+
+                    <button mat-menu-item (click)="downloadFile(row)">
+                      <mat-icon class="red-icon">picture_as_pdf</mat-icon>
+                      <span class="item">Descargar Ficha de Documento</span>
+                    </button>
+
+
+                    <!-- <button mat-menu-item *ngIf="user.rolName === ROL.ADMIN || user.rolName === ROL.LIBRARIAN || user.rolName === ROL.TEACHER" (click)="deletePublication(row)"> -->
+                    <button mat-menu-item *ngIf="isAllowedRole()" (click)="deletePublication(row)">
+                      <mat-icon class="red-icon">close</mat-icon>
+                      <span class="item">Eliminar</span>
+                    </button>
+
+                  </mat-menu>
+                </mat-cell>
+                <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+              </ng-container>
+
+              <!-- noData -->
+              <ng-container matColumnDef="noData">
+                <mat-footer-cell *matFooterCellDef>
+                  <p *ngIf="!publications.length" style="font-size: 90%;">No hay resultados que coincidan con los términos de búsqueda</p>
+                </mat-footer-cell>
+              </ng-container>
+
+              <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+              <mat-row matRipple *matRowDef="let row; columns: displayedColumns;" class="mat-row"></mat-row>
+              <mat-footer-row *matFooterRowDef="['noData']" [ngClass]="{'hide': publications.length }"></mat-footer-row>
+            </mat-table>
+
+            <mat-paginator
+              #paginator
+              showFirstLastButtons
+              [length]="length"
+              [pageSize]="pageSize"
+              [pageSizeOptions]="pageSizeOptions"
+              (page)="pageEvent = getPublicationsPaginator(false,$event)">
+            </mat-paginator>
+          </div>
+        </section>
+      </ng-template>
+    </div>
+  </div>
+</mat-drawer-container>

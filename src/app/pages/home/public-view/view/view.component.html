@@ -1,0 +1,18 @@
+<div class="container mt-5 d-flex justify-content-center">
+  <div class="card border rounded p-4 text-center" style="width: 360px; border: 2px solid #000; border-radius: 20px;">
+    <strong class="mb-4">Información del participante</strong>
+    <i class="fa fa-user fa-5x mx-auto mb-4" style="width: 100px; height: 100px"></i>
+    <div class="text-start mb-4">
+      <p><strong>Nombres:</strong> {{data.fullNameStudent?.trim().split(' ').slice(2).join(' ') || ''}}</p>
+      <p><strong>Apellidos:</strong> {{data.fullNameStudent?.trim().split(' ').slice(0, 2).join(' ') || ''}}</p>
+      <p><strong>Tipo de Documento:</strong> {{data.typeDocName || ''}}</p>
+      <p><strong>Número de Documento:</strong> {{data.personDocumentNumber || ''}}</p>
+    </div>
+
+    <div class="text-start">
+      <p><strong>Curso:</strong> {{data.courseName || 'Sin cursos vigentes'}}</p>
+      <p *ngIf="data.courseName"><strong>Estado del Curso:</strong> {{data.statusGrade || ''}}</p>
+      <p *ngIf="data.courseName"><strong>Válido hasta:</strong> {{data.validityDate || ''}}</p>
+    </div>
+  </div>
+</div>

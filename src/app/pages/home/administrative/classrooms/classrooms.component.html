@@ -1,0 +1,256 @@
+<div class="row animated fadeIn fast" *ngIf="!cargando">
+  <div class="col-md-12">
+      <div class="card">
+          <div class="card-body">
+              <div class="row">
+                <div class="col-md-3"><components-input-search [label]="'Busqueda por Aula'" (return)="searchClassroom($event)"></components-input-search></div>
+                <div class="col-md-4"></div>
+                <div class="col-md-2" style="text-align: right;"><button type="button" mat-raised-button class="styleButton_sml" style="width: 142px;" data-toggle="modal" data-target="#tipoModal">Nuevo tipo de aula</button></div>
+                <div class="col-md-2" style="text-align: right;"><button type="button" mat-raised-button class="styleButton_sml" style="width: 142px;" data-toggle="modal" data-target="#aulaModal">Nueva aula</button></div>
+              </div>
+              <div class="row">
+                  <div class="table-responsive">
+                      <div id="add-contact" class="modal fade in" tabindex="-1" role="dialog"
+                          aria-labelledby="myModalLabel" aria-hidden="true">
+                      </div>
+                      <table id="demo-foo-addrow"
+                          class="table m-t-0 table-hover no-wrap contact-list footable-loaded footable"
+                          data-page-size="5">
+                          <thead style="background-color: #004899; color: white;">
+                              <tr>
+                                  <th class="footable-sortable">
+                                      Aula
+                                      <span class="footable-sort-indicator"></span>
+                                  </th>
+                                  <th class="footable-sortable">
+                                    Edificio
+                                    <span class="footable-sort-indicator"></span>
+                                  </th>
+                                  <th class="footable-sortable">
+                                    Tipo de Aula
+                                    <span class="footable-sort-indicator"></span>
+                                  </th>
+                                  <th class="footable-sortable">
+                                      Asientos
+                                      <span class="footable-sort-indicator"></span>
+                                  </th>
+                                  <th class="footable-sortable" style="text-align: center;">
+                                    Acciones
+                                    <span class="footable-sort-indicator"></span>
+                                </th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              <tr *ngFor="let item of classroomList" class="footable-even">
+                                  <td>{{item.classroomName | uppercase}}</td>
+                                  <td>{{item.buildingName | uppercase}}</td>
+                                  <td>{{item.classroomTypeName | uppercase}}</td>
+                                  <td>{{item.seating}}</td>
+                                  <td style="text-align: center;">
+                                    <a type="button"
+                                      matTooltipPosition="above"
+                                      matTooltip="Editar"
+                                      style="cursor: pointer; color: green;"><i class="fa fa-pencil" aria-hidden="true"></i>
+                                    </a>
+                                  </td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+              <components-button-arrow [actual]="actualClassroom" [totalPage]="totalPageClassroom" [count]="countClassroom" (result)="changePageClassroom($event)"></components-button-arrow>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- Aula Modal -->
+<div class="modal fade" id="aulaModal" tabindex="-1" aria-labelledby="aulaModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="height: 40px;">
+        <div class="col-md-4">
+          <h3 class="modal-title" id="aulaModalLabel"><br>Nueva Aula</h3>
+        </div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+            <div class="col-md-12">
+              <div class="card">
+                  <div class="card-body">
+                      <form [formGroup]="classroomFrom"
+                              autocomplete="off"
+                              (submit)="onSubmitClassroom()">
+                          <div class="row">
+                              <div class="col-md-12">
+                                  <mat-form-field class="width" appearance="outline">
+                                      <mat-label>Edificio</mat-label>
+                                      <mat-select formControlName="buildingID">
+                                          <mat-option value="">SELECCIONE UN EDIFICIO</mat-option>
+                                          <mat-option *ngFor="let item of buildingSelect" [value]="item.buildingID">{{item.buildingName}}</mat-option>
+                                      </mat-select>
+                                      <mat-hint>Campo requerido!</mat-hint>
+                                      <mat-error>
+                                          Edificio es <strong>requerido</strong>
+                                      </mat-error>
+                                  </mat-form-field>
+                              </div>
+                          </div>
+                          <div class="row">
+                              <div class="col-md-6">
+                                  <mat-form-field class="width" appearance="outline">
+                                      <mat-label>Tipo de Aula</mat-label>
+                                      <mat-select formControlName="classroomTypeID" #classroomTypeID>
+                                          <mat-option value="">SELECCIONE UN TIPO DE AULA</mat-option>
+                                          <mat-option *ngFor="let item of classroomTypeSelect" [value]="item.classroomTypeID">{{item.classroomTypeName}}</mat-option>
+                                      </mat-select>
+                                      <mat-hint>Campo requerido!</mat-hint>
+                                      <mat-error>
+                                          Tipo es <strong>requerido</strong>
+                                      </mat-error>
+                                  </mat-form-field>
+                              </div>
+                              <div class="col-md-6">
+                                <components-input-only-letters name="Nombre Aula" field="Nombre" (data)="classroomName( $event )"></components-input-only-letters>
+                              </div>
+                          </div>
+                          <div class="row">
+                              <div class="col-md-4">
+                                  <mat-form-field class="width" appearance="outline">
+                                      <mat-label>Aforo</mat-label>
+                                      <input type="number" matInput formControlName="seating">
+                                      <mat-error>
+                                          Asientos es <strong>requerido</strong>
+                                      </mat-error>
+                                  </mat-form-field>
+                              </div>
+                              <div class="col-md-4">
+                                  <mat-form-field class="width" appearance="outline">
+                                      <mat-label>N° Sillas</mat-label>
+                                      <input type="number" matInput formControlName="chairs">
+                                      <mat-error>
+                                          Sillas es <strong>requerido</strong>
+                                      </mat-error>
+                                  </mat-form-field>
+                              </div>
+                              <div class="col-md-4">
+                                  <mat-form-field class="width" appearance="outline">
+                                      <mat-label>Capacidad</mat-label>
+                                      <input type="number" matInput formControlName="capacity">
+                                      <mat-error>
+                                          Capacidad es <strong>requerido</strong>
+                                      </mat-error>
+                                  </mat-form-field>
+                              </div>
+                          </div>
+                          <div class="row">
+                              <div class="col-md-6">
+                                  <mat-form-field class="width" appearance="outline">
+                                      <mat-label>Capacidad Máxima</mat-label>
+                                      <input type="number" matInput formControlName="capacityMax">
+                                      <mat-error>
+                                          Capacidad es <strong>requerido</strong>
+                                      </mat-error>
+                                  </mat-form-field>
+                              </div>
+                              <div class="col-md-6">
+                                  <mat-form-field class="width" appearance="outline">
+                                      <mat-label>Capacidad Minima</mat-label>
+                                      <input type="number" matInput formControlName="capacityMin">
+                                      <mat-error>
+                                          Capacidad es <strong>requerido</strong>
+                                      </mat-error>
+                                  </mat-form-field>
+                              </div>
+                          </div>
+                          <div class="row">
+                              <div class="col-md-12">
+                                  <mat-form-field class="width" appearance="outline">
+                                      <mat-label>Descripción Aula</mat-label>
+                                      <textarea type="text" matInput formControlName="classroomDesc"></textarea>
+                                      <mat-hint>Campo requerido!</mat-hint>
+                                      <mat-error>
+                                          Descripción es <strong>requerido</strong>
+                                      </mat-error>
+                                  </mat-form-field>
+                              </div>
+                          </div>
+                          <div class="row">
+                              <div class="col-md-3">
+                                <button type="submit" mat-raised-button class="styleButton_sml" style="width: 100px;">
+                                  Guardar
+                                </button>
+                              </div>
+                              <div class="col-md-3">
+                                <button type="button" mat-raised-button class="styleButton_gray" style="width: 100px;" #aulaModalClose data-dismiss="modal">Cerrar</button>
+                              </div>
+                          </div>
+                      </form>
+                  </div>
+              </div>
+            </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tipo Modal -->
+<div class="modal fade" id="tipoModal" tabindex="-1" aria-labelledby="tipoModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="dialog">
+    <div class="modal-content">
+      <div class="modal-header" style="height: 40px;">
+        <div class="col-md-4">
+          <h3 class="modal-title" id="tipoModalLabel"><br>Nuevo tipo de Aula</h3>
+        </div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row animated fadeIn fast" *ngIf="!cargando">
+          <div class="col-md-12">
+              <div class="card">
+                  <div class="card-body">
+                      <form [formGroup]="classroomTypeFrom"
+                              autocomplete="off"
+                              (submit)="onSubmitClassroomType()">
+                          <div class="row">
+                              <div class="col-md-12">
+                                  <components-input-only-letters name="Tipo de Aula" field="Tipo" (data)="classroomNameType( $event )"></components-input-only-letters>
+                              </div>
+                          </div>
+                          <br>
+                          <div class="row">
+                              <div class="col-md-12">
+                                  <mat-form-field class="width" appearance="outline">
+                                      <mat-label>Descripción Tipo de Aula</mat-label>
+                                      <textarea type="text" matInput formControlName="classroomTypeDesc"></textarea>
+                                      <mat-hint>Campo requerido!</mat-hint>
+                                      <mat-error>
+                                          Descripción es <strong>requerido</strong>
+                                      </mat-error>
+                                  </mat-form-field>
+                              </div>
+                          </div>
+                          <br>
+                          <div class="row">
+                              <div class="col-md-3">
+                                <button type="submit" mat-raised-button class="styleButton_sml" style="width: 100px;">
+                                  Guardar
+                                </button>
+                              </div>
+                              <div class="col-md-3">
+                                <button type="button" mat-raised-button class="styleButton_gray" style="width: 100px;" #tipoModalClose data-dismiss="modal">Cerrar</button>
+                              </div>
+                          </div>
+                      </form>
+                  </div>
+              </div>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
+

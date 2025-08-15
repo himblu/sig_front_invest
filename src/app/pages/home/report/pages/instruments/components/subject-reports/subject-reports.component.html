@@ -1,0 +1,131 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+<div *ngIf="!charging">
+  <div class="card">
+    <div class="card-body">
+      <ng-container [formGroup]="filtersForm">
+        <div class="row pl-2 pr-2">
+          <div class="col-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Periodo académico</mat-label>
+              <mat-select formControlName="periodID" (selectionChange)="getSchools();">
+                <mat-option *ngFor="let item of periods" [value]="item.periodID">{{item.periodName}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Escuela</mat-label>
+              <mat-select formControlName="schoolID" (selectionChange)="getCareers();">
+                <mat-option *ngFor="let item of schools" [value]="item.schoolID">{{item.schoolName}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Carrera</mat-label>
+              <mat-select formControlName="careerID" (selectionChange)="getStudyPlan($event.value); getModalities($event.value);">
+                <mat-option *ngFor="let item of careers" [value]="item.careerID">{{item.careerName}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Malla curricular</mat-label>
+              <mat-select formControlName="studyPlanID" (selectionChange)="getCycles($event.value);">
+                <mat-option *ngFor="let item of study_plan" [value]="item.studyPlanID">{{item.studyPlanDesc}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Modalidad</mat-label>
+              <mat-select formControlName="modalityID">
+                <mat-option *ngFor="let item of modalities" [value]="item.modalityID">{{item.modalityName}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Nivel</mat-label>
+              <mat-select formControlName="cycleID" (selectionChange)="getSubjectsList();">
+                <mat-option *ngFor="let item of cycles" [value]="item.cycleID">{{item.cycleName}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-6">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Buscar por docente, asignatura, paralelo</mat-label>
+              <input type="text" matInput formControlName="filter" (input)="getSubjectsList();">
+              <mat-icon matSuffix>search</mat-icon>
+            </mat-form-field>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div><br>
+  <div class="card">
+    <div class="card-body">
+      <div class="row pl-2 pr-2">
+        <div class="col-12">
+          <div class="table-responsive">
+            <table class="table">
+              <thead style="background-color: #004899; color: white;">
+                <tr>
+                  <th>DOCENTE</th>
+                  <th>ASIGNATURA</th>
+                  <th>PARALELO</th>
+                  <th style="text-align: center;">ACCIONES</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of subjectsList">
+                  <td>{{item.teacher}}</td>
+                  <td>{{item.courseName}}</td>
+                  <td>{{item.parallelCode}}</td>
+                  <td style="text-align: center;">
+                    <a type="button" style="color: #004899; cursor: pointer;" [matMenuTriggerFor]="menu">
+                      <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                    </a>
+                    <mat-menu #menu="matMenu">
+                      <button type="button"
+                        mat-menu-item
+                        matTooltipPosition="above"
+                        matTooltip="Descargar Excel"
+                        (click)="getGeneralReport('evaluation-instruments-report/report-partial-course', item);">
+                        <i style="color: green; cursor: pointer;" class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        &nbsp;<span>Informe parcial de asignatura</span>
+                      </button>
+                      <button type="button"
+                        mat-menu-item
+                        matTooltipPosition="above"
+                        matTooltip="Descargar Excel"
+                        (click)="getGeneralReport('evaluation-instruments-report/report-final-course', item);">
+                        <i style="color: green; cursor: pointer;" class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        &nbsp;<span>Informe final de asignatura</span>
+                      </button>
+                    </mat-menu>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <mat-paginator
+            #paginator
+            [length]="length"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="pageSizeOptions"
+            (page)="pageEvent = changePage($event)">
+          </mat-paginator>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

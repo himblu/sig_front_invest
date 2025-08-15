@@ -1,0 +1,149 @@
+<div>
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <form [formGroup]="myForm"
+                    autocomplete="off">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Proyecto</mat-label>
+                                <input formControlName="projectName" type="text" matInput>
+                                <mat-error *ngIf="isValidField('projectName')">{{getFielError('projectName')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-4">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Horas</mat-label>
+                                <input formControlName="societyLinkageHours" type="text" matInput mask="S*"
+                                [patterns]="phone" maxlength="4">
+                                <mat-error *ngIf="isValidField('societyLinkageHours')">{{getFielError('societyLinkageHours')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-4">
+                          <mat-form-field class="width" appearance="outline">
+                            <mat-label><small>Fecha Inicio</small></mat-label>
+                            <input formControlName="societyLinkageStartDate" matInput [matDatepicker]="societyLinkageStartDate" readonly>
+                            <mat-hint>dd/mm/aaaa</mat-hint>
+                            <mat-datepicker-toggle matIconSuffix [for]="societyLinkageStartDate"></mat-datepicker-toggle>
+                            <mat-datepicker #societyLinkageStartDate>
+                              <mat-datepicker-actions>
+                              <button mat-button matDatepickerCancel>Cancel</button>
+                              <button mat-raised-button color="primary" matDatepickerApply>Aceptar</button>
+                              </mat-datepicker-actions>
+                            </mat-datepicker>
+                            <mat-error *ngIf="isValidField('societyLinkageStartDate')">{{getFielError('societyLinkageStartDate')}}</mat-error>
+                          </mat-form-field>
+                        </div>
+                        <div class="col-md-4">
+                          <mat-form-field class="width" appearance="outline">
+                            <mat-label><small>Fecha Fin</small></mat-label>
+                            <input formControlName="societyLinkageEndDate" matInput [matDatepicker]="societyLinkageEndDate" readonly>
+                            <mat-hint>dd/mm/aaaa</mat-hint>
+                            <mat-datepicker-toggle matIconSuffix [for]="societyLinkageEndDate"></mat-datepicker-toggle>
+                            <mat-datepicker #societyLinkageEndDate>
+                              <mat-datepicker-actions>
+                              <button mat-button matDatepickerCancel>Cancel</button>
+                              <button mat-raised-button color="primary" matDatepickerApply>Aceptar</button>
+                              </mat-datepicker-actions>
+                            </mat-datepicker>
+                            <mat-error *ngIf="isValidField('societyLinkageEndDate')">{{getFielError('societyLinkageEndDate')}}</mat-error>
+                          </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-10"></div>
+                        <div class="col-md-2" style="text-align: right;">
+                            <button mat-raised-button class="styleButton_sml" style="max-width: 150px; min-width: 100px;" type="submit" (click)="charge()">Agregar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div><br>
+  </div>
+    <form [formGroup]="societyForm">
+        <div *ngFor="let item of dynamicsArr.controls; let i = index">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div formArrayName="dynamics">
+                            <!-- <h1 class="text-warning">Vinculación N°:{{i + 1}}</h1> -->
+                            <div class="row" [formGroupName]="i">
+                                <div class="col-md-4">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Nombre del curso</mat-label>
+                                        <input formControlName="projectName" type="text" matInput (blur)="putSocietyLinkage(i);">
+                                        <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-4">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Horas</mat-label>
+                                        <input formControlName="societyLinkageHours" type="text" matInput (blur)="putSocietyLinkage(i);">
+                                        <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-4">
+                                  <mat-form-field class="width" appearance="outline">
+                                      <mat-label>Fecha Inicio</mat-label>
+                                      <input type="date" formControlName="societyLinkageStartDate" #societyLinkageStartDate matInput (click)="societyLinkageStartDate.showPicker()" (blur)="putSocietyLinkage(i);">
+                                      <mat-icon style="cursor: pointer;" matSuffix (click)="societyLinkageStartDate.showPicker()">calendar_month</mat-icon>
+                                      <mat-hint>dd/mm/aaaa</mat-hint>
+                                      <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-md-4">
+                                  <mat-form-field class="width" appearance="outline">
+                                    <mat-label>Fecha Fin</mat-label>
+                                    <input type="date" formControlName="societyLinkageEndDate" #societyLinkageEndDate matInput (click)="societyLinkageEndDate.showPicker()" (blur)="putSocietyLinkage(i);">
+                                    <mat-icon style="cursor: pointer;" matSuffix (click)="societyLinkageEndDate.showPicker()">calendar_month</mat-icon>
+                                    <mat-hint>dd/mm/aaaa</mat-hint>
+                                    <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-md-4" style="display: inline-flex;">
+                                  <mat-label>Archivo</mat-label>&nbsp;
+                                  <input type="file"
+                                    *ngIf="!societyLinkage[i]?.urlDocument"
+                                    #input
+                                    style="cursor: pointer;"
+                                    autocomplete="off"
+                                    (change)="onChangeInput(input.files, input, i+1);"
+                                    accept="application/pdf">
+                                  <div *ngIf="societyLinkage[i]?.urlDocument" class="w-100" (click)="openFile(societyLinkage[i].urlDocument);" style="cursor: pointer;">
+                                    <img style="width: 20px;" src="assets/images/file.png" alt="Payment File">
+                                    <span style="color: #5090f5;">Ver Archivo</span>
+                                  </div>
+                                </div>
+                                <div class="col-4">
+                                  <mat-label>Estado</mat-label>
+                                  <mat-checkbox formControlName="statusID" color="primary" (change)="putSocietyLinkage(i);"></mat-checkbox>
+                                </div>
+                                <div class="col-md-2">
+                                    <button mat-raised-button class="styleButton_sml" style="max-width: 150px; min-width: 100px;" type="button" (click)="deleteDynamic(i)" *ngIf="!isLoadingInfo">Eliminar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><br>
+        </div>
+    </form>
+
+<div class="row">
+  <div class="col-12" style="position: relative;" *ngIf="isLoading; else row">
+    <spinner-loader></spinner-loader>
+  </div>
+  <ng-template #row>
+    <div class="col-md-8"></div>
+    <div class="col-2" style="text-align: right;" *ngIf="dynamicsArr.length > 0">
+        <button mat-raised-button
+        matTooltip="Anterior: Investigación" class="styleButton_sml" style="max-width: 150px; min-width: 100px;" type="button" matStepperPrevious >Regresar</button>
+    </div>
+    <div class="col-2" style="text-align: left;" *ngIf="dynamicsArr.length > 0">
+        <button mat-raised-button
+        matTooltip="Siguiente: Referencias" class="styleButton_sml" style="max-width: 150px; min-width: 100px;" type="button" (click)="saveRecord()" >Guardar</button>
+    </div>
+  </ng-template>
+</div>

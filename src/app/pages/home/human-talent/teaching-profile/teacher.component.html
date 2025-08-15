@@ -1,0 +1,46 @@
+<div class="animated fadeIn fast">
+    <mat-stepper #stepper labelPosition="bottom" [linear]="false">
+        <mat-step [stepControl]="firstFormGroup" [editable]="isEditable">
+            <ng-template matStepLabel>Datos personales</ng-template>
+            <form [formGroup]="firstFormGroup">
+                <components-profile-picture type="administrative" (formularioDatos)="cambiarEditableDatos($event)" (validForm)="valid($event, 'firstCtrl')" (idPerson)="chargeID($event)"></components-profile-picture>
+            </form>
+        </mat-step>
+        <mat-step [stepControl]="secondFormGroup" [editable]="isEditable">
+            <ng-template matStepLabel>F. Académica</ng-template>
+            <form [formGroup]="secondFormGroup">
+                <components-academic-training [personID]="personID" (validForm)="valid($event, 'secondCtrl')"></components-academic-training>
+            </form>
+        </mat-step>
+        <mat-step [stepControl]="thirdFormGroup" [editable]="isEditable">
+            <ng-template matStepLabel>E. Laboral</ng-template>
+            <form [formGroup]="thirdFormGroup">
+                <components-work-experience [personID]="personID" (validForm)="valid($event, 'thirdCtrl')"></components-work-experience>
+            </form>
+        </mat-step>
+        <mat-step [stepControl]="fourthFormGroup" [editable]="isEditable">
+            <ng-template matStepLabel>Capacitación</ng-template>
+            <form [formGroup]="fourthFormGroup">
+                <components-training [personID]="personID" (validForm)="valid($event, 'fourthCtrl')"></components-training>
+            </form>
+        </mat-step>
+        <mat-step [stepControl]="fifthFormGroup" [editable]="isEditable">
+            <ng-template matStepLabel>Investigación</ng-template>
+            <form [formGroup]="fifthFormGroup">
+                <components-investigation></components-investigation>
+            </form>
+        </mat-step>
+        <mat-step [stepControl]="sixthFormGroup" [editable]="isEditable">
+            <ng-template matStepLabel>Vinculación</ng-template>
+            <form [formGroup]="sixthFormGroup">
+                <components-society-linkage [personID]="personID" (validForm)="valid($event, 'sixthCtrl')"></components-society-linkage>
+            </form>
+        </mat-step>
+        <mat-step [stepControl]="seventhFormGroup" [editable]="isEditable">
+            <ng-template matStepLabel>Referencias</ng-template>
+            <form [formGroup]="seventhFormGroup">
+                <components-references [personID]="personID" (validForm)="valid($event, 'seventhCtrl')"></components-references>
+            </form>
+        </mat-step>
+    </mat-stepper>
+</div>

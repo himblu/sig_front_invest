@@ -1,0 +1,85 @@
+<div style="display: flex; justify-content: end; align-items: center; background: transparent;" class="p-2">
+  <mat-icon style="cursor: pointer; color: red;" [matDialogClose]="false" class="red-icon" matRipple>close</mat-icon>
+</div>
+
+<mat-dialog-content>
+  <div *ngIf="isLoading; else form;">
+    <spinner-loader></spinner-loader>
+  </div>
+
+  <ng-template #form>
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12" style="text-align: center;">
+            <h4 style="color: #014898;">
+              Asignar permiso
+            </h4>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-4" style="height: 400px; overflow-y: auto; overflow-x: hidden;">
+            <table class="table" style="border: 3px solid #004899;">
+              <thead>
+                <th colspan="1">Módulo</th>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of modules; let i=index;">
+                  <td [ngClass]="{'target': isParentClicked === i}" (click)="loadParentMenu(item, i)" style="cursor: pointer;"><small>{{item.moduleName}}</small></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="col-4" style="height: 400px; overflow-y: auto; overflow-x: hidden;">
+            <table class="table" style="border: 3px solid #004899;" *ngIf="showMenu">
+              <thead>
+                <th colspan="1">Menú</th>
+              </thead>
+              <tbody>
+                <tr *ngFor="let parent of parents; let i=index;">
+                  <td [ngClass]="{'target': isChildClicked === i}" (click)="loadChildMenu(parent, i)" style="cursor: pointer;"><small>{{parent.menuName}}</small></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="col-4" style="height: 400px; overflow-y: auto; overflow-x: hidden;">
+            <table class="table" style="border: 3px solid #004899;" *ngIf="showSubmenu">
+              <thead>
+                <th colspan="2">Submenú</th>
+              </thead>
+              <tbody>
+                <tr *ngFor="let child of childs; let i=index;">
+                  <td><small>{{child.menuName}}</small></td>
+                  <td><small><mat-checkbox color="primary" (change)="getSubmenus($event, child);"></mat-checkbox></small></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <div class="d-flex no-block w-100 justify-content-between">
+    <div class="pl-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="warn"
+        [mat-dialog-close]="false">
+        Cerrar
+      </button>
+    </div>
+    <div class="pr-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="primary"
+        (click)="postPermissions();">
+        Enviar
+      </button>
+    </div>
+  </div>
+</mat-dialog-actions>

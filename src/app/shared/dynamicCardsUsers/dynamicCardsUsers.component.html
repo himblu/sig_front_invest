@@ -1,0 +1,35 @@
+<div class="horizontal-list-container">
+  <mat-card class="list-container" *ngFor="let category of data | keyvalue">
+    <mat-card-title>{{ category.key | titlecase }} {{' ('+filteredOptions(category.key).length+') '}}</mat-card-title>
+
+    <!-- Buscador por Categoría -->
+    <mat-form-field *ngIf="!isDisabled" class="full-width" appearance="outline">
+      <mat-label>Buscar en {{ category.key }}</mat-label>
+      <input matInput [(ngModel)]="searchText[category.key]" placeholder="Buscar..." />
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+
+    <!-- Lista de Selección -->
+    <mat-selection-list [formControl]="getFormControl(category.key)" [disabled]="isDisabled">
+      <ng-container *ngIf="filteredOptions(category.key).length > 0; else noResults">
+        <mat-list-option *ngFor="let option of filteredOptions(category.key)" [value]="option">
+          <mat-icon class="user-icon">person</mat-icon>
+          <span matTooltip="{{ getFullText(option.label) }}">
+            {{ option.label?.projectDesc ? option.label?.projectDesc + " - " : '' }}
+            {{ option.label?.fullName }}
+            {{ option.label?.courseName ? " - " + option.label?.courseName : '' }}
+            {{ option.label?.cycleDesc ? " - " + option.label?.cycleDesc : '' }}
+            {{ option.label?.parallelCode ? " - " + option.label?.parallelCode : '' }}
+            {{ option.label?.codeProject ? " - " + option.label?.codeProject : '' }}
+            {{ option.label?.position ? " - " + option.label?.position : '' }}
+          </span>
+        </mat-list-option>
+      </ng-container>
+    </mat-selection-list>
+
+    <!-- Mensaje cuando no hay resultados -->
+    <ng-template #noResults>
+      <p class="no-results-message">No se encontraron resultados.</p>
+    </ng-template>
+  </mat-card>
+</div>

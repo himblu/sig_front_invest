@@ -1,0 +1,782 @@
+<div>
+  <h2>{{ publication ? "Edición de Documento" : "Registro de Documento" }}</h2>
+  <form (ngSubmit)="sendForm()" [formGroup]="form">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12 d-flex justify-content-end mb-3">
+          <button
+            [disabled]="form.disabled"
+            type="submit"
+            style="letter-spacing: 0"
+            mat-raised-button
+            color="primary"
+          >
+            {{ publication ? "Guardar Cambios" : "Registrar Documento" }}
+          </button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12 col-md-6 col-lg-3">
+          <mat-form-field>
+            <mat-label>Título del documento</mat-label>
+            <input type="text" formControlName="title" dUppercase matInput />
+            <!--            <mat-error *ngIf="form.hasError('required', 'title')">Este campo es requerido</mat-error>-->
+            <!--            <mat-error *ngIf="form.hasError('maxlength', 'title')">Este campo excede el límite de caracteres permitidos</mat-error>-->
+          </mat-form-field>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+          <mat-form-field>
+            <mat-label>Categoría <small>DEWEY</small></mat-label>
+            <mat-select
+              formControlName="deweyCategory"
+              (selectionChange)="getDeweySubcategories($event.value)"
+            >
+              <mat-option
+                *ngFor="let category of deweyCategories"
+                [value]="category.deweyCategoryID"
+              >
+                {{ category.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+          <mat-form-field>
+            <mat-label>Subcategoría <small>DEWEY</small></mat-label>
+            <mat-select formControlName="deweySubcategory">
+              <mat-option
+                *ngFor="let subcategory of deweySubcategories"
+                [value]="subcategory.deweySubCategoryID"
+              >
+                {{ subcategory.deweyDesc }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12 col-md-6 col-lg-3">
+          <mat-form-field>
+            <mat-label>Área de Conocimiento <small>(UNESCO)</small></mat-label>
+            <mat-select
+              formControlName="knowledgeArea"
+              (selectionChange)="getKnowledgeSubareas($event.value)"
+            >
+              <mat-option
+                *ngFor="let area of knowledgeAreas"
+                [value]="area.knowledgeAreaID"
+              >
+                {{ area.knowledgeAreaDesc }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+          <mat-form-field>
+            <mat-label
+              >Subárea de Conocimiento <small>(UNESCO)</small></mat-label
+            >
+            <mat-select
+              formControlName="knowledgeSubarea"
+              (selectionChange)="getKnowledgeSpecificSubareas($event.value)"
+            >
+              <mat-option
+                *ngFor="let subarea of knowledgeSubareas"
+                [value]="subarea.subAreaKnowledgeID"
+              >
+                {{ subarea.subAreaKnowledgeDesc }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+          <mat-form-field>
+            <mat-label
+              >Subárea Específica de Conocimiento
+              <small>(UNESCO)</small></mat-label
+            >
+            <mat-select formControlName="knowledgeSpecificSubarea">
+              <mat-option
+                *ngFor="let specificSubarea of knowledgeSpecificSubareas"
+                [value]="specificSubarea.specificSubareaKnowledgeID"
+              >
+                {{ specificSubarea.specificSubAreaKnowledgeDesc }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12 col-md-6 col-lg-3">
+          <mat-form-field>
+            <mat-label>Carreras</mat-label>
+            <mat-select formControlName="majors" multiple>
+              <!-- Opción Seleccionar Todos -->
+              <mat-option (click)="toggleAllSelection()" [value]="0">
+                  Seleccionar todas
+              </mat-option>
+
+              <!-- Listado de escuelas y carreras -->
+              <mat-optgroup
+                *ngFor="let school of schools"
+                [label]="school.schoolName"
+              >
+                <mat-option
+                  *ngFor="let major of school.careers"
+                  [value]="major.careerID"
+                  (click)="updateSelectState()"
+                >
+                  {{ major.careerName }}
+                </mat-option>
+              </mat-optgroup>
+            </mat-select>
+          </mat-form-field>
+
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+          <mat-form-field>
+            <mat-label>Tipo de Documento</mat-label>
+            <mat-select formControlName="publicationType">
+              <mat-option
+                *ngFor="let publicationType of publicationTypes"
+                [value]="publicationType.publicationTypeID"
+              >
+                {{ publicationType.publicationTypeDesc }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+          <mat-form-field>
+            <mat-label>Idioma</mat-label>
+            <input matInput formControlName="language" type="text" dUppercase />
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12 col-md-6 col-lg-3">
+          <mat-form-field>
+            <mat-label>Tipo de Soporte</mat-label>
+            <mat-select formControlName="publicationSupportID">
+              <mat-option
+                *ngFor="let publicationType of supportTypes"
+                [value]="publicationType.publicationSupportID"
+              >
+                {{ publicationType.publicationSupportDesc }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-md-6 col-lg-6">
+          <mat-form-field style="position: relative; top: -11px">
+            <mat-label>Palabras clave</mat-label>
+            <mat-chip-grid
+              #chipGrid
+              aria-label="Enter keywords"
+              formControlName="keywords"
+            >
+              <mat-chip-row
+                *ngFor="let keyword of keywords"
+                (removed)="removeKeyword(keyword)"
+              >
+                {{ keyword }}
+                <button matChipRemove aria-label="'remove ' + keyword">
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </mat-chip-row>
+            </mat-chip-grid>
+            <input
+              dUppercase
+              placeholder="Nueva palabra clave..."
+              [matChipInputFor]="chipGrid"
+              (matChipInputTokenEnd)="addKeyword($event)"
+            />
+          </mat-form-field>
+        </div>
+
+
+        <!--        <div class="col-12 mb-4">-->
+        <!--          <button type="button" style="letter-spacing: 0" mat-raised-button color="primary" (click)="addEditionToThisPublication();">Agregar Edición</button>-->
+        <!--        </div>-->
+      </div>
+      <div class="row">
+        <div class="col-12 col-md-6 col-lg-9">
+          <mat-form-field>
+            <mat-label>Observación</mat-label>
+            <textarea
+              style="min-height: 76px; max-height: 400px"
+              matInput
+              dUppercase
+              formControlName="observation"
+            ></textarea>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div formArrayName="editions">
+        <mat-tab-group mat-stretch-tabs="false" style="width: 100%">
+          <mat-tab
+            [label]="
+              editionFormGroup.value.edition | editionTabName : indexEdition
+            "
+            [formGroupName]="indexEdition"
+            *ngFor="
+              let editionFormGroup of editionsFormArray.controls;
+              let indexEdition = index
+            "
+          >
+            <!--            <div class="row">-->
+            <!--              <div class="col-9 d-flex justify-content-end">-->
+            <!--                <button type="button" mat-icon-button color="accent" (click)="removeEdition(indexEdition);">-->
+            <!--                  <mat-icon>delete</mat-icon>-->
+            <!--                </button>-->
+            <!--              </div>-->
+            <!--            </div>-->
+
+            <div class="row mt-4">
+              <div class="col-12 col-md-6 col-lg-3">
+                <mat-form-field>
+                  <mat-label>Edición</mat-label>
+                  <input matInput formControlName="edition" type="text" dUppercase />
+                </mat-form-field>
+              </div>
+
+              <div class="col-12 col-md-6 col-lg-3">
+                <mat-form-field>
+                  <mat-label>Año del Documento</mat-label>
+                  <input
+                    matInput
+                    type="text"
+                    [mask]="'9*'"
+                    [allowNegativeNumbers]="false"
+                    formControlName="publicationYear"
+                    autocomplete="off"
+                  />
+                </mat-form-field>
+              </div>
+
+              <div class="col-12 col-md-6 col-lg-3">
+                <mat-form-field>
+                  <mat-label>ISBN</mat-label>
+                  <input
+                    matInput
+                    formControlName="publicationCode"
+                    type="text"
+                    dUppercase
+                  />
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-12 col-md-6 col-lg-3">
+                <mat-form-field>
+                  <mat-label>Precio Aproximado</mat-label>
+                  <input
+                    type="text"
+                    matInput
+                    prefix="$ "
+                    mask="separator.6"
+                    thousandSeparator=","
+                    decimalMarker="."
+                    inputmode="numeric"
+                    formControlName="price"
+                    autocomplete="off"
+                  />
+                </mat-form-field>
+              </div>
+
+              <div class="col-12 col-md-6 col-lg-3">
+                <mat-form-field>
+                  <mat-label>Disponibilidad</mat-label>
+                  <mat-select multiple formControlName="availability">
+                    <mat-option
+                      *ngFor="let availability of publicationAvailabilities"
+                      [value]="availability.availabilityID"
+                    >
+                      {{ availability.availabilityDesc }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <!--              <div class="col-12">-->
+              <!--                <mat-checkbox-->
+              <!--                  color="primary"-->
+              <!--                  formControlName="hasDigitalEdition">-->
+              <!--                  <span class="checkbox-label">Esta publicación tiene un archivo digital</span>-->
+              <!--                </mat-checkbox>-->
+              <!--              </div>-->
+
+              <div
+                class="col-12 mb-4"
+                *ngIf="REQUIRED_FILE_FOR_DIGITAL_PUBLICATION"
+              >
+                <input
+                  disabled
+                  style="cursor: pointer"
+                  class="mt-1 mb-1 ml-1 align-self-center"
+                  #fileInput
+                  (change)="onChangeFileInput(fileInput.files, indexEdition)"
+                  type="file"
+                  [accept]="'application/pdf'"
+                />
+              </div>
+            </div>
+
+            <h3 style="font-size: 15px; font-weight: 600" class="no-gutters">
+              Autores
+            </h3>
+            <div class="row mb-4">
+              <div class="col-12 row no-gutters">
+                <div class="col-12 col-md-4 d-flex">
+                  <mat-form-field>
+                    <mat-label>Buscar Autores</mat-label>
+                    <input type="text" matInput formControlName="author" dUppercase />
+                  </mat-form-field>
+                  <button
+                    type="button"
+                    [disabled]="disableControls"
+                    class="ml-2"
+                    color="primary"
+                    mat-mini-fab
+                    (click)="createAuthor(indexEdition)"
+                  >
+                    <mat-icon>add</mat-icon>
+                  </button>
+                </div>
+              </div>
+              <div class="col-4">
+                <h5
+                  style="font-size: 14px; font-weight: 400"
+                  class="no-gutters"
+                >
+                  Autores disponibles
+                </h5>
+                <div class="list-container">
+                  <mat-selection-list
+                    #unselectedAuthorList
+                    [disabled]="disableControls"
+                  >
+                    <mat-list-option
+                      [value]="author.authorID"
+                      *ngFor="let author of unselectedAuthors[indexEdition]"
+                    >
+                      <span class="list-option">
+                        {{ author.authorName }}
+                      </span>
+                    </mat-list-option>
+                  </mat-selection-list>
+                </div>
+              </div>
+              <div class="col-1 d-flex flex-column justify-content-center">
+                <div class="d-flex justify-content-center">
+                  <button
+                    type="button"
+                    [disabled]="disableControls"
+                    color="primary"
+                    mat-mini-fab
+                    (click)="addAuthorToAEdition(indexEdition)"
+                    class="mb-3"
+                  >
+                    <mat-icon>chevron_right</mat-icon>
+                  </button>
+                </div>
+                <div class="d-flex justify-content-center">
+                  <button
+                    type="button"
+                    [disabled]="disableControls"
+                    color="primary"
+                    mat-mini-fab
+                    (click)="removeSelectedAuthor(indexEdition)"
+                  >
+                    <mat-icon>chevron_left</mat-icon>
+                  </button>
+                </div>
+              </div>
+              <div class="col-4">
+                <h5
+                  style="font-size: 14px; font-weight: 400"
+                  class="no-gutters"
+                >
+                  Autores seleccionados
+                </h5>
+                <div class="list-container">
+                  <mat-selection-list
+                    #selectedAuthorList
+                    [disabled]="disableControls"
+                  >
+                    <mat-list-option
+                      selected
+                      [value]="author.authorID"
+                      *ngFor="let author of selectedAuthors[indexEdition]"
+                    >
+                      <span class="list-option">{{ author.authorName }}</span>
+                    </mat-list-option>
+                  </mat-selection-list>
+                  <mat-error *ngIf="form.get(['editions', indexEdition, 'authors'])?.hasError('required')">
+                    Debe seleccionar al menos un autor.
+                  </mat-error>
+                </div>
+              </div>
+            </div>
+
+            <h3 style="font-size: 15px; font-weight: 600" class="no-gutters">
+              Editoriales
+            </h3>
+            <div class="row mb-4">
+              <div class="col-12 row no-gutters">
+                <div class="col-12 col-md-4 d-flex">
+                  <mat-form-field>
+                    <mat-label>Buscar Editoriales</mat-label>
+                    <input type="text" matInput formControlName="editorial" dUppercase />
+                  </mat-form-field>
+                  <button
+                    type="button"
+                    color="primary"
+                    class="ml-2"
+                    mat-mini-fab
+                    (click)="createEditorial(indexEdition)"
+                  >
+                    <mat-icon>add</mat-icon>
+                  </button>
+                </div>
+              </div>
+              <div class="col-4">
+                <h5
+                  style="font-size: 14px; font-weight: 400"
+                  class="no-gutters"
+                >
+                  Editoriales disponibles
+                </h5>
+                <div class="list-container">
+                  <mat-selection-list
+                    #unselectedEditorialList
+                  >
+                    <mat-list-option
+                      [value]="editorial.editorialID"
+                      *ngFor="
+                        let editorial of unselectedEditorials[indexEdition]
+                      "
+                    >
+                      <span class="list-option">{{
+                        editorial.editorialDesc
+                      }}</span>
+                    </mat-list-option>
+                  </mat-selection-list>
+                </div>
+              </div>
+              <div class="col-1 d-flex flex-column justify-content-center">
+                <div class="d-flex justify-content-center">
+                  <button
+                    type="button"
+                    color="primary"
+                    mat-mini-fab
+                    class="mb-3"
+                    (click)="addEditorialToAEdition(indexEdition)"
+                  >
+                    <mat-icon>chevron_right</mat-icon>
+                  </button>
+                </div>
+                <div class="d-flex justify-content-center">
+                  <button
+                    type="button"
+                    color="primary"
+                    mat-mini-fab
+                    (click)="removeSelectedEditorial(indexEdition)"
+                  >
+                    <mat-icon>chevron_left</mat-icon>
+                  </button>
+                </div>
+              </div>
+              <div class="col-4">
+                <h5
+                  style="font-size: 14px; font-weight: 400"
+                  class="no-gutters"
+                >
+                  Editoriales seleccionadas
+                </h5>
+                <div class="list-container">
+                  <mat-selection-list
+                    #selectedEditorialList
+                  >
+                    <mat-list-option
+                      selected
+                      [value]="editorial.editorialID"
+                      *ngFor="let editorial of selectedEditorials[indexEdition]"
+                    >
+                      <span class="list-option">{{
+                        editorial.editorialDesc
+                      }}</span>
+                    </mat-list-option>
+                  </mat-selection-list>
+                  <mat-error *ngIf="form.get(['editions', indexEdition, 'editorials'])?.hasError('required')">
+                    Debe seleccionar al menos una editorial.
+                  </mat-error>
+                </div>
+              </div>
+            </div>
+
+            <h3 style="font-size: 15px; font-weight: 600" class="no-gutters">
+              Resumen del Documento
+            </h3>
+            <div class="row mb-4">
+              <div class="col-12 col-md-9">
+                <ngx-editor-menu
+                  [editor]="summaries[indexEdition]"
+                  [toolbar]="toolbar"
+                ></ngx-editor-menu>
+                <ngx-editor
+                  placeholder="Escribe aquí..."
+                  [editor]="summaries[indexEdition]"
+                  outputFormat="html"
+                  formControlName="summary"
+                ></ngx-editor>
+              </div>
+            </div>
+
+            <h3 style="font-size: 15px; font-weight: 600" class="no-gutters">
+              Contenido del Documento
+            </h3>
+            <div class="row mb-4">
+              <div class="col-12 col-md-9">
+                <ngx-editor-menu
+                  [editor]="contents[indexEdition]"
+                  [toolbar]="toolbar"
+                ></ngx-editor-menu>
+                <ngx-editor
+                  placeholder="Escribe aquí..."
+                  [editor]="contents[indexEdition]"
+                  outputFormat="html"
+                  formControlName="content"
+                ></ngx-editor>
+              </div>
+            </div>
+
+            <!--            <h3 style="font-size: 15px; font-weight: 600" class="no-gutters">Ubicaciones</h3>-->
+            <!--            <div class="row">-->
+            <!--              <div class="col-12 col-md-4">-->
+            <!--                <mat-form-field>-->
+            <!--                  <mat-label>Ubicaciones</mat-label>-->
+            <!--                  <mat-select formControlName="campuses" multiple>-->
+            <!--                    <mat-option *ngFor="let campus of campuses;" [value]="campus.campusID" (onSelectionChange)="manageCampusStock($event, indexEdition, campus);">-->
+            <!--                      {{ campus.campusName }}-->
+            <!--                    </mat-option>-->
+            <!--                  </mat-select>-->
+            <!--                </mat-form-field>-->
+            <!--              </div>-->
+            <!--            </div>-->
+
+            <h3 style="font-size: 15px; font-weight: 600" class="no-gutters">
+              Gestionar Existencias
+            </h3>
+            <div formArrayName="campusesStock">
+              <ng-container
+                [formGroupName]="indexCampusStock"
+                *ngFor="
+                  let campusStockFormGroup of campusStockFormArray(indexEdition)
+                    .controls;
+                  let indexCampusStock = index
+                "
+              >
+                <div class="mb-4">
+                  <button
+                    type="button"
+                    style="letter-spacing: 0"
+                    mat-raised-button
+                    color="primary"
+                    (click)="addStockItem(indexEdition, indexCampusStock)"
+                  >
+                    Agregar Tipo de Existencia
+                    <mat-icon>add</mat-icon>
+                  </button>
+                </div>
+                <p
+                  *ngIf="
+                    stockFormArray(indexEdition, indexCampusStock).hasError(
+                      'uniqueStock'
+                    )
+                  "
+                >
+                  <small style="color: #f44336"
+                    >Dos o más publicaciones tienen el mismo tipo de
+                    entrada.</small
+                  >
+                </p>
+                <div class="row" formArrayName="stock">
+                  <div class="col-12 col-md-9 row">
+                    <div
+                      class="col-12 mt-1 row stock-group"
+                      [formGroupName]="indexStock"
+                      *ngFor="
+                        let stockFormGroup of stockFormArray(
+                          indexEdition,
+                          indexCampusStock
+                        ).controls;
+                        let indexStock = index
+                      "
+                    >
+                      <div style="display: flex; align-items: end; width: 100%">
+                        <div class="col" style="flex: 1">
+                          <p *ngIf="stockFormGroup.value.isForUpdate">
+                            Cantidad prestada:
+                            {{ stockFormGroup.value.borrowedItems }}
+                          </p>
+                          <!-- <p>
+                            Cantidad real:
+                            {{
+                              stockFormGroup.value.borrowedItems +
+                                stockFormGroup.value.quantity
+                            }}
+                          </p> -->
+                          <mat-form-field>
+                            <mat-label>{{
+                              stockFormGroup.value.isForUpdate
+                                ? "Cantidad actual"
+                                : "Cantidad"
+                            }}</mat-label>
+                            <input
+                              matInput
+                              type="text"
+                              [mask]="'9*'"
+                              [allowNegativeNumbers]="false"
+                              formControlName="quantity"
+                              autocomplete="off"
+                            />
+                            <mat-error
+                              *ngIf="
+                                stockFormGroup.hasError('required', 'quantity')
+                              "
+                              >La cantidad es requerida</mat-error
+                            >
+                            <mat-error
+                              *ngIf="
+                                stockFormGroup.value.isForUpdate &&
+                                stockFormGroup.hasError('min', 'quantity')
+                              "
+                              >La cantidad mínima para registrar es
+                              {{
+                                stockFormGroup.value.borrowedItems
+                              }}</mat-error
+                            >
+                          </mat-form-field>
+                        </div>
+                        <div class="col" style="flex: 1">
+                          <mat-form-field>
+                            <mat-label>Tipo de Entrada</mat-label>
+                            <mat-select formControlName="incomeType">
+                              <mat-option
+                                *ngFor="let incomeType of incomeTypes"
+                                [value]="incomeType.incomeTypeID"
+                              >
+                                <span>{{ incomeType.incomeTypeDesc }}</span>
+                              </mat-option>
+                            </mat-select>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <mat-form-field>
+                          <mat-label>Estado de Documento</mat-label>
+                          <mat-select
+                            formControlName="condition"
+                            [disabled]="stockFormGroup.value.isForUpdate"
+                          >
+                            <mat-option
+                              *ngFor="
+                                let publicationCondition of publicationsCondition
+                              "
+                              [value]="publicationCondition.physicalQualityID"
+                            >
+                              <span>{{
+                                publicationCondition.physicalQualityDesc
+                              }}</span>
+                            </mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+                      <div
+                        class="col"
+                        style="display: contents"
+                      >
+                        <div class="d-flex align-self-start">
+                          <button
+                            type="button"
+                            mat-mini-fab
+                            color="accent"
+                            (click)="
+                              removeStockItem(
+                                indexEdition,
+                                indexCampusStock,
+                                indexStock
+                              )
+                            "
+                          >
+                            <mat-icon>delete</mat-icon>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+            <div class="file-upload-container">
+              <!-- Si hay un archivo, mostrar solo el enlace y los íconos de edición y regreso -->
+              <ng-container *ngIf="fileUrl; else uploadSection">
+                <div class="file-info">
+<!--                    [href]="environment.pullZone + fileUrl"-->
+                  <a
+                    [href]="getFileUrl()"
+                    target="_blank"
+                    rel="noopener"
+                    class="file-link">
+                    <i class="fa fa-file"></i> Ver archivo
+                  </a>
+
+                  <!-- Ícono de lápiz para editar -->
+                  <i
+                    class="fa fa-pencil edit-icon"
+                    (click)="onEditClick()"
+                    matTooltip="Editar archivo"></i>
+                  <!-- Ícono para regresar al estado inicial -->
+                  <i
+                    *ngIf="publication.urlFile!==fileUrl"
+                    class="fa fa-refresh "
+                    (click)="onResetClick()"
+                    matTooltip="Eliminar archivo y regresar"></i>
+                </div>
+              </ng-container>
+
+              <!-- Sección para subir archivo -->
+              <ng-template #uploadSection>
+                <label class="file-upload-button" for="fileInput">
+                  <div class="icon-container">
+                    <i class="fa fa-plus"></i>
+                  </div>
+                  <span>Añadir archivo</span>
+                </label>
+                <input
+                  id="fileInput"
+                  type="file"
+                  accept="application/pdf"
+                  style="display: none;"
+                  (change)="onFileSelected($event)">
+              </ng-template>
+            </div>
+
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+    </div>
+  </form>
+</div>

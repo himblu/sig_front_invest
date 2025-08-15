@@ -1,0 +1,67 @@
+<div class="row animated fadeIn fast" *ngIf="isLoading; else body">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+<ng-template #body>
+  <div class="card">
+    <div class="card-body">
+      <div class="row pl-2 pr-2" [formGroup]="filtersForm">
+        <div class="col-4">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Tipo de Práctica</mat-label>
+            <mat-select formControlName="modalityPracticeID" (selectionChange)="getGradeLinkageByPerson();">
+              <mat-option *ngFor="let item of modalityPractices" [value]="item.modalityPracticeID">{{item.modalityPracticeDesc}}</mat-option>
+            </mat-select>
+            <mat-error></mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="card">
+    <div class="card-body">
+      <div class="row pl-2 pr-2">
+        <div class="col-12">
+          <div class="table-responsive">
+            <table class="table">
+              <thead style="background-color: #004899; color: white;">
+                <tr>
+                  <th>#</th>
+                  <th>Periodo académico</th>
+                  <th>Tipo</th>
+                  <th>Proyecto</th>
+                  <th>Calificación</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngIf="!grades?.length; else tr;">
+                  <td style="text-align: center;" colspan="6">
+                    <ng-container *ngIf="filtersForm.get('modalityPracticeID')?.value; else type;">No existen registros</ng-container>
+                    <ng-template #type>Seleccione un tipo de práctica</ng-template>
+                  </td>
+                </tr>
+                <ng-template #tr>
+                  <tr *ngFor="let item of grades; let i=index;">
+                    <td>{{i+1}}</td>
+                    <td>{{item.periodName}}</td>
+                    <td>{{item.modalityPracticeDesc}}</td>
+                    <td>{{item.specificProject}}</td>
+                    <td>{{item.grade}}</td>
+                    <td>{{item.state}}</td>
+                  </tr>
+                </ng-template>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

@@ -1,0 +1,97 @@
+<div class="row animated fadeIn fast" *ngIf="charging; else body">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+<ng-template #body>
+  <div class="card">
+    <div class="card-body">
+      <div class="row pl-2 pr-2" [formGroup]="filtersForm">
+        <div class="col-4">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Buscador</mat-label>
+            <input type="text" matInput formControlName="filter" (input)="getStudentsGradesLinkageList(false);">
+          </mat-form-field>
+        </div>
+        <div class="col-2">
+          <button
+            class="download-button"
+            mat-raised-button
+            matTooltipPosition="above"
+            matTooltip="Descargar PDF"
+            (click)="getStudentsGradeLinkageReport();">
+            Reporte de calificaciones
+            <mat-icon class="red-icon">picture_as_pdf</mat-icon>
+          </button>
+        </div>
+        <div class="col-4"></div>
+        <div class="col-2" style="text-align: right;">
+          <button mat-raised-button class="styleButton_sml" style="max-height: 150px;" color="primary" (click)="onSubmit();">Guardar</button>
+        </div>
+      </div>
+      <div class="row pl-2 pr-2">
+        <div class="col-12">
+          <div class="table-responsive">
+            <table class="table">
+              <thead style="background-color: #004899; color: white;">
+                <tr>
+                  <th>Documento</th>
+                  <th>Estudiante</th>
+                  <th>Calificación</th>
+                  <!-- <th>Observación</th> -->
+                  <th>Estado</th>
+                  <th style="text-align: center;">Archivos</th>
+                </tr>
+              </thead>
+              <tbody [formGroup]="gradesForm">
+                <tr *ngIf="!gradesList?.length; else tr;">
+                  <td colspan="4" style="text-align: center;">Sin registros</td>
+                </tr>
+                <ng-template #tr formArrayName="grades">
+                  <tr *ngFor="let item of gradesList; let i=index;" [formGroupName]="i">
+                    <td>{{item.personDocumentNumber}}</td>
+                    <td>{{item.fullName}}</td>
+                    <td>
+                      <div style="height: 30px; width: 75px;">
+                        <mat-form-field>
+                          <input type="number" matInput formControlName="grade" [max]="10" [min]="1">
+                        </mat-form-field>
+                      </div>
+                    </td>
+                    <!-- <td>
+                      <div style="height: 30px; max-width: 150px;">
+                        <mat-form-field>
+                          <input type="text" matInput formControlName="observation">
+                        </mat-form-field>
+                      </div>
+                    </td> -->
+                    <td>
+                      <ng-container *ngIf="item.state === 'REPROBADO'; else template">
+                        <label matTooltipPosition="above" matTooltip="{{item.observation}}">{{item.state}}</label>
+                      </ng-container>
+                      <ng-template #template>{{item.state}}</ng-template>
+                    </td>
+                    <td style="text-align: center;">
+                      <a style="cursor: pointer; color: #004899;" (click)="openDialog(item);"><i class="fa fa-file" aria-hidden="true"></i></a>
+                    </td>
+                  </tr>
+                </ng-template>
+              </tbody>
+            </table>
+          </div>
+          <mat-paginator
+            #paginator
+            [length]="length"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="pageSizeOptions"
+            (page)="pageEvent = getPaginator($event)">
+          </mat-paginator>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

@@ -1,0 +1,129 @@
+<div class="row mt-4 mb-4">
+    <div class="col text-center">
+        <h2>Horarios</h2>
+    </div>
+</div>
+<div class="row pl-5 pr-5" *ngIf="schedule">
+  <div class="col-4" style="text-align: left;">
+    <label>Carrera: {{schedule.careerName}}</label>
+  </div>
+  <div class="col-4" style="text-align: left;">
+    <label>Periodo (Nivel): {{schedule.cycleDesc}}</label>
+  </div>
+  <div class="col-4" style="text-align: left;">
+    <label>Reporte:
+      <a style="cursor: pointer;" (click)="generateReport();">
+        <i class="fa fa-file-pdf-o" aria-hidden="true" style="color: red;"></i>
+      </a>
+    </label>
+  </div>
+
+  <div class="col-4" style="text-align: left;">
+    <label>Malla Curricular: {{schedule.studyPlanDesc}}</label>
+  </div>
+  <div class="col-4" style="text-align: left;">
+    <label>Paralelo: {{schedule.parallelCode}}</label>
+  </div>
+  <div class="col-4" style="text-align: left;">
+    <label>Disponibilidad Nivel: {{schedule.available}}</label>
+  </div>
+
+  <div class="col-4" style="text-align: left;">
+    <label>Modalidad: {{schedule.modalityName}}</label>
+  </div>
+  <div class="col-4" style="text-align: left;">
+    <label>Módulo: {{schedule.classModuleID}}</label>
+  </div>
+  <div class="col-4" style="text-align: left;">
+    <label>Disponibilidad Asignatura: {{schedule.availableSubjects}}</label>
+  </div>
+</div>
+<div class="card pl-5 pr-5">
+    <div class="card-body">
+        <div class="row">
+            <table class="w-100 mat-elevation-z8">
+                <tbody>
+                    <tr>
+                        <ng-container *ngFor="let head of scheduleHeader">
+
+                            <th>
+                                {{ head }}
+                            </th>
+
+                        </ng-container>
+                    </tr>
+                    <ng-container>
+                        <ng-container *ngFor="let hour of listHours">
+                            <tr>
+                                <td>
+                                    {{ hour?.startTime }}
+                                </td>
+                                <td>
+                                    {{ hour?.endTime }}
+                                </td>
+                                <td >
+                                    <ng-container *ngIf="schedules?.lun">
+                                        <p *ngFor="let subj of schedules?.lun[hour.startTime+'-'+hour.endTime]">
+                                            {{ subj.courseName }} - {{ subj.teacher}}
+
+                                        </p>
+                                    </ng-container>
+                                </td>
+
+                                <td>
+                                    <ng-container *ngIf="schedules?.mar">
+
+                                    <p *ngFor="let subj of schedules?.mar[hour.startTime+'-'+hour.endTime]">
+                                        {{ subj.courseName }} - {{ subj.teacher}}
+                                    </p>
+                                    </ng-container>
+
+                                </td>
+                                <td>
+                                    <ng-container *ngIf="schedules?.mie">
+
+                                    <p *ngFor="let subj of schedules?.mie[hour.startTime+'-'+hour.endTime]">
+                                        {{ subj.courseName }} - {{ subj.teacher}}
+                                    </p>
+                                    </ng-container>
+                                </td>
+                                <td>
+                                    <ng-container *ngIf="schedules?.jue">
+
+                                    <p *ngFor="let subj of schedules?.jue[hour.startTime+'-'+hour.endTime]">
+                                        {{ subj.courseName }} - {{ subj.teacher}}
+                                    </p>
+                                    </ng-container>
+                                </td>
+                                <td>
+                                    <ng-container *ngIf="schedules?.vie">
+
+                                    <p *ngFor="let subj of schedules?.vie[hour.startTime+'-'+hour.endTime]">
+                                        {{ subj.courseName }} - {{ subj.teacher}}
+                                    </p>
+                                    </ng-container>
+                                </td>
+                                <td>
+                                    <ng-container *ngIf="schedules?.sab">
+
+                                    <p *ngFor="let subj of schedules?.sab[hour.startTime+'-'+hour.endTime]">
+                                        {{ subj.courseName }} - {{ subj.teacher}}
+                                    </p>
+                                    </ng-container>
+                                </td>
+                                <td>
+                                    <ng-container *ngIf="schedules?.dom">
+
+                                    <p *ngFor="let subj of schedules?.dom[hour.startTime+'-'+hour.endTime]">
+                                        {{ subj.courseName }} - {{ subj.teacher}}
+                                    </p>
+                                    </ng-container>
+                                </td>
+                            </tr>
+                        </ng-container>
+                    </ng-container>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

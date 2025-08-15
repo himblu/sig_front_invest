@@ -1,0 +1,833 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<div class="row pl-4 pr-4">
+  <div class="col-2">
+    <button
+      class="download-button"
+      mat-raised-button
+      (click)="getPdf()">
+      Descargar PEA
+      <mat-icon class="red-icon">picture_as_pdf</mat-icon>
+    </button>
+  </div>
+  <div class="col-2">
+    <a
+      style="background-color: rgb(84, 158, 77);
+      color: white;"
+      mat-raised-button
+      matTooltipPosition="above"
+      matTooltip="Descargar"
+      href="https://tecnologicoitcaeduec-my.sharepoint.com/personal/encuba_itca_edu_ec/_layouts/15/onedrive.aspx?ga=1&id=%2Fpersonal%2Fencuba%5Fitca%5Fedu%5Fec%2FDocuments%2FCONTRATO%20SISTEMA%20INFORM%C3%81TICO%20DE%20GESTI%C3%93N%20%28SIG%29%20%2D%20ENCUBA%2FMANUALES%20DE%20USUARIO%20%28SIG%29%2FPLAN%20DE%20ESTUDIOS%20DE%20LA%20ASIGNTURA%20%28PEA%29%2FMU%5FPROCESO%5FPEA%5FROL%20DOCENTE%2Epdf&parent=%2Fpersonal%2Fencuba%5Fitca%5Fedu%5Fec%2FDocuments%2FCONTRATO%20SISTEMA%20INFORM%C3%81TICO%20DE%20GESTI%C3%93N%20%28SIG%29%20%2D%20ENCUBA%2FMANUALES%20DE%20USUARIO%20%28SIG%29%2FPLAN%20DE%20ESTUDIOS%20DE%20LA%20ASIGNTURA%20%28PEA%29"
+      target="_blank">
+      <small>Manual Usuario</small>
+    </a>
+  </div>
+</div>
+<br>
+<mat-vertical-stepper [linear]="false" #vStepper *ngIf="!charging">
+  <!-- PLAN 1 -->
+  <mat-step [stepControl]="plan1Form" completed="false">
+    <ng-template matStepLabel><a style="color: #3f51b5;">PLAN 1</a></ng-template>
+    <div class="card" style="background-color: rgb(221, 238, 243);">
+      <div class="card-body">
+        <form [formGroup]="plan1Form"
+          autocomplete="off"
+          (submit)="onSubmitPlan1()">
+          <div formArrayName="data">
+            <div class="row">
+              <div class="col-md-4" style="text-align: center;">
+                <h4>Descripción de la Asignatura:
+                  <a>
+                    <i class="fa fa-question-circle-o" aria-hidden="true" matTooltipPosition="above"
+                    matTooltip="La descripción presenta una idea general de la temática de la asignatura."></i>
+                  </a>
+                </h4>
+              </div>
+              <div class="col-md-7" [formGroupName]="0">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Descripción</mat-label>
+                  <textarea type="text" matInput formControlName="planDetailSettingDesc" #description required (input)="wordLimit(description, hintDescription, 200)"
+                  placeholder="Máximo 200 palabras"></textarea>
+                  <mat-hint><label #hintDescription><small>Palabras: 0</small></label></mat-hint>
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4" style="text-align: center;">
+                <h3>Objetivo del programa de la Asignatura:
+                  <a>
+                    <i class="fa fa-question-circle-o" aria-hidden="true" matTooltipPosition="above"
+                    matTooltip="Hace referencia al qué (contenido), cómo (metodología) y para qué (competencia)."></i>
+                  </a>
+                </h3>
+              </div>
+              <div class="col-md-7" [formGroupName]="1">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Objetivo</mat-label>
+                  <textarea type="text" matInput formControlName="planDetailSettingDesc" #objective required (input)="wordLimit(objective, hintObjective, 50)"
+                  placeholder="Máximo 50 palabras"></textarea>
+                  <mat-hint><label #hintObjective><small>Palabras: 0</small></label></mat-hint>
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-12" style="text-align: right;">
+            <button type="submit" mat-raised-button class="styleButton_sml" *ngIf="!loadingPlan">Siguiente</button>
+            <spinner-loader *ngIf="loadingPlan"></spinner-loader>
+          </div>
+        </form>
+      </div>
+    </div>
+  </mat-step>
+  <!-- PLAN 2 -->
+  <mat-step completed="false">
+    <ng-template matStepLabel><a style="color: #3f51b5;">PLAN 2</a></ng-template>
+    <div class="card" style="background-color: rgb(221, 238, 243);" *ngIf="plan2Form">
+      <div class="card-body">
+        <mat-stepper [linear]="false" #plan2Stepper style="background-color: rgb(221, 238, 243);">
+          <div *ngFor="let item of courseSchedule; let i=index; let last=last;">
+            <mat-step [stepControl]="plan2Form" completed="false">
+              <ng-template matStepLabel><a style="color: #3f51b5;">{{item.unitName}}</a></ng-template>
+              <form [formGroup]="plan2Form"
+                autocomplete="off"
+                (submit)="validatePracticeGap();">
+                <div formArrayName="data">
+                  <div class="row" *ngIf="resultLearning && resultLearning.length > 0">
+                    <div class="col-12" style="text-align: left;">
+                      <h4>LOGRO O RESULTADO DE APRENDIZAJE: {{resultLearning[i].planDetailSettingDesc}}</h4>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-5-5" style="text-align: left;">
+                      <h4>{{week[i].detailName}}</h4>
+                    </div>
+                    <div class="col-0-5"></div>
+                    <div class="col-4" style="text-align: left;">
+                      <h4>NOMBRE DE LA UNIDAD</h4>
+                    </div>
+                    <div class="col-1-5" style="text-align: right;">
+                      <h2>
+                        <a>
+                          <i class="fa fa-plus-circle" aria-hidden="true" style="cursor: pointer; color: green;"
+                            matTooltipPosition="above"
+                            matTooltip="GAP"
+                            data-toggle="modal"
+                            data-target="#gapModal"
+                            (click)="getGapHeader(item.unitID, i)">
+                          </i>&nbsp;
+                          <small>GAP</small>
+                        </a>
+                      </h2>
+                    </div>
+                  </div>
+                  <div class="row" [formGroupName]="0">
+                    <div class="col-5-5">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Fecha Inicio y Fin</mat-label>
+                        <mat-date-range-input [rangePicker]="picker">
+                            <input readonly="true" matStartDate placeholder="Inicio" formControlName="startDateUnit">
+                            <input readonly="true" matEndDate placeholder="Fin" formControlName="endDateUnit" (dateChange)="weeksBetween()">
+                        </mat-date-range-input>
+                        <mat-hint>dd/mm/aaaa – dd/mm/aaaa</mat-hint>
+                        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-date-range-picker #picker></mat-date-range-picker>
+                        <mat-error>Campo <strong>requerido</strong></mat-error>
+                      </mat-form-field>
+                      <br>
+                      <mat-form-field appearance="outline">
+                        <mat-label>Semanas:</mat-label>
+                        <input type="text" matInput readonly="true" formControlName="numberWeek">
+                        <mat-error></mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-0-5"></div>
+                    <div class="col-5-5">
+                      <p *ngFor="let item of contents"><label *ngIf="item.unitID === i+1">{{item.settingUnitDesc}}</label></p>
+                    </div>
+                  </div><br>
+                </div>
+
+                <div class="row">
+                  <div class="col-10" style="text-align: left;">
+                    <h3 *ngIf="hours">APRENDIZAJE EN CONTACTO CON EL DOCENTE ({{hours[0].hoursTeachContact}} horas)</h3>
+                  </div>
+                </div>
+                <div class="row" formArrayName="teacher" *ngIf="teacherLearning">
+                  <ng-container *ngFor="let item of this.getPlan2Row('teacher').controls; let i=index" [formGroupName]="i">
+                    <div class="col-3">
+                      <small>{{item.value.settingUnitDesc}}</small>
+                    </div>
+                    <div class="col-2-5">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Horas</mat-label>
+                        <input readonly="true" type="number" matInput formControlName="hours">
+                        <mat-error>
+                          Campo <strong>requerido</strong>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-0-5"></div>
+                  </ng-container>
+                </div>
+                <div class="row">
+                  <div class="col-10" style="text-align: left;">
+                    <h3 *ngIf="hours">APRENDIZAJE PRÁCTICO EXPERIMENTAL ({{hours[0].hoursPracExp}} horas)</h3>
+                  </div>
+                </div>
+                <div class="row" formArrayName="practice" *ngIf="practiceLearning">
+                  <ng-container *ngFor="let item of this.getPlan2Row('practice').controls; let i=index" [formGroupName]="i">
+                    <div class="col-3">
+                      <small>{{item.value.settingUnitDesc}}</small>
+                    </div>
+                    <div class="col-2-5">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Horas</mat-label>
+                        <input readonly="true" type="number" matInput formControlName="hours">
+                        <mat-error>
+                          Campo <strong>requerido</strong>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-0-5"></div>
+                  </ng-container>
+                </div>
+                <div class="row">
+                  <div class="col-10" style="text-align: left;">
+                    <h3 *ngIf="hours">APRENDIZAJE AUTÓNOMO ({{hours[0].hoursAutonomous}} horas)</h3>
+                  </div>
+                </div>
+                <div class="row" formArrayName="autonomus" *ngIf="autonomusLearning">
+                  <ng-container *ngFor="let item of this.getPlan2Row('autonomus').controls; let i=index" [formGroupName]="i">
+                    <div class="col-3">
+                      <small>{{item.value.settingUnitDesc}}</small>
+                    </div>
+                    <div class="col-2-5">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Horas</mat-label>
+                        <input readonly="true" type="number" matInput formControlName="hours">
+                        <mat-error>
+                          Campo <strong>requerido</strong>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-0-5"></div>
+                  </ng-container>
+                </div>
+
+                <div class="col-md-12" style="text-align: right;">
+                  <ng-container *ngIf="!loadingPlan">
+                    <button type="button" *ngIf="item.unitID === 1" mat-raised-button class="styleButton_sml" (click)="stepperPrev()">Plan 1</button>
+                    <button type="button" *ngIf="item.unitID > 1" mat-raised-button class="styleButton_sml" (click)="setSubContents(i-1); plan2StepperPrev();">Anterior</button>&nbsp;
+                    <button type="submit" mat-raised-button class="styleButton_sml">Siguiente</button>
+                  </ng-container>
+                  <spinner-loader *ngIf="loadingPlan"></spinner-loader>
+                </div>
+              </form>
+            </mat-step>
+          </div>
+          <mat-step>
+            <ng-template matStepLabel>Finalizar</ng-template>
+            <p>Ha finalizado el Plan 2.</p>
+            <div class="col-md-12" style="text-align: right;">
+              <button mat-raised-button class="styleButton_sml" (click)="plan2StepperPrev()" (click)="setSubContents(3)">Anterior</button>&nbsp;
+              <button type="submit" mat-raised-button class="styleButton_sml" (click)="getPlan3(); stepperNext();">Siguiente</button>
+            </div>
+          </mat-step>
+        </mat-stepper>
+      </div>
+    </div>
+  </mat-step>
+  <!-- PLAN 3 -->
+  <mat-step completed="false">
+    <ng-template matStepLabel><a style="color: #3f51b5;">PLAN 3</a></ng-template>
+    <div class="card" style="background-color: rgb(221, 238, 243);">
+      <div class="card-body">
+        <mat-stepper [linear]="false" #plan3Stepper style="background-color: rgb(221, 238, 243);" *ngIf="unitsList">
+          <div *ngFor="let unit of unitsList; let lastcall=last; let i=index;">
+            <mat-step [stepControl]="plan3Form">
+              <ng-template matStepLabel><a style="color: #3f51b5;">{{unit.unitName}}</a></ng-template>
+              <form [formGroup]="plan3Form"
+                autocomplete="off"
+                (submit)="onSubmitPlan3(unit.unitID)">
+                <div class="row" *ngIf="resultLearning && resultLearning.length > 0">
+                  <div class="col-12" style="text-align: left;">
+                    <h4>LOGRO O RESULTADO DE APRENDIZAJE: {{resultLearning[i].planDetailSettingDesc}}</h4>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-2" style="text-align: left;">
+                    <h4>PRODUCTO GENERADO PARA EVALUACIÓN
+                      <a>
+                        <i class="fa fa-question-circle-o" aria-hidden="true" matTooltipPosition="above"
+                        matTooltip="El producto generado para la evaluación, debe evidenciar el logro de aprendizaje y tener coherencia con las actividades planificadas en el plan 2."></i>
+                      </a>
+                    </h4>
+                  </div>
+                  <div class="col-0-5"></div>
+                  <div class="col-2" style="text-align: left;">
+                    <h4>CRITERIOS DE EVALUACIÓN
+                      <a>
+                        <i class="fa fa-question-circle-o" aria-hidden="true" matTooltipPosition="above"
+                        matTooltip="Enunciar las características que deben cumplir las producciones académicas para ser consideradas de calidad. Pueden ser:
+                        presentación, ortografía, organización, calidad de la investigación, contenido, fuentes de consulta,  conclusiones, cumplimiento, entrega oportuna, material de apoyo."></i>
+                      </a>
+                    </h4>
+                  </div>
+                  <div class="col-0-5"></div>
+                  <div class="col-2" style="text-align: left;">
+                    <h4>INSTRUMENTOS DE EVALUACIÓN</h4>
+                  </div>
+                  <div class="col-0-5"></div>
+                  <div class="col-2" style="text-align: left;">
+                    <h4>TIPO DE EVALUACIÓN</h4>
+                  </div>
+                  <div class="col-2" style="text-align: left;">
+                    <h4>PARCIAL</h4>
+                  </div>
+                  <div class="col-12" style="text-align: right;">
+                    <h4>NUEVO:&nbsp;
+                      <a type="button" style="cursor: pointer;" (click)="addPlan3Row()">
+                        <i class="fa fa-plus-circle" aria-hidden="true" matTooltipPosition="above" matTooltip="Nuevo"></i>
+                      </a>
+                    </h4>
+                  </div>
+                </div><br>
+                <div formArrayName="rows">
+                  <div class="row" *ngFor="let row of getPlan3Row().controls; let i=index" [formGroupName]="i">
+                    <div class="col-2-5">
+                      <mat-form-field class="width" appearance="outline">
+                        <!--<mat-label>Seleccione</mat-label>
+                        <mat-select formControlName="productGeneratedID" required (click)="getProductGenerated(unit.unitID)">
+                          <mat-option *ngFor="let item of products" [value]="item.settingUnitsID">{{item.settingUnitDesc}}</mat-option>
+                        </mat-select>-->
+                        <mat-label>Producto</mat-label>
+                        <textarea formControlName="productGenerated" matInput required></textarea>
+                        <mat-error>Campo <strong>requerido</strong></mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-2-5">
+                      <mat-form-field class="width" appearance="outline">
+                        <!--<mat-label>Seleccione</mat-label>
+                        <mat-select formControlName="evaluationCriteriaID" required (click)="getEvaluationCriteria(unit.unitID)">
+                          <mat-option *ngFor="let item of evaluationCriteria" [value]="item.settingUnitsID">{{item.settingUnitDesc}}</mat-option>
+                        </mat-select>-->
+                        <mat-label>Criterio</mat-label>
+                        <textarea formControlName="evaluationCriteria" matInput required></textarea>
+                        <mat-error>Campo <strong>requerido</strong></mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-2-5">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Seleccione</mat-label>
+                        <mat-select formControlName="evaluationToolID">
+                          <mat-option *ngFor="let item of evaluationTools" [value]="item.evaluationToolID">{{item.evaluationToolName}}</mat-option>
+                        </mat-select>
+                        <mat-error>Campo <strong>requerido</strong></mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-2">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Seleccione</mat-label>
+                        <mat-select formControlName="evaluationTypeID">
+                          <mat-option *ngFor="let item of evaluationType" [value]="item.evaluationTypeID">{{item.evaluationTypeName}}</mat-option>
+                        </mat-select>
+                        <mat-error>Campo <strong>requerido</strong></mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-2">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Seleccione</mat-label>
+                        <mat-select formControlName="evaluationID">
+                          <mat-option *ngFor="let item of partials" [value]="item.evaluationID">{{item.evaluationName}}</mat-option>
+                        </mat-select>
+                        <mat-error>Campo <strong>requerido</strong></mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-0-5" style="text-align: center;">
+                      <a style="cursor: pointer; color: red;" (click)="deletePlan3Row(i)" *ngIf="getPlan3Row().length > 1 && isLinear === true">
+                        <i class="fa fa-minus-circle" aria-hidden="true" matTooltipPosition="above" matTooltip="Eliminar"></i>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-12" style="text-align: right;">
+                  <ng-container *ngIf="!loadingPlan">
+                    <button type="button" *ngIf="unit.unitID === 1" mat-raised-button class="styleButton_sml" (click)="stepperPrev()">Plan 2</button>
+                    <button type="button" *ngIf="unit.unitID > 1" mat-raised-button class="styleButton_sml" (click)="getPlan3(unit.unitID-1); plan3StepperPrev();">Anterior</button>&nbsp;
+                    <button type="submit" mat-raised-button class="styleButton_sml">Siguiente</button>
+                  </ng-container>
+                  <spinner-loader *ngIf="loadingPlan"></spinner-loader>
+                </div>
+              </form>
+            </mat-step>
+          </div>
+          <mat-step>
+            <ng-template matStepLabel>Finalizar</ng-template>
+            <p>Ha finalizado el Plan 3.</p>
+            <div class="col-md-12" style="text-align: right;">
+              <button type="button" mat-raised-button class="styleButton_sml" (click)="getPlan3(4)" (click)="plan3StepperPrev()">Anterior</button>&nbsp;
+              <button type="submit" mat-raised-button class="styleButton_sml" (click)="getPlan5()" (click)="stepperNext();">Siguiente</button>
+            </div>
+          </mat-step>
+        </mat-stepper>
+      </div>
+    </div>
+  </mat-step>
+  <!-- PLAN 5 -->
+  <mat-step [stepControl]="plan5Form" completed="false">
+    <ng-template matStepLabel><a style="color: #3f51b5;">PLAN 5 </a></ng-template>
+    <div class="card" style="background-color: rgb(221, 238, 243);">
+      <div class="card-body">
+        <form [formGroup]="plan5Form"
+          autocomplete="off"
+          (submit)="onSubmitPlan5()">
+          <div formArrayName="basics">
+            <div class="row">
+              <div class="col-md-12">
+                <h4>BIBLIOGRAFÍA BÁSICA:  <small>(Mímino 1 - Máximo 2)</small>&nbsp;
+                  <a>
+                    <i class="fa fa-question-circle-o" aria-hidden="true" matTooltipPosition="above"
+                    matTooltip="Se debe colocar máximo dos libros: un libro principal relacionado con la asignatura, y el otro libro debe ser la guia didáctica de la asignatura. 4.1.4."></i>
+                  </a>&nbsp;
+                  <a type="button" style="cursor: pointer;" (click)="addBasicsRow()" *ngIf="plan5Form.controls['basics'].value.length < 2 && isLinear === true">
+                    <i class="fa fa-plus-circle" aria-hidden="true" matTooltipPosition="above" matTooltip="Agregar libro"></i>
+                  </a>
+                </h4>
+              </div>
+            </div>
+            <div class="row" *ngFor="let item of getBasicsRow().controls; let i=index" [formGroupName]="i">
+              <div class="col-1-5">
+                <h4>Libro {{i+1}}</h4>
+              </div>
+              <!--<div class="col-3">
+                <mat-form-field class="width" style="width: 200px;" appearance="outline">
+                  <mat-label>Buscador por título</mat-label>
+                  <input type="text" matInput #title (input)="getPublication(title.value, i, 'basics')">
+                  <mat-icon matSuffix>search</mat-icon>
+                </mat-form-field>
+              </div>-->
+              <div class="col-5">
+                <mat-form-field class="example-full-width">
+                  <mat-label>Buscador por título</mat-label>
+                  <input type="text"
+                    placeholder="Elija un Libro"
+                    aria-label="Number"
+                    matInput
+                    #search
+                    formControlName="search"
+                    (input)="getPublication(search.value, i, 'basics')"
+                    [matAutocomplete]="auto">
+                    <mat-autocomplete #auto="matAutocomplete">
+                      <mat-option *ngFor="let item of publications" [value]="item.title" (onSelectionChange)="getClickedPublication(item, i, 'basics', $event);">
+                        {{item.title}}
+                      </mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+              </div>
+              <div class="col-0-5" style="text-align: center;">
+                <a style="cursor: pointer; color: red;" (click)="deleteBasicsRow(i)" *ngIf="getBasicsRow().length > 1 && isLinear === true">
+                  <i class="fa fa-minus-circle" aria-hidden="true" matTooltipPosition="above" matTooltip="Eliminar"></i>
+                </a>
+              </div>
+              <div class="col-5"></div>
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Titulo del libro</mat-label>
+                  <input type="text" readonly="true" matInput formControlName="title">
+                  <mat-error>Campo <strong>requerido</strong></mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Disponibilidad</mat-label>
+                  <mat-select formControlName="availabilityID" (selectionChange)="getBibliography($event, i, 'basics')">
+                    <mat-option *ngFor="let item of publicationAvailability" [value]="item.availabilityID">{{item.availabilityDesc}}</mat-option>
+                  </mat-select>
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Autor</mat-label>
+                  <input type="text" matInput formControlName="author">
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Año del Documento</mat-label>
+                  <input type="text" matInput formControlName="year">
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Ciudad - País</mat-label>
+                  <input type="text" matInput formControlName="city">
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Editorial</mat-label>
+                  <input type="text" matInput formControlName="editorial">
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+
+          <div formArrayName="references">
+            <div class="row">
+              <div class="col-md-12">
+                <h4>BIBLIOGRAFÍA DE CONSULTA:  <small>(Mímino 2 - Máximo 3)</small>&nbsp;
+                  <a>
+                    <i class="fa fa-question-circle-o" aria-hidden="true" matTooltipPosition="above"
+                    matTooltip="Se debe colocar al menos tres documentos de consulta, de los cuales, uno de ellos debe existir en la biblioteca física o virtual del instituto.
+                    Se considera documentos de consulta los siguientes: libros físicos o digitales, textos científicos y técnicos, artículos de revistas científicas y técnicas, manuales técnicos, planos, catálogos, etc."></i>
+                  </a>&nbsp;
+                  <a type="button" style="cursor: pointer;" (click)="addReferencesRow()" *ngIf="plan5Form.controls['references'].value.length < 3 && isLinear === true">
+                    <i class="fa fa-plus-circle" aria-hidden="true" matTooltipPosition="above" matTooltip="Agregar libro"></i>
+                  </a>
+                </h4>
+              </div>
+            </div>
+            <div class="row" *ngFor="let item of getReferencesRow().controls; let i=index" [formGroupName]="i">
+              <div class="col-1-5">
+                <h4>Libro {{i+1}}</h4>
+              </div>
+              <!--<div class="col-3">
+                <mat-form-field class="width" style="width: 200px;" appearance="outline">
+                  <mat-label>Buscador por título</mat-label>
+                  <input type="text" matInput #title (input)="getPublication(title.value, i, 'basics')">
+                  <mat-icon matSuffix>search</mat-icon>
+                </mat-form-field>
+              </div>-->
+              <div class="col-5">
+                <mat-form-field class="example-full-width">
+                  <mat-label>Buscador por título</mat-label>
+                  <input type="text"
+                    placeholder="Elija un Libro"
+                    aria-label="Number"
+                    matInput
+                    #search
+                    formControlName="search"
+                    (input)="getPublication(search.value, i, 'references')"
+                    [matAutocomplete]="auto">
+                    <mat-autocomplete #auto="matAutocomplete">
+                      <mat-option *ngFor="let item of publications" [value]="item.title" (onSelectionChange)="getClickedPublication(item, i, 'references', $event);">
+                        {{item.title}}
+                      </mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+              </div>
+              <div class="col-0-5" style="text-align: center;">
+                <a style="cursor: pointer; color: red;" (click)="deleteReferencesRow(i)" *ngIf="getReferencesRow().length > 2 && isLinear === true">
+                  <i class="fa fa-minus-circle" aria-hidden="true" matTooltipPosition="above" matTooltip="Eliminar"></i>
+                </a>
+              </div>
+              <div class="col-5"></div>
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Titulo del libro</mat-label>
+                  <input type="text" readonly="true" matInput formControlName="title">
+                  <mat-error>Campo <strong>requerido</strong></mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Disponibilidad</mat-label>
+                  <mat-select formControlName="availabilityID" (selectionChange)="getBibliography($event, i, 'references')">
+                    <mat-option *ngFor="let item of publicationAvailability" [value]="item.availabilityID">{{item.availabilityDesc}}</mat-option>
+                  </mat-select>
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Autor</mat-label>
+                  <input type="text" matInput formControlName="author">
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Año del Documento</mat-label>
+                  <input type="text" matInput formControlName="year">
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Ciudad - País</mat-label>
+                  <input type="text" matInput formControlName="city">
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Editorial</mat-label>
+                  <input type="text" matInput formControlName="editorial">
+                  <mat-error>
+                    Campo <strong>requerido</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </form>
+        <form [formGroup]="supportForm"
+        *ngIf="supportForm"
+          autocomplete="off">
+          <div formArrayName="data">
+            <div class="row" [formGroupName]="0">
+              <div class="col-md-12">
+                <h4>SUSTENTO DE LA SELECCIÓN DE LA BIBLIOGRAFÍA BÁSICA</h4>
+              </div>
+              <div class="col-12">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Sustento</mat-label>
+                  <textarea type="text" matInput formControlName="supportDesc"></textarea>
+                  <mat-error>Campo <strong>requerido</strong></mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row" [formGroupName]="1">
+              <div class="col-md-12">
+                <h4>SUSTENTO DE LA SELECCIÓN DE LOS DOCUMENTOS DE CONSULTA</h4>
+              </div>
+              <div class="col-12">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Sustento</mat-label>
+                  <textarea type="text" matInput formControlName="supportDesc"></textarea>
+                  <mat-error>Campo <strong>requerido</strong></mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </form>
+        <div class="col-md-12" style="text-align: right;">
+          <ng-container *ngIf="!loadingPlan">
+            <button type="button" mat-raised-button class="styleButton_sml" (click)="stepperPrev()">Plan 3</button>&nbsp;
+            <button type="button" mat-raised-button class="styleButton_sml" (click)="onSubmitPlan5()">Siguiente</button>
+          </ng-container>
+          <spinner-loader *ngIf="loadingPlan"></spinner-loader>
+        </div>
+      </div>
+    </div>
+  </mat-step>
+  <mat-step>
+    <ng-template matStepLabel><a style="color: #3f51b5;">TÉRMINOS Y CONDICIONES </a></ng-template>
+    <div class="card" style="background-color: rgb(221, 238, 243);">
+      <div class="card-body">
+        <ng-container *ngIf="termsAndConditions">
+          <div class="row" *ngFor="let item of termsAndConditions">
+            <div class="col-12" style="text-align: justify;">
+              <h4>{{item.conditionsMessageDesc}}</h4>
+            </div>
+            <div class="col-12" style="text-align: center;" *ngIf="isLinear === true">
+              <button type="button" mat-raised-button class="styleButton_sml" style="width: 140px;" (click)="onSubmitTermsConditions(item.termsAndConditionsID)">
+                Aceptar
+              </button>
+            </div>
+            <div class="col-12" style="text-align: center;" *ngIf="isLinear === false">
+              <button type="button" mat-raised-button class="styleButton_sml" (click)="stepperPrev()">Plan 5</button>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </mat-step>
+  <!-- -->
+</mat-vertical-stepper>
+
+<!-- Modal -->
+<div class="modal fade bd-example-modal-lg" id="gapModal" tabindex="-1" aria-labelledby="gapModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="height: 40px;">
+        <div class="col-md-4">
+          <h3 class="modal-title" id="gapModalLabel"><br>GAP</h3>
+        </div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-body">
+              <form [formGroup]="gapForm"
+                    (submit)="onSubmitGap()">
+                <div class="row">
+                  <div class="col-md-4">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Unidad</mat-label>
+                      <input readonly="true" type="text" matInput formControlName="unitName" style="text-transform:uppercase">
+                      <mat-error>
+                        Detalle es <strong>requerido</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-4">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Resultado de aprendizaje</mat-label>
+                      <input readonly="true" type="text" matInput formControlName="planDetailSettingDesc" style="text-transform:uppercase">
+                      <mat-error>
+                        Detalle es <strong>requerido</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-4">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Título de la práctica</mat-label>
+                      <input type="text" matInput formControlName="titleGap" style="text-transform:uppercase">
+                      <mat-error>
+                        Detalle es <strong>requerido</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-4">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>No. de práctica</mat-label>
+                      <input type="number" matInput formControlName="numberPractice" style="text-transform:uppercase">
+                      <mat-error>
+                        Detalle es <strong>requerido</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-4">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Tiempo de duración de la práctica</mat-label>
+                      <input type="number" matInput formControlName="duration" style="text-transform:uppercase">
+                      <mat-error>
+                        Detalle es <strong>requerido</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-4">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Parcial</mat-label>
+                      <mat-select formControlName="partialID" required>
+                        <mat-option *ngFor="let item of partials | slice:0:2" [value]="item.componentID">{{item.evaluationName}}</mat-option>
+                      </mat-select>
+                      <mat-error>Campo <strong>requerido</strong></mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Objetivo de la práctica</mat-label>
+                      <textarea type="text" matInput formControlName="objective" style="text-transform:uppercase"></textarea>
+                      <mat-error>
+                        Detalle es <strong>requerido</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Fundamentos</mat-label>
+                      <textarea type="text" matInput formControlName="fundaments" style="text-transform:uppercase"></textarea>
+                      <mat-error>
+                        Detalle es <strong>requerido</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Preparación previa</mat-label>
+                      <textarea type="text" matInput formControlName="advancePreparation" style="text-transform:uppercase"></textarea>
+                      <mat-error>
+                        Detalle es <strong>requerido</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Maquinaria, equipos, herrameintas, insumos y/o suministros de oficina</mat-label>
+                      <textarea type="text" matInput formControlName="tools" style="text-transform:uppercase"></textarea>
+                      <mat-error>
+                        Detalle es <strong>requerido</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Procedimientos a desarrollarse en la práctica</mat-label>
+                      <textarea type="text" matInput formControlName="proceduresDevelopmentPractice" style="text-transform:uppercase"></textarea>
+                      <mat-error>
+                        Detalle es <strong>requerido</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Producto generado para evaluación del aprendizaje</mat-label>
+                      <textarea type="text" matInput formControlName="generatedProduct" style="text-transform:uppercase"></textarea>
+                      <mat-error>
+                        Detalle es <strong>requerido</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Norma de seguridad</mat-label>
+                      <textarea type="text" matInput formControlName="safetyRules" style="text-transform:uppercase"></textarea>
+                      <mat-error>
+                        Detalle es <strong>requerido</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-2">
+                    <button type="submit" mat-raised-button class="styleButton_sml" style="width: 100px;">
+                      <span *ngIf="!isUpdatingGap">Guardar</span>
+                      <span *ngIf="isUpdatingGap">Actualizar</span>
+                    </button>
+                  </div>
+                  <div class="col-md-2">
+                    <button type="button" mat-raised-button class="styleButton_gray" style="width: 100px;" #modalClose data-dismiss="modal">Cerrar</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

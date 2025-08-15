@@ -1,0 +1,234 @@
+<div class="animated fadeIn fast">
+    <div class="form-row">
+      <div class="col-lg-7 col-md-6 d-none d-md-block bg-left"></div>
+      <div class="col-lg-5 col-md-6 col-12 bg-right d-flex flex-column justify-content-between">
+            <form class="form-horizontal form-material"
+                autocomplete="off"
+                class="pl-4 pr-4"
+                #signUpSurveyForm="ngForm"
+                style="padding-top: 20px !important;"
+            >
+                <div class="form-row mb-2">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <mat-label>Tipo de Documento</mat-label>
+                            <select name="typeDocId" (change)="newPerson.personDocumentNumber = null" [(ngModel)]="newPerson.typeDocId"
+                            class="form-control bg-white rounded-pill" style="border-radius: 15px;" required>
+                                <option [ngValue]="undefined">--SELECCIONE--</option>
+                                <option *ngFor="let t of documentTypes" [ngValue]="t.typeDocId">{{t.typeDocName | uppercase}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                      <ng-container *ngIf="!newPerson.typeDocId || newPerson.typeDocId === 1; else passport">
+                        <div class="form-group">
+                          <mat-label>Número de Documento</mat-label>
+                          <div class="input-group">
+                              <input type="text" name="dni" [maxlength]="10" [minlength]="10" (blur)="validateDocument()" class="form-control input-control"
+                              [(ngModel)]="newPerson.personDocumentNumber" placeholder="100xxxxxxx" required [disabled]="!newPerson.typeDocId"
+                              onKeypress="if (event.keyCode < 47 || event.keyCode > 57) event.returnValue = false;">
+                          </div>
+                        </div>
+                      </ng-container>
+                      <ng-template #passport>
+                        <div class="form-group">
+                          <mat-label>Número de Documento</mat-label>
+                          <div class="input-group">
+                              <input type="text" name="dni" (blur)="validateDocument()" class="form-control input-control"
+                              [(ngModel)]="newPerson.personDocumentNumber" placeholder="100xxxxxxx" required [disabled]="!newPerson.typeDocId">
+                          </div>
+                        </div>
+                      </ng-template>
+                    </div>
+                </div>
+                <ng-container *ngIf="newPerson.showAnotherFields">
+                    <div class="form-group mb-2">
+                        <mat-label>Nombres</mat-label>
+                        <div class="input-group">
+                            <input type="text" name="personFirstName" [disabled]="newPerson.recordFounded" class="form-control input-control text-uppercase"
+                            (keypress)="onlyLetters($event)" [(ngModel)]="newPerson.personFirstName" placeholder="" required placeholder="Ingrese sus nombres">
+                        </div>
+                    </div>
+                    <div class="form-row mb-2">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <mat-label>Apellido Paterno</mat-label>
+                                <div class="input-group">
+                                    <input type="text" name="personMiddleName" [disabled]="newPerson.recordFounded" class="form-control input-control text-uppercase"
+                                    (keypress)="onlyLetters($event)" [(ngModel)]="newPerson.personMiddleName" placeholder="" required placeholder="Ingrese su apellido">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <mat-label>Apellido Materno</mat-label>
+                                <div class="input-group">
+                                    <input type="text" name="personLastName" [disabled]="newPerson.recordFounded" class="form-control input-control text-uppercase"
+                                    (keypress)="onlyLetters($event)" [(ngModel)]="newPerson.personLastName" placeholder="" required placeholder="Ingrese su apellido">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+                <div class="form-row">
+                  <div class="col-8">
+                      <div class="form-group">
+                          <mat-label>Correo electrónico</mat-label>
+                          <div class="input-group">
+                              <input type="email" class="form-control input-control" [(ngModel)]="newPerson.personEmail" name="email" placeholder="INGRESE SU CORREO ELECTRÓNICO" required>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-4">
+                      <div class="form-group">
+                          <mat-label>Teléfono</mat-label>
+                          <div class="input-group">
+                              <input type="text" (keypress)="onlyNumbers($event)" class="form-control input-control" [(ngModel)]="newPerson.numberPhone"
+                              name="numberPhone" [minlength]="6" [maxlength]="10" placeholder="9XXXXXXXXX" required>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="form-group">
+                      <mat-label>Fecha de nacimiento</mat-label>
+                      <div class="input-group">
+                        <input class="form-control input-control" type="date" #birthday matInput (click)="birthday.showPicker()"
+                        [(ngModel)]="newPerson.birthday" name="birthday" required [max]="now">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="form-group">
+                      <mat-label>Tipo de sangre</mat-label>
+                      <div class="input-group">
+                        <select class="form-control input-control" required [(ngModel)]="newPerson.bloodTypeID" name="bloodTypeID">
+                          <option [ngValue]="undefined">--SELECCIONE--</option>
+                          <option *ngFor="let item of bloodTypes" [ngValue]="item.bloodTypeID">{{item.bloodTypeDesc}}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-4">
+                    <div class="form-group">
+                      <mat-label>Sexo</mat-label>
+                      <div class="input-group">
+                        <select class="form-control input-control" required [(ngModel)]="newPerson.sexID" name="sexID">
+                          <option [ngValue]="undefined">--SELECCIONE--</option>
+                          <option *ngFor="let item of sexList" [ngValue]="item.sexID">{{item.sexDesc}}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-4">
+                    <div class="form-group">
+                      <mat-label>Estado Civil</mat-label>
+                      <div class="input-group">
+                        <select class="form-control input-control" required [(ngModel)]="newPerson.civilStatusID" name="civilStatusID">
+                          <option [ngValue]="undefined">--SELECCIONE--</option>
+                          <option *ngFor="let i of civilStatuses" [ngValue]="i.civilStatusID">{{i.civilStatusDesc}}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-4">
+                    <div class="form-group">
+                      <mat-label>País</mat-label>
+                      <div class="input-group">
+                        <select class="form-control input-control" [(ngModel)]="newPerson.countryID" name="countryID" required
+                        (change)="validateCountry();">
+                          <option [ngValue]="undefined">--SELECCIONE--</option>
+                          <option *ngFor="let i of countries" [ngValue]="i.countryID">{{i.countryName}}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <ng-container *ngIf="newPerson.countryID === 59">
+                    <div class="col-4">
+                      <div class="form-group">
+                        <mat-label>Provincia</mat-label>
+                        <div class="input-group">
+                          <select class="form-control input-control" required [(ngModel)]="newPerson.provinceID" name="provinceID" (change)="getCantons()">
+                            <option [ngValue]="undefined" selected>--SELECCIONE--</option>
+                            <option *ngFor="let i of provinces" [ngValue]="i.provinceID">{{i.provinceName}}</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-4">
+                      <div class="form-group">
+                        <mat-label>Cantón</mat-label>
+                        <div class="input-group">
+                          <select class="form-control input-control" required [(ngModel)]="newPerson.cantonID" name="cantonID" (change)="getParish()">
+                            <option [ngValue]="undefined" selected>--SELECCIONE--</option>
+                            <option *ngFor="let i of cantons" [ngValue]="i.cantonID">{{i.cantonName}}</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-4">
+                      <div class="form-group">
+                        <mat-label>Parroquia</mat-label>
+                        <div class="input-group">
+                          <select class="form-control input-control" required [(ngModel)]="newPerson.parishID" name="parishID">
+                            <option [ngValue]="undefined" selected>--SELECCIONE--</option>
+                            <option *ngFor="let item of parishes" [value]="item.parishID">{{item.parishName}}</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </ng-container>
+                  <div class="col-12">
+                    <div class="form-group">
+                      <mat-label>Dirección</mat-label>
+                      <div class="input-group">
+                        <input type="text" class="form-control input-control" [(ngModel)]="newPerson.addressDesc" name="addressDesc" placeholder="INGRESE SU DIRECCIÓN" required>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group mb-2">
+                    <mat-label>Elija su Institución de Procedencia</mat-label>
+                    <select class="form-control bg-white rounded-pill" name="institutionID" #institutionID [(ngModel)]="newPerson.institutionID"
+                      (change)="selectInstitution()" style="border-radius: 15px;">
+                        <option [ngValue]="undefined">--SELECCIONE--</option>
+                        <option *ngFor="let f of collegesFiltereds" [ngValue]="f.institutionID">
+                          {{f.collegeName | uppercase}}
+                        </option>
+                    </select>
+                    <span class="text-info float-right" *ngIf="newPerson.collegeTypeID && !newPerson.collegeName"><i class="fa fa-exclamation-triangle mr-1"></i>Si tu colegio no esta en la lista. Comunicate con ITCA.</span>
+                    <span class="text-info float-right" *ngIf="newPerson.error || !newPerson.collegeName">{{newPerson.message | uppercase}}</span>
+                </div>
+                <div class="form-group mt-3">
+                    <div class="checkbox checkbox-primary pull-left p-t-0">
+                        <input id="checkbox-signup" type="checkbox" name="accept" [(ngModel)]="newPerson.accept" style="background-color: #fff !important;" class="filled-in chk-col-light-blue">
+                        <label for="checkbox-signup" class="text-white shadow-pimary-color font-title">
+                          Acepta
+                          <a style="color: rgba(0, 0, 0, 0.733);" class="text-info" href="assets/Doc/terminos_y_condiciones_ITCA.pdf" target="_blank">
+                            Terminos y Condiciones
+                          </a>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group text-center m-t-20">
+                    <div class="col-xs-12">
+                        <button mat-raised-button (click)="toContinue()" [disabled]="signUpSurveyForm.invalid || !newPerson.accept || newPerson.error || !newPerson.institutionID" type="button" class="width" style="background-color: white; padding: 25px; border-radius: 25px; border: 3px solid #9ac12d;">
+                            CONTINUAR
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group m-b-0">
+                    <div class="col-sm-12 text-center text-white">
+                        <h5 class="text-white">¿Ya tiene una cuenta creada?
+                          <a (click)="logout();" class="text-info m-l-5 font-title shadow-pimary-color" style="cursor: pointer;">
+                            Iniciar Sesión
+                          </a>
+                        </h5>
+                    </div>
+                </div>
+              <div class="text-center m-5 p-5 d-block d-md-none">
+                <img src="assets/images/Encuba_ITCA.png" alt="Firma" class="img-fluid firma-img">
+              </div>
+            </form>
+        </div>
+    </div>
+</div>

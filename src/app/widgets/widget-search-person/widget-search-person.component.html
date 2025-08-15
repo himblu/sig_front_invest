@@ -1,0 +1,43 @@
+<div class="form-row">
+  <div class="col-8 p-3">
+    <strong class="display-4 font-nm">
+      <i class="fa fa-search mr-1"></i>Buscar persona
+    </strong>
+  </div>
+  <div class="col-4 text-right p-3">
+    <button class="btn btn-light text-danger btn-sm btn-pill" (click)="cancel()">
+      <i class="fa fa-times mr-1"></i>Cancelar
+    </button>
+  </div>
+  <div class="col-3"></div>
+  <div class="col-6 text-center">
+    <input type="text" name="text" #param [(ngModel)]="text" placeholder="BUSCAR PERSONA POR TEXTO" class="form-control text-uppercase">
+  </div>
+  <div class="col-3"></div>
+  <div class="col-3"></div>
+  <div class="col-6 mt-2 mb-3 text-center">
+    <button class="btn btn-sm bg-primary-color" (click)="searchPerson()" [disabled]="!text">
+      <i class="fa fa-search mr-1"></i>Buscar
+    </button>
+  </div>
+  <div class="col-3"></div>
+  <div class="col-12" *ngIf="results.length">
+    <ul class="list-group mb-3">
+      <li class="li list-group-item p-2" *ngFor="let r of results">
+        <div class="form-row">
+          <div class="col-6 pt-1">
+            {{r.PersonFullName | uppercase}}
+          </div>
+          <div class="col-3 text-center pt-1">
+            @{{r.userName}}
+          </div>
+          <div class="col-3 text-right">
+            <button class="btn btn-sm btn-light text-primary-color" (click)="selectPerson(r)">
+              <i class="fa fa-circle mr-1"></i>Elegir
+            </button>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>

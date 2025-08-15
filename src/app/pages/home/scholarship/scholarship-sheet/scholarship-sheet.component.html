@@ -1,0 +1,421 @@
+<div class="animated fadeIn fast">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-3">
+                <div class="card-header bg-primary-color p-2">
+                    <div class="row">
+                        <div class="col-9">
+                            <i class="fa fa-person mr-1"></i>Datos Básicos del Estudiante
+                        </div>
+                        <div class="col-3 text-right">
+                            <button class="btn btn-sm btn-light" (click)="saveScholarshipSheet()">
+                                <i class="fa fa-save mr-1"></i>Guardar cambios
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-2">
+                    <p class="card-text"><strong>Nombre:</strong> {{socioeconomicSheet.student.fullName | uppercase}}</p>
+                    <p class="card-text"><strong>Escuela:</strong> {{socioeconomicSheet.student.schoolName | uppercase}}</p>
+                    <p class="card-text"><strong>Carrera:</strong> {{socioeconomicSheet.student.careerName | uppercase}}</p>
+                    <p class="card-text"><strong>Malla Curricular:</strong> {{socioeconomicSheet.student.studyPlanDesc | uppercase}}</p>
+                    <p class="card-text"><strong>Modalidad:</strong> {{socioeconomicSheet.student.modalityName | uppercase}}</p>
+                    <p class="card-text"><strong>Sección:</strong> {{(socioeconomicSheet.student.workingDayDesc || '-') | uppercase}}</p>
+                </div>
+            </div>
+            <div class="alert alert-danger text-center mt-2 mb-3" *ngIf="!socioeconomicSheet.student.hasSocioEconomicSheet">
+                <i class="fa fa-warning fa-3x"></i><br>No tienes información en la Ficha Socioeconomica. <br>Solo la información que puedes rellenar será de la Sección de <strong>Datos de Vivienda</strong>.
+            </div>
+            <div class="card mb-2" *ngFor="let s of sections">
+                <div class="card-header bg-primary-color">
+                    <i class="{{s.icon}} mr-1"></i>{{s.name}}
+                </div>
+                <div class="card-body p-2">
+                    <div class="row" *ngIf="s.id === 0">
+                        <div class="col-12">
+                            <div class="card mb-3">
+                                <div class="card-header bg-primary-color p-2">
+                                    <i class="fa fa-info mr-1"></i>Información General
+                                </div>
+                                <div class="card-body p-2">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <small>Periodo Académico</small>
+                                            <input type="text" name="periodID" [(ngModel)]="socioeconomicSheet.student.periodName" readonly class="form-control form-control-sm">
+                                        </div>
+                                        <div class="col-6">
+                                            <small>Beca</small>
+                                            <input type="text" readonly name="scholarshipName" [(ngModel)]="socioeconomicSheet.scholarship.main.scholarshipName" class="form-control form-control-sm">
+                                        </div>
+                                        <!-- <div class="col-12">
+                                            <small></small>
+                                            <input type="text" name="" [(ngModel)]="socioeconomicSheet.scholarship.main." class="form-control form-control-sm">
+                                        </div>
+                                        <div class="col-6">
+                                            <small></small>
+                                            <input type="text" name="" [(ngModel)]="socioeconomicSheet.scholarship.main." class="form-control form-control-sm">
+                                        </div>
+                                        <div class="col-6">
+                                            <small></small>
+                                            <input type="text" name="" [(ngModel)]="socioeconomicSheet.scholarship.main." class="form-control form-control-sm">
+                                        </div>
+                                        <div class="col-12">
+                                            <small></small>
+                                            <input type="text" name="" [(ngModel)]="socioeconomicSheet.scholarship.main." class="form-control form-control-sm">
+                                        </div>
+                                        <div class="col-12">
+                                            <small></small>
+                                            <input type="text" name="" [(ngModel)]="socioeconomicSheet.scholarship.main." class="form-control form-control-sm">
+                                        </div> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <form #addressForm="ngForm">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-primary-color p-2">
+                                        <div class="row">
+                                            <div class="col-9 pt-1">
+                                                <i class="fa fa-home mr-1"></i>Datos de la Vivienda
+                                            </div>
+                                            <div class="col-3 text-right">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body p-2">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <small>Estado de la vivienda</small>
+                                                <select required name="statusHomeType" [(ngModel)]="currentAssign.addressInfo.statusHomeType" class="form-control form-control-sm" [disabled]="!userIsStudent">
+                                                    <option [ngValue]="undefined">--SELECCIONE--</option>
+                                                    <option *ngFor="let h of statusHomeTypes" [ngValue]="h.code">{{h.name | uppercase}}</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-4">
+                                                <small>Zona de Vivieda</small>
+                                                <select required name="addressZone" [(ngModel)]="currentAssign.addressInfo.addressZone" class="form-control form-control-sm" [disabled]="!userIsStudent">
+                                                    <option [ngValue]="undefined">--SELECCIONE--</option>
+                                                    <option *ngFor="let h of homeZones" [ngValue]="h.code">{{h.name | uppercase}}</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-4">
+                                                <small>Número de Dormitorios</small>
+                                                <input type="text" required (keypress)="onlyNumbers($event)" name="bedroomsNumber" [(ngModel)]="currentAssign.addressInfo.bedroomsNumber" class="form-control form-control-sm" [disabled]="!userIsStudent">
+                                            </div>
+                                            <div class="col-4">
+                                                <small>Tipo de Movilidad</small>
+                                                <select required name="mobilityType" [(ngModel)]="currentAssign.addressInfo.mobilityType" class="form-control form-control-sm" [disabled]="!userIsStudent">
+                                                    <option [ngValue]="undefined">--SELECCIONE--</option>
+                                                    <option *ngFor="let m of mobilityTypes" [ngValue]="m.code">{{m.name | uppercase}}</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-4">
+                                                <small>Tipo de Piso de la Casa</small>
+                                                <div class="form-check" *ngFor="let t of houseFloorTypes; let i = index">
+                                                    <input class="form-check-input" type="checkbox" name="{{t.type}}-{{t.code}}-{{i}}" [(ngModel)]="t.selected" id="{{t.type}}-{{t.code}}" [disabled]="!userIsStudent">
+                                                    <label class="form-check-label" for="{{t.type}}-{{t.code}}">
+                                                      {{t.name}}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <small>Bienes</small>
+                                                <div class="form-check" *ngFor="let t of goods; let i = index">
+                                                    <input class="form-check-input" type="checkbox" name="{{t.type}}-{{t.code}}-{{i}}" [(ngModel)]="t.selected" id="{{t.type}}-{{t.code}}"  [disabled]="!userIsStudent">
+                                                    <label class="form-check-label" for="{{t.type}}-{{t.code}}">
+                                                      {{t.name}}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <small>Bienes Tecnológicos</small>
+                                                <div class="form-check" *ngFor="let t of technologicalGoods; let i = index">
+                                                    <input class="form-check-input" type="checkbox" name="{{t.type}}-{{t.code}}-{{i}}" [(ngModel)]="t.selected" id="{{t.type}}-{{t.code}}" [disabled]="!userIsStudent">
+                                                    <label class="form-check-label" for="{{t.type}}-{{t.code}}">
+                                                      {{t.name}}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <small>Coordenada de la Casa</small>
+                                                <input type="text" required name="houseCoordinates" [(ngModel)]="currentAssign.addressInfo.houseCoordinates" class="form-control form-control-sm" [disabled]="!userIsStudent">
+                                            </div>
+                                            <div class="col-4">
+                                                <small>Recibe bono de Desarrollo Humano</small>
+                                                <select required name="receiveBonus" [(ngModel)]="currentAssign.humanDevelopment.receiveBonus" class="form-control form-control-sm" [disabled]="!userIsStudent">
+                                                    <option [ngValue]="undefined">--SELECCIONE--</option>
+                                                    <option *ngFor="let m of mainOptions" [ngValue]="m.code">{{m.name | uppercase}}</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-8"></div>
+                                          <div class="col-12">
+                                            <small>Motivo de la Beca</small>
+                                            <textarea
+                                              required
+                                              name="reason"
+                                              [(ngModel)]="currentAssign.reason"
+                                              (ngModelChange)="validateReason()"
+                                              class="form-control form-control-sm text-area"
+                                              [disabled]="!userIsStudent"
+                                              [ngClass]="{'is-invalid': reasonHasError}"
+                                              rows="3"
+                                            ></textarea>
+                                            <div *ngIf="reasonHasError" class="invalid-feedback">
+                                              El motivo no puede tener más de 40 palabras.
+                                            </div>
+                                          </div>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-12">
+                            <div class="card mb-3">
+                                <div class="card-header bg-primary-color p-2">
+                                    <div class="row">
+                                        <div class="col-7">
+                                            <i class="fa fa-person mr-1"></i>Datos de Jefe de Hogar
+                                        </div>
+                                        <div class="col-5 text-right">
+                                            <!-- <button class="btn btn-sm btn-light text-primary-color" (click)="">
+                                                <i class="fa fa-plus mr-1"></i>Agregar Jefe de Familia al Estudiante
+                                            </button> -->
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body text-center" *ngIf="!socioeconomicSheet.groupFamily.length">
+                                    <i class="fa fa-times fa-3x"></i> <br>
+                                    No se tienen registrado ningun pariente registrado.
+                                </div>
+                                <ul class="list-group" *ngIf="socioeconomicSheet.groupFamily.length">
+                                    <li class="list-group-item" *ngFor="let g of socioeconomicSheet.groupFamily">
+                                        <div class="row">
+                                            <div class="col-9">
+                                                <strong>{{g.fullNameParents}}</strong> <br>
+                                                <span class="badge bg-primary-color mr-1">{{g.relationName}}</span><small>{{g.professionName}} | {{g.academicInstructionName}}</small>
+                                            </div>
+                                            <div class="col-3 text-right">
+                                                <button class="btn" [ngClass]="{'bg-light': !g.selected, 'bg-primary-color': g.selected}"  [disabled]="!userIsStudent" (click)="toggleSelectHouseHold(g)">
+                                                    <i class="fa mr-1" [ngClass]="{'fa-circle-o': !g.selected, 'fa-circle text-success': g.selected}"></i>
+                                                    {{g.selected ? 'QUITAR JEFE DE FAMILIA' : 'ASIGNAR JEFE DE FAMILIA'}}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="card mb-3">
+                                <div class="card-header bg-primary-color p-2">
+                                    <i class="fa fa-bill mr-1"></i>Datos Laborales del Estudiante
+                                </div>
+                                <div class="card-body p-2">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <small>Nombre del Lugar donde Trabaja</small>
+                                            <input type="text" name="jobExperienceInstitution" [(ngModel)]="socioeconomicSheet.scholarship.work.jobExperienceInstitution" disabled class="form-control form-control-sm">
+                                        </div>
+                                        <div class="col-6">
+                                            <small>Cargo que ocupa</small>
+                                            <input type="text" name="jobExperiencePosition" [(ngModel)]="socioeconomicSheet.scholarship.work.jobExperiencePosition" disabled class="form-control form-control-sm">
+                                        </div>
+                                        <div class="col-4">
+                                            <small>Tiempo de Servicio</small>
+                                            <input type="text" name="serviceTime" [(ngModel)]="socioeconomicSheet.scholarship.work.serviceTime" disabled class="form-control form-control-sm">
+                                        </div>
+                                        <div class="col-4">
+                                            <small>Horario de Trabajo</small>
+                                            <input type="text" name="workingHours" [(ngModel)]="socioeconomicSheet.scholarship.work.workingHours" disabled class="form-control form-control-sm">
+                                        </div>
+                                        <div class="col-4">
+                                            <small>Telefono de Trabajo</small>
+                                            <input type="text" name="jobExperiencePhone" [(ngModel)]="socioeconomicSheet.scholarship.work.jobExperiencePhone" disabled class="form-control form-control-sm">
+                                        </div>
+                                        <div class="col-12">
+                                            <small>Dirección de Trabajo</small>
+                                            <input type="text" name="jobExperienceAddress" [(ngModel)]="socioeconomicSheet.scholarship.work.jobExperienceAddress" disabled class="form-control form-control-sm">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" *ngIf="s.id === 1">
+                        <!-- <div class="col-12 text-right">
+                            <button class="btn btn-sm bg-primary-color" (click)="addItem()">
+                                <i class="fa fa-plus mr-1"></i>Nuevo Familiar
+                            </button>
+                        </div> -->
+                        <div class="col-12 text-center" *ngIf="!socioeconomicSheet.groupFamily.length">
+                            <i class="fa fa-times fa-2x"></i><br>
+                            No se tiene registrado ningun familiar.
+                        </div>
+                        <div class="col-12">
+                            <div class="card mb-3" *ngIf="socioeconomicSheet.groupFamily.length">
+                                <div class="card-header">Grupo Familiar</div>
+                                <ul class="list-group">
+                                    <li class="list-group-item" *ngFor="let g of socioeconomicSheet.groupFamily">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <strong>{{g.fullNameParents}}</strong> <br>
+                                                <span class="badge bg-primary-color mr-1">{{g.relationName}}</span><small>{{g.professionName || 'SIN PROFESIÓN'}} | {{g.academicInstructionName || 'SIN GRADO DE INSTRUCCIÓN'}}</small>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="card" *ngIf="socioeconomicSheet.groupDependency.length">
+                                <div class="card-header">Grupo Familiar que Depende del mismo ingreso</div>
+                                <ul class="list-group">
+                                    <li class="list-group-item" *ngFor="let g of socioeconomicSheet.groupDependency">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <strong>{{g.fullNameDependency}}</strong> <br>
+                                                <span class="badge bg-primary-color mr-1">{{g.relationNameDependency}}</span><small>{{g.professionNameDependency}} | {{g.civilStatusDependency}}</small>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- <table class="table table-sm table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Nombre Completo</th>
+                                        <th class="text-center">Parentesco</th>
+                                        <th class="text-center">Instrucción</th>
+                                        <th class="text-center">Ocupación</th>
+                                        <th class="text-center">Institución</th>
+                                        <th class="text-center">Nivel de Estudios</th>
+                                        <th class="text-center">Ingresos</th>
+                                        <th class="text-center">Gastos</th>
+                                        <th class="text-center"><br></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let p of socioeconomicSheet.groupFamily; let i = index">
+                                        <td contenteditable="true" [textContent]="p.fullName" (input)="p.fullName=$any($event).target.value"></td>
+                                        <td>
+                                            <select name="relationID-{{i}}" [(ngModel)]="p.relationID" class="form-control form-control-sm borderless">
+                                                <option [ngValue]="undefined">--SELECCIONE--</option>
+                                                <option *ngFor="let r of groupFamily" [ngValue]="r.relationID">{{r.relationName | uppercase}}</option>
+                                            </select>
+                                        </td>
+                                        <td contenteditable="true" [textContent]="p.instruction" (input)="p.instruction=$any($event).target.value"></td>
+                                        <td>
+                                            <select name="occupationID-{{i}}" [(ngModel)]="p.occupationID" class="form-control form-control-sm borderless">
+                                                <option [ngValue]="undefined">--SELECCIONE--</option>
+                                                <option *ngFor="let o of occupations" [ngValue]="o.occupationID">{{o.occupationName | uppercase}}</option>
+                                            </select>
+                                        </td>
+                                        <td contenteditable="true" [textContent]="p.institutionName" (input)="p.institutionName=$any($event).target.value"></td>
+                                        <td contenteditable="true" [textContent]="p.educationalLevel" (input)="p.educationalLevel=$any($event).target.value"></td>
+                                        <td contenteditable="true" [textContent]="p.incomes" (input)="p.incomes=$any($event).target.value"></td>
+                                        <td contenteditable="true" [textContent]="p.expenses" (input)="p.expenses=$any($event).target.value"></td>
+                                        <td class="text-right">
+                                            <button class="btn btn-sm btn-light danger" (click)="deleteItem(p)">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table> -->
+                        </div>
+                    </div>
+                    <div class="row" *ngIf="s.id === 2">
+                        <!-- <div class="col-6 text-right">
+                            <button class="btn btn-sm bg-primary-color" (click)="addItem('incomes')">
+                                <i class="fa fa-plus mr-1"></i>Nuevo Ingreso
+                            </button>
+                        </div> -->
+                        <div class="col-6 text-center" *ngIf="!socioeconomicSheet.economic.incomes.length">
+                            <i class="fa fa-times fa-2x"></i> <br>
+                            No tienes registrado ningun ingreso.
+                        </div>
+                        <div class="col-6" *ngIf="socioeconomicSheet.economic.incomes.length">
+                            <strong class="text-primary-color">INGRESOS</strong>
+                            <table class="table table-sm table-bordered">
+                                <thead>
+                                    <tr class="bg-primary-color">
+                                        <th class="text-center">Descripción</th>
+                                        <th class="text-center">Monto</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let i of socioeconomicSheet.economic.incomes">
+                                        <td [textContent]="i.incomeEgressName" (input)="i.description=$any($event).target.value"></td>
+                                        <td class="text-right">{{i.mount | number:'1.2-2'}}</td>
+                                    </tr>
+                                    <tr class="table-info">
+                                        <td>TOTAL</td>
+                                        <td class="text-right">{{socioeconomicSheet.economic.totalIncomes | number:'1.2-2'}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- <div class="col-6 text-right">
+                            <button class="btn btn-sm bg-primary-color text-right" (click)="addItem('expenses')">
+                                <i class="fa fa-plus mr-1"></i>Nuevo Egreso
+                            </button>
+                        </div> -->
+                        <div class="col-6 mt-3 text-center" *ngIf="!socioeconomicSheet.economic.expenses.length">
+                            <i class="fa fa-times fa-2x"></i> <br>
+                            No tienes registrado ningun egreso.
+                        </div>
+                        <div class="col-6" *ngIf="socioeconomicSheet.economic.expenses.length">
+                            <strong class="text-primary-color">EGRESOS</strong>
+                            <table class="table table-sm table-bordered">
+                                <thead>
+                                    <tr class="bg-primary-color">
+                                        <th class="text-center">Descripción</th>
+                                        <th class="text-center">Monto</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let i of socioeconomicSheet.economic.expenses">
+                                        <td [textContent]="i.incomeEgressName" (input)="i.description=$any($event).target.value"></td>
+                                        <td class="text-right">{{i.mount | number:'1.2-2'}}</td>
+                                    </tr>
+                                    <tr class="table-info">
+                                        <td>TOTAL</td>
+                                        <td class="text-right">{{socioeconomicSheet.economic.totalExpenses | number:'1.2-2'}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!--
+<div class="modal fade" id="familyModal" tabindex="-1" aria-labelledby="familyModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="familyModalLabel">Editar Información Familiar</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="familyMembers" class="form-label">Número de Miembros</label>
+                        <input type="number" class="form-control" id="familyMembers" value="5">
+                    </div>
+                    <div class="mb-3">
+                        <label for="familyIncome" class="form-label">Ingresos Familiares</label>
+                        <input type="number" class="form-control" id="familyIncome" value="1500">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div> -->

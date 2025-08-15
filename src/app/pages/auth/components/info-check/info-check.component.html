@@ -1,0 +1,37 @@
+<mat-dialog-content>
+  <div class="card">
+    <div class="card-body row">
+      <div class="col-12">
+        <h2>Declaración de veracidad de la información.</h2>
+        <h3>
+          Declaro que la información proporcionada es verídica, completa y acorde a los requerimientos solicitados.
+          <br>
+          Entiendo y acepto que, en caso de detectar datos falsos o incompletos, no se generarán ni enviarán las credenciales de acceso (usuario y contraseña).
+        </h3>
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <div class="d-flex no-block w-100 justify-content-between">
+    <div class="pl-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="warn"
+        [mat-dialog-close]="false">
+        Rechazar
+      </button>
+    </div>
+    <div class="pr-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="primary"
+        [mat-dialog-close]="true">
+        Aceptar
+      </button>
+    </div>
+  </div>
+</mat-dialog-actions>

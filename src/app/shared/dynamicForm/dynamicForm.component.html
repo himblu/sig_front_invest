@@ -1,0 +1,63 @@
+<div class="card-header text-primary-color">
+  <i class="fa fa-cog mr-1"></i>
+  <strong>Especifique configuración necesaria</strong> <br>
+  Seleccione los parametros necesarios para configurar los instrumentos correspondientes.
+</div>
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <mat-card class="p-3">
+    <div *ngFor="let row of formConfig" class="row">
+      <div *ngFor="let field of row.fields" class="col-md-3">
+
+        <!-- 📌 Campo de selección (select) -->
+        <mat-form-field
+          appearance="outline"
+          class="full-width"
+          [ngClass]="{'error-border': form.get(field.key)?.invalid && form.get(field.key)?.touched}"
+          *ngIf="field.type === 'select'">
+          <mat-label>{{ field.label }} </mat-label>
+          <mat-select
+            [formControlName]="field.key"
+            [disabled]="form.get(field.key)?.disabled"
+            (selectionChange)="emitChange(field.sendForm)">
+            <mat-option *ngFor="let option of options[field.key]" [value]="option.value">
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="form.get(field.key)?.hasError('required')">
+            Este campo es requerido.
+          </mat-error>
+        </mat-form-field>
+
+        <!-- 📌 Campo de texto y número -->
+        <mat-form-field
+          appearance="outline"
+          class="full-width"
+          *ngIf="field.type === 'text' || field.type === 'number'">
+          <mat-label>{{ field.label }}</mat-label>
+          <input
+            matInput
+            [type]="field.type"
+            [formControlName]="field.key"
+            [disabled]="form.get(field.key)?.disabled"
+            (input)="emitChange(field.sendForm)"
+            (blur)="markTouched(field.key)">
+          <mat-error *ngIf="form.get(field.key)?.hasError('required')">
+            Este campo es requerido.
+          </mat-error>
+          <mat-error *ngIf="form.get(field.key)?.hasError('min')">
+            Debe ser mayor a {{ form.get(field.key)?.errors?.['min']?.min }}
+          </mat-error>
+          <mat-error *ngIf="form.get(field.key)?.hasError('max')">
+            Debe ser menor a {{ form.get(field.key)?.errors?.['max']?.max }}
+          </mat-error>
+        </mat-form-field>
+
+      </div>
+    </div>
+    <div class="col-3">
+      <button class="download-button" (click)="getReport()" [disabled]="!this.form.valid" mat-raised-button>
+        <i class="fa fa-file-pdf-o" aria-hidden="true" style="color: red;"></i>&nbsp;Descargar PDF
+      </button>
+    </div>
+  </mat-card>
+</form>

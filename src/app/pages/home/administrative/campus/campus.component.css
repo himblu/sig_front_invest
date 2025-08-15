@@ -1,0 +1,32 @@
+div.col-md-3{
+    padding: 0 !important;
+    width: 20px !important;
+
+}
+div.components-button-menu.small-title {
+    font-size: 50px;
+  }
+
+.bt{
+	height: 100px;
+	width: 300px;
+	font-size: 30px;
+}
+
+.my-primary{
+  color: #3f51b5 ;
+  background-color: white;
+	outline-color: #3f51b5;
+	outline: 2px solid
+}
+
+.my-primary:focus, .my-primary:hover{
+  color: white ;
+  background-color: #3f51b5;
+	outline-color: white;
+	outline: 2px solid
+}
+
+.card-body{
+	background-color: rgb(221, 238, 243);
+}

@@ -1,0 +1,54 @@
+
+<div style="display: flex; justify-content: end; align-items: center; background: transparent;" class="p-2">
+  <mat-icon style="cursor: pointer; color: red;" [matDialogClose]="false" class="red-icon" matRipple>close</mat-icon>
+</div>
+
+<mat-dialog-content>
+  <div *ngIf="isLoading; else form">
+    <spinner-loader></spinner-loader>
+  </div>
+
+  <ng-template #form>
+    <div class="row animated fadeIn fast">
+      <p>Proyecto Específicos</p>
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <ng-container>
+              <div class="row">
+                <div class="col-12">
+                  <table class="table">
+                    <thead style="background-color: #004899; color: white;">
+                      <tr>
+                        <th>#</th>
+                        <th>Proyecto Específico</th>
+                        <th style="text-align: center;">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody style="color: black;">
+                      <tr *ngFor="let item of microProjects; let i=index;">
+                        <td>{{i+1}}</td>
+                        <td>{{item.projectPracInformativeDesc}}</td>
+                        <td style="text-align: center;">
+                          <a style="cursor: pointer;"
+                            matTooltipPosition="above"
+                            matTooltip="Descargar Excel"
+                            (click)="getProjectPracticesExcelContent(item);">
+                            <i style="color: green;" class="fa fa-file-excel-o" aria-hidden="true"></i>
+                          </a>
+                        </td>
+                      </tr>
+                      <tr *ngIf="microProjects.length === 0">
+                        <td colspan="3" style="text-align: center;">No existen registros</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</mat-dialog-content>

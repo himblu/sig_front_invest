@@ -1,0 +1,127 @@
+<style>
+  .progress-bar {
+    transition: width 0.6s ease;
+  }
+  .sticky-header {
+    position: -webkit-sticky; /* For Safari */
+    position: sticky;
+    top: 150;
+    /* background-color: #f8f9fa; */
+    z-index: 1;
+  }
+</style>
+<div class="animated fadeIn fast">
+  <div class="form-row">
+    <div class="col-md-3">
+      <div class="card mb-3">
+        <div class="card-header p-2">
+          <i class="fa fa-filter mr-1"></i>Filtros
+        </div>
+        <div class="card-body p-2">
+          <div class="form-group">
+            <select class="form-control" *ngIf="teacherTypes.length > 1" name="teacherID" [(ngModel)]="filter.teacherID">
+              <option [ngValue]="undefined">--SELECCIONE ID DOCENTE--</option>
+              <option *ngFor="let s of teacherTypes" [ngValue]="s.teacherID">{{(s.positionName + ' - ID: ' + s.teacherID) | uppercase}}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <select class="form-control" name="periodID" [(ngModel)]="filter.periodID">
+              <option [ngValue]="undefined">--SELECCIONE PERIODO--</option>
+              <option *ngFor="let s of periods" [ngValue]="s.periodID">{{s.periodID}}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <select class="form-control" name="sectionStatusID" [(ngModel)]="filter.sectionStatusID">
+              <option [ngValue]="undefined">--TODOS--</option>
+              <option *ngFor="let s of sectionStatuses" [ngValue]="s.sectionStatusID">{{s.sectionStatusDesc | uppercase}}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <input name="text" [(ngModel)]="filter.text" type="text" class="form-control text-uppercase" placeholder="BUSCAR POR TEXTO">
+          </div>
+          <button type="button" class="btn bg-primary-color btn-block" (click)="searchCoursesOfTeacher()">
+            <i class="fa fa-search mr-1"></i>Buscar
+          </button>
+        </div>
+      </div>
+
+      <!-- Botón para descargar resultados -->
+      <div class="text-center mb-3">
+
+      </div>
+    </div>
+
+    <!-- Lista de Resultados -->
+     <div class="col-9 text-center text-secondary" *ngIf="!searched">
+      <i class="fa fa-search fa-3x"></i><br>
+      Realiza la busqueda de tus cursos.
+     </div>
+    <div class="col-md-9" *ngIf="searched">
+      <div class="card">
+        <div class="card-header">
+          <i class="fa fa-list-alt mr-1"></i>Resultados
+        </div>
+        <div class="card-body text-center text-secondary" *ngIf="!results.length">
+          <i class="fa fa-times text-danger fa-3x"></i><br>
+          No se tienen registros.
+        </div>
+        <div class="card-body" *ngIf="results.length">
+          <div class="form-row">
+            <div class="col-4"></div>
+            <div class="col-4"></div>
+            <div class="col-4 text-right">
+              <button type="button" class="btn bg-primary-color btn-sm" (click)="downloadResults()">
+                <i class="fa fa-download mr-1"></i>Descargar Resultados
+              </button>
+            </div>
+            <div class="col-12 mt-3">
+              <div class="table-responsive font-nm" style="min-height: 400px; overflow: auto;">
+                <table class="table table-sm table-bordered">
+                  <thead>
+                    <tr class="bg-primary-color">
+                      <th style="vertical-align: middle;">Periodo</th>
+                      <th style="vertical-align: middle;">Inicio - Fin</th>
+                      <th style="vertical-align: middle;">Curso</th>
+                      <th style="vertical-align: middle;">Modalidad</th>
+                      <th style="vertical-align: middle;">Sección</th>
+                      <th style="vertical-align: middle;">Horas</th>
+                      <th style="vertical-align: middle;">Estudiantes</th>
+                      <th style="vertical-align: middle;">Estado</th>
+                      <th style="vertical-align: middle;">Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let r of results">
+                      <td style="vertical-align: middle;">{{r.periodID}}</td>
+                      <td style="vertical-align: middle;">{{r.startDate}} - {{r.endDate}}</td>
+                      <td style="vertical-align: middle;">{{r.courseName | uppercase}}</td>
+                      <td style="vertical-align: middle;">{{r.classSessionDesc | uppercase}}</td>
+                      <td style="vertical-align: middle;">{{r.classSectionNumber}}</td>
+                      <td style="vertical-align: middle;">{{r.hours || '-'}}</td>
+                      <td style="vertical-align: middle;">{{r.enroll}}</td>
+                      <td style="vertical-align: middle;">{{r.sectionStatusDesc | uppercase}}</td>
+                      <td style="vertical-align: middle;" class="text-right">
+                        <div class="btn-group" dropdown>
+                          <button id="button-animated" dropdownToggle type="button" class="btn btn-sm bg-primary-color dropdown-toggle"
+                                  aria-controls="dropdown-animated">
+                            <i class="fa fa-list mr-1"></i><span class="caret"></span>
+                          </button>
+                          <ul id="dropdown-animated" *dropdownMenu class="dropdown-menu dropdown-menu-right"
+                              role="menu" aria-labelledby="button-animated">
+                            <li style="cursor: pointer;" role="menuitem" (click)="getEnrollmentReport(r)"><a class="dropdown-item">Matriculados (PDF)</a></li>
+                            <li style="cursor: pointer;" role="menuitem" *ngIf="r.flgGrade === 1"><a class="dropdown-item" (click)="viewDetailCourse(r)">Calificaciones</a></li>
+                            <li style="cursor: pointer;" role="menuitem" (click)="getScheduleCourseReport(r)"><a class="dropdown-item">Horario (PDF)</a></li>
+                          </ul>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

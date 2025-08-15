@@ -1,0 +1,15 @@
+::ng-deep .mdc-dialog__title {
+  padding: 0;
+}
+
+::ng-deep .mat-mdc-dialog-actions {
+  justify-content: space-between;
+}
+
+::ng-deep .mdc-dialog__content {
+  padding-top: 0 !important;
+}
+
+.white-icon {
+  color: white;
+}

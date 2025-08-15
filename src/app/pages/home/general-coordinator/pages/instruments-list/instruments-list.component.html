@@ -1,0 +1,206 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<div class="row animated fadeIn fast" *ngIf="!charging">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="row pl-2 pr-2" [formGroup]="filtersForm">
+          <div class="col-4">
+            <mat-form-field appearance="outline">
+              <mat-label>Periodo Académico</mat-label>
+              <mat-select formControlName="periodID" (selectionChange)="getInstruments();">
+                <mat-option *ngFor="let item of periods" [value]="item.periodID">{{item.periodName}}</mat-option>
+              </mat-select>
+              <mat-error>Campo requerido</mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-4">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Seguimiento / Evaluación</mat-label>
+              <mat-select formControlName="evaluationOrFollowup" (selectionChange)="getInstruments();">
+                <mat-option [value]="0">SEGUIMIENTO DOCENTE</mat-option>
+                <mat-option [value]="1">EVALUACIÓN DOCENTE</mat-option>
+              </mat-select>
+              <mat-error>Campo requerido</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row" *ngIf="!evaluationInstruments?.length; else content;">
+          <div class="col-12" style="text-align: center;">
+            <h3>Sin resultados</h3>
+          </div>
+        </div>
+        <ng-template #content>
+          <div class="row">
+            <div class="col-4">
+              <div class="card">
+                <div class="card-body" style="height: 250px; overflow: auto;">
+                  <table class="table">
+                    <thead>
+                      <td colspan="4"><small>Instrumentos de evaluación</small></td>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of evaluationInstruments; let i=index;"
+                        [ngClass]="{'target': isClickedEvaluations === i}">
+                        <td>{{i+1}}</td>
+                        <td style="cursor: pointer;" (click)="getScalesEquivalence(item, i); getEvaluationInstruments(item); getInstrumentContents(item, i); clearRegisters();">{{item.evaluationName}}</td>
+                        <td>
+                          <div style="width: 5px;" *ngIf="isClickedEvaluations === i">
+                            <i class="fa fa-arrow-right" aria-hidden="true" style="color: green;"></i>
+                          </div>
+                        </td>
+                        <td>
+                          <div style="width: 5px;">
+                            <i class="fa fa-pencil" aria-hidden="true"
+                            style="color: blue; cursor: pointer;"
+                            (click)="updateEvaluationInstruments(item);"
+                            ></i>
+                          </div>
+                        </td>
+                        <td>
+                          <div style="width: 5px;">
+                            <i class="fa fa-file-pdf-o" aria-hidden="true"
+                            style="color: red; cursor: pointer;"
+                            (click)="getPdfBaseEvaluationInstrument(item);"
+                            ></i>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="card" *ngIf="scalesEquivalence.length">
+                <div class="card-body" style="height: 250px; overflow: auto;">
+                  <table class="table">
+                    <thead>
+                      <td colspan="4"><small>Escalas de evaluación</small></td>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of scalesEquivalence; let i=index;">
+                        <td>{{item.equivalence}}</td>
+                        <td>{{item.equivalenceDesc}}</td>
+                        <td>
+                          <div style="width: 5px;" *ngIf="isClickedScales === i">
+                            <i class="fa fa-arrow-right" aria-hidden="true" style="color: green;"></i>
+                          </div>
+                        </td>
+                        <td>
+                          <div style="width: 5px;">
+                            <i class="fa fa-pencil" aria-hidden="true"
+                            style="color: blue; cursor: pointer;"
+                            (click)="updateEvaluationScales(item);"
+                            ></i>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="card" *ngIf="instrumentContents.length">
+                <div class="card-body" style="height: 250px; overflow: auto;">
+                  <table class="table">
+                    <thead>
+                      <td colspan="4"><small>Contenidos</small></td>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of instrumentContents; let i=index;" style="cursor: pointer;"
+                        [ngClass]="{'target': isClickedContents === i}">
+                        <td>{{i+1}}</td>
+                        <td (click)="getAssessmentContents(item, i); getInstrumentsQuestions(item);">{{item.contentDesc}}</td>
+                        <td>
+                          <div style="width: 5px;" *ngIf="isClickedContents === i">
+                            <i class="fa fa-arrow-right" aria-hidden="true" style="color: green;"></i>
+                          </div>
+                        </td>
+                        <td>
+                          <div style="width: 5px;">
+                            <i class="fa fa-pencil" aria-hidden="true"
+                            style="color: blue; cursor: pointer;"
+                            (click)="updateInstrumentContents(item);"
+                            ></i>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <br>
+          <div class="row">
+            <div class="col-4">
+              <div class="card" *ngIf="assessmentContents.length">
+                <div class="card-body" style="height: 250px; overflow: auto;">
+                  <table class="table">
+                    <thead>
+                      <td colspan="4"><small>Valoraciones</small></td>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of assessmentContents; let i=index;">
+                        <td>{{i+1}}</td>
+                        <td>{{item.assessmentDesc}}</td>
+                        <td>
+                          <div style="width: 5px;" *ngIf="isClickedInstruments === i">
+                            <i class="fa fa-arrow-right" aria-hidden="true" style="color: green;"></i>
+                          </div>
+                        </td>
+                        <td>
+                          <div style="width: 5px;">
+                            <i class="fa fa-pencil" aria-hidden="true"
+                            style="color: blue; cursor: pointer;"
+                            (click)="updateAssessmentContent(item);"
+                            ></i>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="card" *ngIf="instrumentQuestions.length">
+                <div class="card-body" style="height: 250px; overflow: auto;">
+                  <table class="table">
+                    <thead>
+                      <td colspan="3"><small>Preguntas</small></td>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of instrumentQuestions; let i=index;">
+                        <td>{{item.orderNumber}}</td>
+                        <td>{{item.questionsDesc}}</td>
+                        <td>
+                          <div style="width: 5px;">
+                            <i class="fa fa-pencil" aria-hidden="true"
+                            style="color: blue; cursor: pointer;"
+                            (click)="updateQuestions(item);"
+                            ></i>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>

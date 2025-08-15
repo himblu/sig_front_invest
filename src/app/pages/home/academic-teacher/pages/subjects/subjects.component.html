@@ -1,0 +1,217 @@
+<div class="row animated fadeIn fast" *ngIf="isLoading">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">isLoading</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<div class="row animated fadeIn fast" *ngIf="!isLoading">
+  <div class="col-md-12">
+    <h2 style="text-align: center; color: #004899;">LISTA DE ASIGNATURAS</h2>
+    <div class="card" style="border-radius: 15px;">
+      <div class="card-body">
+        <section [formGroup]="filtersForm">
+          <div class="row pl-3 pr-3">
+            <div class="col-3">
+              <mat-form-field appearance="outline">
+                <mat-label>Periodo Académico</mat-label>
+                <mat-select formControlName="periodID" (selectionChange)="getSubjectsList();" placeholder="Filtrar por Periodo Académico">
+                  <mat-option *ngFor="let period of periods;" [value]="period.periodID">
+                    {{ period.periodName }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-3">
+              <mat-form-field appearance="outline">
+                <mat-label>Buscar por asignatura o carrera</mat-label>
+                <input matInput formControlName="search" autocomplete="off">
+                <mat-icon matSuffix>search</mat-icon>
+              </mat-form-field>
+            </div>
+            <div class="col-2">
+              <button
+                class="download-button"
+                mat-raised-button
+                matTooltipPosition="above"
+                matTooltip="Descargar PDF"
+                (click)="getGeneralReportPdf()">
+                Reporte General
+                <mat-icon class="red-icon">picture_as_pdf</mat-icon>
+              </button>
+            </div>
+            <div class="col-2">
+              <button
+                class="download-button"
+                mat-raised-button
+                matTooltipPosition="above"
+                matTooltip="Descargar Excel"
+                (click)="getGeneralReportExcel()">
+                Reporte General
+                <mat-icon class="green-icon">description</mat-icon>
+              </button>
+            </div>
+          </div>
+        </section>
+        <div class="table-responsive">
+          <div id="add-contact" class="modal fade in" tabindex="-1" role="dialog"
+               aria-labelledby="myModalLabel" aria-hidden="true">
+          </div>
+          <table id="demo-foo-addrow"
+                 class="table m-t-0 table-hover no-wrap contact-list footable-loaded footable"
+                 data-page-size="5">
+            <thead style="background-color: #004899; color: white;">
+            <tr>
+              <th class="footable-sortable">
+                Código de Asignatura
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Asignatura
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Modalidad
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Módulo
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Carrera
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Créditos/Horas
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Horas Docencia
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Nivel
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Paralelo
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable" style="text-align: center;">
+                Acciones
+                <span class="footable-sort-indicator"></span>
+              </th>
+            </tr>
+            </thead>
+            <tbody style="color: black;">
+            <tr *ngFor="let item of subjectsList" class="footable-even" style="text-transform: uppercase;">
+              <td>{{item.codeCourse}}</td>
+              <td>{{item.courseName}}</td>
+              <td>{{item.modalityName}}</td>
+              <td>{{item.classModuleDesc}}</td>
+              <td>{{item.careerName}}</td>
+              <td>{{item.credits}} / {{item.hours}}</td>
+              <td>{{item.hoursTeachContact}}</td>
+              <td>{{item.cycleDesc}}</td>
+              <td>{{item.parallelCode}}</td>
+              <td style="text-align: center; cursor: pointer;" (click)="$event.stopPropagation();" [matMenuTriggerFor]="menu" #menuTrigger="matMenuTrigger">
+                <a type="button"
+                    matTooltipPosition="above"
+                    matTooltip="Acciones"
+                    (click)="$event.stopPropagation();"
+                    [matMenuTriggerFor]="menu"
+                    #menuTrigger="matMenuTrigger"
+                    style="cursor: pointer; color: blue;"><i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                </a>
+                <mat-menu [xPosition]="'before'" #menu="matMenu">
+                  <button mat-menu-item [matMenuTriggerFor]="students">
+                    <mat-icon style="color: #004899; font-size: larger;">assignment_ind</mat-icon>
+                    <span class="item">Listado de estudiantes</span>
+                  </button>
+                  <button mat-menu-item [matMenuTriggerFor]="grades">
+                    <mat-icon style="color: #004899; font-size: larger;">chrome_reader_mode</mat-icon>
+                    <span class="item">Reporte de notas</span>
+                  </button>
+                  <button mat-menu-item (click)="openFile('api/academic-reports/students-payment/'+item.periodID+'/'+item.classSectionNumber)">
+                    <mat-icon style="color: red; font-size: larger;">assignment</mat-icon>
+                    <span class="item">Reporte de cuotas</span>
+                  </button>
+                  <button mat-menu-item (click)="sendSubject(item)">
+                    <mat-icon style="font-size: larger;">exit_to_app</mat-icon>
+                    <span class="item">Opciones</span>
+                  </button>
+                  <button mat-menu-item (click)="pea(item)">
+                    <mat-icon style="font-size: larger;">book</mat-icon>
+                    <span class="item">PEA</span>
+                  </button>
+                  <button mat-menu-item [matMenuTriggerFor]="gap">
+                    <mat-icon style="color: #004899; font-size: larger;">assignment</mat-icon>
+                    <span class="item">GAP</span>
+                  </button>
+                  <button mat-menu-item [matMenuTriggerFor]="informs">
+                    <mat-icon style="color: green; font-size: larger;">assignment</mat-icon>
+                    <span class="item">Informes</span>
+                  </button>
+                </mat-menu>
+                <mat-menu #students="matMenu">
+                  <button type="button" mat-menu-item (click)="getStudentsPdf(item)">
+                    <i style="color: red;" class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                    &nbsp;Descargar PDF
+                  </button>
+                  <button type="button" mat-menu-item (click)="getStudentsExcel(item)">
+                    <i style="color: green;" class="fa fa-file-excel-o" aria-hidden="true"></i>
+                    &nbsp;Descargar Excel
+                  </button>
+                </mat-menu>
+                <mat-menu #grades="matMenu">
+                  <button type="button" mat-menu-item (click)="getGradesPdf(item)">
+                    <i style="color: red;" class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                    &nbsp;Descargar PDF
+                  </button>
+                  <button type="button" mat-menu-item (click)="getGradesExcel(item)">
+                    <i style="color: green;" class="fa fa-file-excel-o" aria-hidden="true"></i>
+                    &nbsp;Descargar Excel
+                  </button>
+                </mat-menu>
+                <mat-menu #gap="matMenu">
+                  <ng-container *ngFor="let unit of units">
+                    <button type="button" mat-menu-item (click)="getGapReportPdf(unit, item)">
+                      <i style="color: red;" class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                      &nbsp;{{unit.unitName}}
+                    </button>
+                  </ng-container>
+                </mat-menu>
+                <mat-menu #informs="matMenu">
+                  <button type="button"
+                    mat-menu-item
+                    (click)="getGeneralReport('evaluation-instruments-report/report-partial-course', item);">
+                    <i style="color: green; cursor: pointer;" class="fa fa-file-excel-o" aria-hidden="true"></i>
+                    &nbsp;<span>Informe parcial de asignatura</span>
+                  </button>
+                  <button type="button"
+                    mat-menu-item
+                    (click)="getGeneralReport('evaluation-instruments-report/report-final-course', item);">
+                    <i style="color: green; cursor: pointer;" class="fa fa-file-excel-o" aria-hidden="true"></i>
+                    &nbsp;<span>Informe final de asignatura</span>
+                  </button>
+                </mat-menu>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <mat-paginator
+          #paginator
+          [length]="length"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions"
+          (page)="pageEvent = getSubjectsListPaginator($event)">
+        </mat-paginator>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,195 @@
+<div class="row animated fadeIn fast" *ngIf="cargando">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+<div class="row animated fadeIn fast" *ngIf="!cargando">
+  <div class="col-md-12">
+    <h1 style="text-align: center; color: #004899;">PARCIALES</h1>
+    <div class="card" style="border-radius: 15px;">
+      <div class="card-body">
+        <div class="row pl-3 pr-3">
+          <div class="col-4">
+            <section [formGroup]="filtersForm">
+              <mat-form-field appearance="outline">
+                <mat-label>Periodo Académico</mat-label>
+                <mat-select formControlName="periodID" placeholder="Filtrar por Periodo Académico">
+                  <mat-option *ngFor="let period of periods;" [value]="period.periodID" (click)="getPartials(period.periodID)">
+                    {{ period.periodName }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </section>
+          </div>
+          <div class="col-md-7" style="text-align: right;">
+            <button type="button" mat-raised-button class="styleButton_sml" style="width: 162px;" data-toggle="modal" data-target="#partialModal" (click)="openModal(0)">
+              Nuevo parcial
+            </button>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table id="demo-foo-addrow"
+            class="table m-t-0 table-hover no-wrap contact-list footable-loaded footable"
+            data-page-size="5">
+            <thead style="background-color: #004899; color: white;">
+            <tr>
+              <th class="footable-sortable">
+                Periodo académico
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Parcial
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Porcentaje
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable" style="text-align: center;">
+                Acciones
+                <span class="footable-sort-indicator"></span>
+              </th>
+            </tr>
+            </thead>
+            <tbody style="color: black;">
+            <tr *ngFor="let item of partialList; let i=index;" class="footable-even" style="text-transform: uppercase;">
+              <td>{{item.periodName}}</td>
+              <td>{{item.evaluationName}}</td>
+              <td *ngIf="item.componentID !== aux">{{item.percentage}}</td>
+              <td *ngIf="item.componentID === aux">
+                <form [formGroup]="filtersForm">
+                  <mat-form-field style="width: 75px;" appearance="outline">
+                    <input matInput style="width: 50px;" type="text" formControlName="percentage">
+                    <mat-error></mat-error>
+                  </mat-form-field>
+                </form>
+              </td>
+              <td style="text-align: center;">
+                <a type="button"
+                    *ngIf="item.componentID !== aux"
+                    matTooltipPosition="above"
+                    matTooltip="Editar"
+                    style="cursor: pointer; color: green;"><i class="fa fa-pencil" aria-hidden="true" (click)="updateInTable(item)"></i>
+                </a>
+                <a type="button"
+                    *ngIf="item.componentID === aux"
+                    matTooltipPosition="above"
+                    matTooltip="Guardar"
+                    style="cursor: pointer; color: blue;"><i class="fa fa-floppy-o" aria-hidden="true" (click)="updatePartial(item)"></i>
+                </a>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <components-button-arrow [actual]="actualPartial" [totalPage]="totalPagePartial" [count]="countPartial" (result)="changePagePartial($event)"></components-button-arrow>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="partialModal" tabindex="-1" aria-labelledby="partialModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="height: 40px;">
+        <div class="col-md-5">
+          <h3 class="modal-title" id="partialModalLabel"><br>{{title}}</h3>
+        </div>
+        <div class="col-md-1">
+          <button type="button" id="btn_close" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-body">
+              <form [formGroup]="partialForm"
+                autocomplete="off"
+                (submit)="onSubmitPartial()">
+                <div formArrayName="components">
+                  <div class="row" [formGroupName]="0">
+                    <div class="col-md-5" style="text-align: center;">
+                      <h3>Parcial 1: </h3>
+                    </div>
+                    <div class="col-md-4">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Parcial 1</mat-label>
+                        <input type="number" matInput formControlName="percentage" #firstPartial (blur)="calculate(+firstPartial.value, +secondPartial.value, +exam.value)">
+                        <mat-icon matSuffix>percent</mat-icon>
+                        <mat-error>
+                          Campo <strong>requerido</strong>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                  <div class="row" [formGroupName]="1">
+                    <div class="col-md-5" style="text-align: center;">
+                      <h3>Parcial 2: </h3>
+                    </div>
+                    <div class="col-md-4">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Parcial 2</mat-label>
+                        <input type="number" matInput formControlName="percentage" #secondPartial (blur)="calculate(+firstPartial.value, +secondPartial.value, +exam.value)">
+                        <mat-icon matSuffix>percent</mat-icon>
+                        <mat-error>
+                          Campo <strong>requerido</strong>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                  <div class="row" [formGroupName]="2">
+                    <div class="col-md-5" style="text-align: center;">
+                      <h3>Exámen de logros: </h3>
+                    </div>
+                    <div class="col-md-4">
+                      <mat-form-field class="width" appearance="outline">
+                        <mat-label>Exámen</mat-label>
+                        <input type="number" matInput formControlName="percentage" #exam (blur)="calculate(+firstPartial.value, +secondPartial.value, +exam.value)">
+                        <mat-icon matSuffix>percent</mat-icon>
+                        <mat-error>
+                          Campo <strong>requerido</strong>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-5" style="text-align: center;">
+                    <h3>Total: </h3>
+                  </div>
+                  <div class="col-md-4">
+                    <mat-form-field class="width" appearance="outline">
+                      <mat-label>Total</mat-label>
+                      <input min="100" max="100" readonly="true" type="number" matInput formControlName="count">
+                      <mat-icon matSuffix>percent</mat-icon>
+                      <mat-error>
+                        Requerido <strong>100%</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-3">
+                    <button type="submit" mat-raised-button class="styleButton_sml" style="width: 100px;">
+                      Guardar
+                    </button>
+                  </div>
+                  <div class="col-md-3">
+                    <button type="button" mat-raised-button class="styleButton_gray" style="width: 100px;" data-dismiss="modal" #modalClose>Cerrar</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

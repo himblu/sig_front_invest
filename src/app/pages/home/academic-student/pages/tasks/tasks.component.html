@@ -1,0 +1,149 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+<div *ngIf="!charging">
+  <div class="card" *ngIf="event">
+    <div class="card-body">
+      <div class="row pl-3">
+        <div class="col-md-6"><h3 style="color: black">{{event.courseName}}</h3></div>
+      </div>
+      <div class="row pl-4">
+        <div class="row col-md-6">
+          <div class="col-12">
+            <div style="color: #004899;">Nombre: <label style="color: black">{{event.taskName}}</label></div>
+          </div>
+          <div class="col-12">
+            <div style="color: #004899;">Descripción: <label style="color: black">{{event.taskDesc}}</label></div>
+          </div>
+          <div class="col-12">
+            <div style="color: #004899;">Recursos:
+              <a style="cursor: pointer;"
+                *ngIf="event.fileTeache"
+                [href]="url+'/'+event.fileTeache"
+                target="_blank"
+                matTooltip="Archivo de apoyo"
+                matTooltipClass="blue-tooltip">
+                <i class="fa fa-file" aria-hidden="true"></i>
+              </a>&nbsp;
+              <a style="cursor: pointer;"
+                *ngIf="event.urlWeb"
+                [href]="event.urlWeb"
+                target="_blank"
+                matTooltip="Link de apoyo"
+                matTooltipClass="blue-tooltip">
+                <i class="fa fa-external-link" aria-hidden="true"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="row col-md-6">
+          <div class="col-12" style="color: #004899;">
+            <div style="color: #004899;">Intentos: <label style="color: black">{{event.attempts}}</label></div>
+          </div>
+          <div class="col-12">
+            <div style="color: #004899;">Fecha de asignación: <label style="color: black">{{event.startDate | date: 'dd/MM/yyyy, HH:mm' :'UTC'}}</label></div>
+          </div>
+          <div class="col-12">
+            <div style="color: #004899;">Fecha de entrega: <label style="color: black">{{event.endDate | date: 'dd/MM/yyyy, HH:mm' :'UTC'}}</label></div>
+          </div>
+          <div class="col-12" *ngIf="event.urlFile">
+            <div style="color: #004899;">Visualizar tarea:
+              <a style="cursor: pointer;"
+                [href]="url+'/'+event.urlFile"
+                target="_blank"
+                matTooltip="Click"
+                matTooltipClass="blue-tooltip">
+                <i class="fa fa-file" aria-hidden="true"></i>
+              </a>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+<br>
+<div *ngIf="!charging">
+  <div class="card" *ngIf="event">
+    <ng-container *ngIf="(currentDate | date: 'yMMdd, HH:mm') >=  (event.startDate | date: 'yMMdd, HH:mm' :'UTC')">
+      <div class="card-body" *ngIf="event.submitted < event.attempts && (currentDate | date: 'yMMdd, HH:mm') < (event.endDate | date: 'yMMdd, HH:mm' :'UTC')">
+        <form [formGroup]="tasksForm"
+          autocomplete="off"
+          (submit)="onSubmitTasks()">
+          <div class="row pl-3">
+            <div class="col-md-2" style="text-align: left;">
+              <h3>Descripción: </h3>
+            </div>
+            <div class="col-md-8">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Descripción</mat-label>
+                <textarea type="text" matInput formControlName="descriptionTask"></textarea>
+                <mat-error>
+                  Campo <strong>requerido</strong>
+                </mat-error>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="row pl-3">
+            <div class="col-md-2" style="text-align: left;">
+              <h4>Actividad: </h4>
+            </div>
+            <div class="col-md-7">
+              <div style="border: 1px solid rgba(0, 0, 0, 0.315); width: 380px; height: 40px; display: flex;">
+                <input
+                  style="cursor: pointer;"
+                  class="mt-1 mb-1 ml-1 align-self-center"
+                  #input
+                  type="file"
+                  (change)="onChangeInput(input.files, input);"
+                  type="file" [accept]="('application/pdf, image/*, .doc, .docx, .xlsx, .xls')">
+              </div>
+            </div>
+            <div class="col-md-1">
+              <button type="submit" mat-raised-button class="styleButton_sml" style="width: 100px;">
+                Guardar
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </ng-container>
+    <div class="card-body" style="text-align: center;" *ngIf="event.submitted === event.attempts">
+      <h1>Ha superado el número de intentos permitido.</h1>
+    </div>
+    <div class="card-body" style="text-align: center;" *ngIf="(currentDate | date: 'yMMdd, HH:mm') > (event.endDate | date: 'yMMdd, HH:mm' :'UTC')">
+      <h1>Ha superado el tiempo límite.</h1>
+    </div>
+    <div class="card-body" style="text-align: center;" *ngIf="(currentDate | date: 'yMMdd, HH:mm') <  (event.startDate | date: 'yMMdd, HH:mm' :'UTC')">
+      <h1>Actividad no disponible hasta el {{event.startDate | date: 'dd/MM/yyyy, HH:mm' :'UTC'}}.</h1>
+    </div>
+  </div>
+  <br>
+  <ng-container *ngIf="(currentDate | date: 'yMMdd, HH:mm') >=  (event.startDate | date: 'yMMdd, HH:mm' :'UTC')">
+    <div class="card" *ngIf="event">
+      <div class="card-body">
+        <div class="row pl-3">
+          <div class="col-md-2" style="text-align: left;">
+            <h3>Calificación:</h3>
+          </div>
+          <div class="col-7">
+            <h3>{{event.grade}}</h3>
+          </div>
+        </div>
+        <div class="row pl-3">
+            <div class="col-md-2" style="text-align: left;">
+              <h3>Retroalimentación:</h3>
+            </div>
+            <div class="col-7">
+              <h3>{{event.commentary}}</h3>
+            </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

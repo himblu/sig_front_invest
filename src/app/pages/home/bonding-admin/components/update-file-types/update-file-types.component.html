@@ -1,0 +1,61 @@
+
+<div style="display: flex; justify-content: end; align-items: center; background: transparent;" class="p-2">
+  <mat-icon style="cursor: pointer; color: red;" [matDialogClose]="false" class="red-icon" matRipple>close</mat-icon>
+</div>
+
+<mat-dialog-content>
+  <div *ngIf="isLoading; else form">
+    <spinner-loader></spinner-loader>
+  </div>
+
+  <ng-template #form>
+      <div class="card">
+        <div class="card-body">
+          <div class="row" [formGroup]="filesForm">
+            <div class="col-6">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Tipo de archivo</mat-label>
+                <mat-select formControlName="fileTypeID" placeholder="Seleccione">
+                  <mat-option *ngFor="let item of fileTypes | FilterTypes" [value]="item.fileTypeID"
+                    (onSelectionChange)="selectedFile($event, item);">
+                    {{item.fileTypeName}}
+                  </mat-option>
+                </mat-select>
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-6">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Nombre</mat-label>
+                <textarea matInput formControlName="fileTypeName" cdkTextareaAutosize></textarea>
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+      </div>
+  </ng-template>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <div class="d-flex no-block w-100 justify-content-between">
+    <div class="pl-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="warn"
+        [mat-dialog-close]="false">
+        Cerrar
+      </button>
+    </div>
+    <div class="pr-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="primary"
+        (click)="onSubmit();">
+        Guardar
+      </button>
+    </div>
+  </div>
+</mat-dialog-actions>

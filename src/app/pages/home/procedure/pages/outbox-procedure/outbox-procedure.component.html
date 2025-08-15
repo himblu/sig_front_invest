@@ -1,0 +1,485 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+<div *ngIf="!charging">
+  <div class="card">
+    <div class="card-body">
+      <div class="row pl-2 pr-2" *ngIf="filtersForm.get('documentManagementID').value !== 0; else new;">
+        <ng-container [formGroup]="filtersForm">
+          <ng-container *ngIf="currentRol === ROL.ADMIN || currentRol === ROL.REGISTRY">
+            <div class="col-4">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Periodo académico</mat-label>
+                <mat-select formControlName="periodID" (selectionChange)="getCareersByPeriod($event.value);">
+                  <mat-option *ngFor="let item of periods" [value]="item.periodID">{{item.periodName}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-4">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Para</mat-label>
+                <mat-select formControlName="typeRolID" (selectionChange)="getDocumentManagementByTypeRolID();">
+                  <mat-option *ngFor="let item of types" [value]="item.typeRolID">{{item.typeRolDesc}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-4">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Lista de trámite</mat-label>
+                <mat-select formControlName="documentManagementID">
+                  <mat-option [value]="0" (click)="currentProcedure= null;">Nuevo</mat-option>
+                  <mat-option *ngFor="let item of procedures" [value]="item.documentManagementID"
+                  (onSelectionChange)="selectedProcedure($event, item); getPersonsToMessage($event.isUserInput);">
+                    {{item.documentManagementSubject}} <small>({{item.areaName}})</small>
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-4">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Seleccionar usuarios</mat-label>
+                <input type="text"
+                  matInput
+                  #search
+                  (input)="getUsersByTypeRolID(search.value)"
+                  [matAutocomplete]="auto"
+                  [readonly]="filtersForm.get('typeRolID').value === ''">
+                  <mat-autocomplete #auto="matAutocomplete">
+                    <mat-option *ngFor="let item of users" [value]="item.userID">
+                      <div (click)="optionClicked($event, item)">
+                        <mat-checkbox color="primary" [checked]="item.selected" (change)="toggleSelection(item)" (click)="$event.stopPropagation()">
+                          {{item.personFullName}}
+                        </mat-checkbox>
+                      </div>
+                    </mat-option>
+                  </mat-autocomplete>
+              </mat-form-field>
+            </div>
+            <!-- <div class="col-4" *ngIf="filtersForm.get('documentManagementID').value === 0">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Departamentos</mat-label>
+                <mat-select formControlName="areaID" (selectionChange)="getPersonsToMessage(true);">
+                  <mat-option *ngFor="let item of departmentsByRol" [value]="item.areaID">{{item.areaName}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div> -->
+            <ng-container *ngIf="currentProcedure?.areaID !== 0">
+              <div class="col-4">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Carrera</mat-label>
+                  <mat-select formControlName="careerID" (selectionChange)="getModalities($event.value); getStudyPlan($event.value); getPersonsToMessage(true);">
+                    <mat-option [value]="0">Todos</mat-option>
+                    <mat-option *ngFor="let item of careers" [value]="item.careerID" (onSelectionChange)="getSelectedSchool($event, item);">{{item.careerName}}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-4">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Malla curricular</mat-label>
+                  <mat-select formControlName="studyPlanID" (selectionChange)="getPersonsToMessage(true);">
+                    <mat-option [value]="0">Todos</mat-option>
+                    <mat-option *ngFor="let item of studyPlan" [value]="item.studyPlanID">{{item.studyPlanDesc}}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-4">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Modalidad</mat-label>
+                  <mat-select formControlName="modalityID" (selectionChange)="getPersonsToMessage(true);">
+                    <mat-option [value]="0">Todos</mat-option>
+                    <mat-option *ngFor="let item of modalities" [value]="item.modalityID">{{item.modalityName}}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-4">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Nivel</mat-label>
+                  <mat-select formControlName="cycleID" (selectionChange)="getParallels($event.value); getPersonsToMessage(true);">
+                    <mat-option [value]="0">Todos</mat-option>
+                    <mat-option *ngFor="let item of cycles" [value]="item.cycleID">{{item.cycleDesc}}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-4">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Paralelo</mat-label>
+                  <mat-select formControlName="parallelCode" (selectionChange)="getPersonsToMessage(true);">
+                    <mat-option value="">Todos</mat-option>
+                    <mat-option *ngFor="let item of parallels" [value]="item.parallelCode">{{item.parallelCode}}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </ng-container>
+            <div class="col-4">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Nro de receptores</mat-label>
+                <input type="text" matInput readonly="true" [value]="sendingNumber">
+              </mat-form-field>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="currentRol !== ROL.ADMIN">
+            <ng-container *ngIf="currentRol !== ROL.REGISTRY">
+              <div class="col-4">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Lista de trámite</mat-label>
+                  <mat-select formControlName="documentManagementID">
+                    <mat-option [value]="0" (click)="currentProcedure= null;">Nuevo</mat-option>
+                    <mat-option *ngFor="let item of procedures" [value]="item.documentManagementID" (onSelectionChange)="selectedProcedure($event, item);">
+                      {{item.documentManagementSubject}} <small>({{item.areaName}})</small>
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-4" *ngIf="currentRol !== ROL.TEACHER; else teacherSearch;">
+                <mat-form-field class="width" appearance="outline" *ngIf="currentProcedure?.search !== true && filtersForm.get('documentManagementID').value !== 0">
+                  <mat-label>Departamentos</mat-label>
+                  <input type="text" readonly="true" matInput [value]="departments" matTooltip="{{departments}}">
+                </mat-form-field>
+                <mat-form-field class="width" appearance="outline" *ngIf="currentProcedure?.search === true">
+                  <mat-label>Seleccionar usuarios</mat-label>
+                    <input type="text"
+                      matInput
+                      #search
+                      (input)="getUsersByRolID(search.value, currentProcedure.userSearchRolID)"
+                      [matAutocomplete]="auto">
+                      <mat-autocomplete #auto="matAutocomplete">
+                        <mat-option *ngFor="let item of users" [value]="item.userID">
+                          <div (click)="optionClicked($event, item)">
+                            <mat-checkbox color="primary" [checked]="item.selected" (change)="toggleSelection(item)" (click)="$event.stopPropagation()">
+                              {{item.personFullName}}
+                            </mat-checkbox>
+                          </div>
+                        </mat-option>
+                      </mat-autocomplete>
+                </mat-form-field>
+              </div>
+              <ng-template #teacherSearch>
+                <div class="col-4">
+                  <mat-form-field class="width" appearance="outline">
+                    <mat-label>Seleccionar usuarios</mat-label>
+                    <input type="text"
+                      matInput
+                      #search
+                      (input)="getUsersByAreaID(search.value)"
+                      [matAutocomplete]="auto">
+                      <mat-autocomplete #auto="matAutocomplete">
+                        <mat-option *ngFor="let item of users" [value]="item.userID">
+                          <div (click)="optionClicked($event, item)">
+                            <mat-checkbox color="primary" [checked]="item.selected" (change)="toggleSelection(item)" (click)="$event.stopPropagation()">
+                              {{item.personFullName}}
+                            </mat-checkbox>
+                          </div>
+                        </mat-option>
+                      </mat-autocomplete>
+                  </mat-form-field>
+                </div>
+              </ng-template>
+            </ng-container>
+          </ng-container>
+          <ng-container *ngIf="currentRol === ROL.ADMIN || currentRol === ROL.TEACHER || currentRol === ROL.REGISTRY; else cc;">
+            <div class="col-4">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>CC</mat-label>
+                <mat-select formControlName="cc">
+                  <mat-option *ngFor="let item of types" [value]="item.typeRolID">{{item.typeRolDesc}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-4">
+              <mat-form-field class="width" appearance="outline">
+              <mat-label>Seleccionar usuarios</mat-label>
+              <input type="text"
+                matInput
+                #searchCC
+                (input)="getCCUsersByTypeRol(searchCC.value)"
+                [matAutocomplete]="auto"
+                [readonly]="filtersForm.get('cc').value === null">
+                <mat-autocomplete #auto="matAutocomplete">
+                  <mat-option *ngFor="let item of usersCC" [value]="item.userID">
+                    <div (click)="optionCCClicked($event, item)">
+                      <mat-checkbox color="primary" [checked]="item.selected" (change)="toggleCCSelection(item)" (click)="$event.stopPropagation()">
+                        {{item.personFullName}}
+                      </mat-checkbox>
+                    </div>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+            <div class="col-4">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>CC receptores</mat-label>
+                <input type="text" matInput readonly="true" [value]="sendingCCNumber">
+              </mat-form-field>
+            </div>
+          </ng-container>
+          <ng-template #cc>
+            <div class="col-4">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>CC</mat-label>
+                <mat-select formControlName="detailArea" multiple>
+                  <mat-option *ngFor="let item of areas" [value]="item.areaID"
+                  [disabled]="filtersForm.get('areaID').value === item.areaID">
+                    {{item.areaName}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </ng-template>
+        </ng-container>
+        <ng-container [formGroup]="messageForm">
+          <div class="col-8">
+            <mat-label>Archivos: </mat-label>
+            <input type="file"
+              multiple
+              #input
+              style="cursor: pointer;"
+              autocomplete="off"
+              (change)="onChangeInput(input.files, input);"
+              accept="application/pdf">
+          </div>
+          <div class="col-12">
+            <hr>
+          </div>
+          <div class="col-12">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Asunto</mat-label>
+              <input type="text" matInput formControlName="subject" [readonly]="filtersForm.get('documentManagementID')?.value !== 0">
+            </mat-form-field>
+          </div>
+          <div class="col-6">
+            <div class="row">
+              <ng-container [formGroup]="replaceForm" *ngIf="filtersForm.get('documentManagementID')?.value > 0">
+                <div class="col-6" *ngIf="messageDescription.includes('(-nombres-)');">
+                  <mat-form-field class="width" appearance="outline">
+                    <mat-label>Nombres</mat-label>
+                    <input type="text" matInput formControlName="names" placeholder="(-nombres-)"
+                    [readonly]="replaceForm.get('status').value === 1">
+                  </mat-form-field>
+                </div>
+                <div class="col-6" *ngIf="messageDescription.includes('(-documento-)');">
+                  <mat-form-field class="width" appearance="outline">
+                    <mat-label>Nro Documento</mat-label>
+                    <input type="text" matInput formControlName="identification" placeholder="(-documento-)"
+                    [readonly]="replaceForm.get('status').value === 1">
+                  </mat-form-field>
+                </div>
+                <div class="col-6" *ngIf="messageDescription.includes('(-fecha-)');">
+                  <mat-form-field class="width" appearance="outline">
+                    <mat-label>Fecha</mat-label>
+                    <input type="date" #date matInput formControlName="date" placeholder="(-fecha-)" (click)="date.showPicker()"
+                    [readonly]="replaceForm.get('status').value === 1">
+                    <mat-icon style="cursor: pointer;" matSuffix (click)="date.showPicker()">calendar_month</mat-icon>
+                  </mat-form-field>
+                </div>
+                <div class="col-6" *ngIf="messageDescription.includes('(-escuela-)');">
+                  <mat-form-field class="width" appearance="outline">
+                    <mat-label>Escuela</mat-label>
+                    <input type="text" matInput formControlName="school" placeholder="(-escuela-)"
+                    [readonly]="replaceForm.get('status').value === 1">
+                  </mat-form-field>
+                </div>
+                <div class="col-6" *ngIf="messageDescription.includes('(-carrera-)');">
+                  <mat-form-field class="width" appearance="outline">
+                    <mat-label>Carrera</mat-label>
+                    <input type="text" matInput formControlName="career" placeholder="(-carrera-)"
+                    [readonly]="replaceForm.get('status').value === 1">
+                  </mat-form-field>
+                </div>
+                <div class="col-6" *ngIf="messageDescription.includes('(-modalidad-)');">
+                  <mat-form-field class="width" appearance="outline">
+                    <mat-label>Modalidad</mat-label>
+                    <input type="text" matInput formControlName="modality" placeholder="(-modalidad-)"
+                    [readonly]="replaceForm.get('status').value === 1">
+                  </mat-form-field>
+                </div>
+                <div class="col-6" *ngIf="messageDescription.includes('(-curso-)');">
+                  <mat-form-field class="width" appearance="outline">
+                    <mat-label>Curso</mat-label>
+                    <input type="text" matInput formControlName="grade" placeholder="(-curso-)"
+                    [readonly]="replaceForm.get('status').value === 1">
+                  </mat-form-field>
+                </div>
+                <div class="col-6" *ngIf="messageDescription.includes('(-paralelo-)');">
+                  <mat-form-field class="width" appearance="outline">
+                    <mat-label>Paralelo</mat-label>
+                    <input type="text" matInput formControlName="parallel" placeholder="(-paralelo-)"
+                    [readonly]="replaceForm.get('status').value === 1">
+                  </mat-form-field>
+                </div>
+                <div class="col-6" *ngIf="messageDescription.includes('(-departamento-)');">
+                  <mat-form-field class="width" appearance="outline">
+                    <mat-label>Departamento</mat-label>
+                    <input type="text" matInput formControlName="department" placeholder="(-departamento-)"
+                    [readonly]="replaceForm.get('status').value === 1">
+                  </mat-form-field>
+                </div>
+                <div class="col-6" *ngIf="messageDescription.includes('(-cargo-)');">
+                  <mat-form-field class="width" appearance="outline">
+                    <mat-label>Cargo</mat-label>
+                    <input type="text" matInput formControlName="charge" placeholder="(-cargo-)"
+                    [readonly]="replaceForm.get('status').value === 1">
+                  </mat-form-field>
+                </div>
+                <div class="col-6" *ngIf="messageDescription.includes('(-remitente-)');">
+                  <mat-form-field class="width" appearance="outline">
+                    <mat-label>Remitente</mat-label>
+                    <input type="text" matInput formControlName="sender" placeholder="(-remitente-)"
+                    [readonly]="replaceForm.get('status').value === 1">
+                  </mat-form-field>
+                </div>
+                <div class="col-9" *ngIf="messageDescription.includes('(-descripción-)');">
+                  <mat-form-field class="width" appearance="outline">
+                    <mat-label>Descripción</mat-label>
+                    <textarea type="text" matInput formControlName="description" placeholder="(-descripción-)"
+                      [readonly]="replaceForm.get('status').value === 1">
+                    </textarea>
+                  </mat-form-field>
+                </div>
+                <div class="col-3" style="text-align: left;">
+                  <button
+                    *ngIf="replaceForm.get('status').value === 0"
+                    mat-raised-button
+                    class="styleButton_sml"
+                    style="max-width: 100px;"
+                    (click)="replaceHtml();">
+                    Previsualizar
+                  </button>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+          <div class="col-6" *ngIf="filtersForm.get('documentManagementID')?.value !== 0 && filtersForm.get('documentManagementID')?.value !== ''">
+            <div class="row">
+              <div class="col-12" [innerHTML]="this.messageForm.get('messageManagementDetail').value"></div>
+              <div class="col-12" [innerHTML]="messageDetail"></div>
+            </div>
+          </div>
+          <div class="col-10" *ngIf="filtersForm.get('documentManagementID')?.value !== 0"></div>
+          <div class="col-2" style="text-align: right;">
+            <button
+              *ngIf="replaceForm.get('status').value === 1"
+              mat-raised-button
+              class="styleButton_sml"
+              style="max-width: 100px;"
+              (click)="postMessageManagement();">
+              Enviar
+            </button>
+          </div>
+        </ng-container>
+      </div>
+      <ng-template #new>
+        <div class="row pl-2 pr-2" [formGroup]="filtersForm">
+          <div class="col-4">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Para</mat-label>
+              <mat-select formControlName="typeRolID">
+                <mat-option *ngFor="let item of types" [value]="item.typeRolID">{{item.typeRolDesc}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-4">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Seleccionar usuarios</mat-label>
+              <input type="text"
+                matInput
+                #search
+                (input)="getUsersByTypeRolID(search.value)"
+                [matAutocomplete]="auto"
+                [readonly]="filtersForm.get('typeRolID').value === ''">
+                <mat-autocomplete #auto="matAutocomplete">
+                  <mat-option *ngFor="let item of users" [value]="item.userID">
+                    <div (click)="optionClicked($event, item)">
+                      <mat-checkbox color="primary" [checked]="item.selected" (change)="toggleSelection(item)" (click)="$event.stopPropagation()">
+                        {{item.personFullName}}
+                      </mat-checkbox>
+                    </div>
+                  </mat-option>
+                </mat-autocomplete>
+            </mat-form-field>
+          </div>
+          <div class="col-4">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Nro de receptores</mat-label>
+                <input type="text" matInput readonly="true" [value]="sendingNumber">
+              </mat-form-field>
+            </div>
+          <div class="col-4">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>CC</mat-label>
+              <mat-select formControlName="cc">
+                <mat-option *ngFor="let item of types" [value]="item.typeRolID">{{item.typeRolDesc}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-4">
+            <mat-form-field class="width" appearance="outline">
+            <mat-label>Seleccionar usuarios</mat-label>
+            <input type="text"
+              matInput
+              #searchCC
+              (input)="getCCUsersByTypeRol(searchCC.value)"
+              [matAutocomplete]="autoCC"
+              [readonly]="filtersForm.get('cc').value === null">
+              <mat-autocomplete #autoCC="matAutocomplete">
+                <mat-option *ngFor="let item of usersCC" [value]="item.userID">
+                  <div (click)="optionCCClicked($event, item)">
+                    <mat-checkbox color="primary" [checked]="item.selected" (change)="toggleCCSelection(item)" (click)="$event.stopPropagation()">
+                      {{item.personFullName}}
+                    </mat-checkbox>
+                  </div>
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row pl-2 pr-2" [formGroup]="messageForm">
+          <div class="col-12">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Asunto</mat-label>
+              <input type="text" matInput formControlName="subject">
+            </mat-form-field>
+          </div>
+          <div class="col-12">
+            <ngx-editor-menu [editor]="details" [toolbar]="toolbar"></ngx-editor-menu>
+            <ngx-editor placeholder="Escribe aquí..." [editor]="details" outputFormat="html" formControlName="messageManagementDetail"></ngx-editor><br>
+          </div>
+          <div class="col-8">
+            <mat-label>Archivos: </mat-label>
+            <input type="file"
+              multiple
+              #input
+              style="cursor: pointer;"
+              autocomplete="off"
+              (change)="onChangeInput(input.files, input);"
+              accept="application/pdf">
+          </div>
+          <div class="col-10" [innerHTML]="messageDetail"></div>
+
+          <div class="col-8"></div>
+          <div class="col-4" style="text-align: right;">
+            <button
+              mat-raised-button
+              class="styleButton_sml"
+              style="max-width: 100px;"
+              (click)="initForm();">
+              Cancelar
+            </button>&nbsp;
+            <button
+              mat-raised-button
+              class="styleButton_sml"
+              style="max-width: 100px;"
+              (click)="postMessageManagement();">
+              Enviar
+            </button>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,92 @@
+<section class="container">
+
+  <div class="row" *ngIf="!documents.length">
+    <div class="col-md-12">
+      <div class="alert alert-info text-center">
+        <h4 class="alert-heading">Sin documentos pendientes</h4>
+        <i class="fa fa-info-circle fa-3x"></i>
+        <p class="mb-0">Al parecer no tienes documentos pendientes. Si crees que esto es un error, comunícate con la administración de la institución educativa a la que perteneces.</p>
+      </div>
+    </div>
+  </div>
+  <div class="row mt-3" [formGroup]="form">
+    <div class="col-12 mb-3" *ngFor="let item of documents; let index = index;">
+      <div class="d-flex no-block justify-content-between align-items-center">
+        <div class="col-md-4 d-flex no-block align-items-center">
+          <div class="circle">{{ index + 1 }}</div>
+          <h5 class="ml-4" style="font-size: 95%;">{{ item.fileTypeName }} &nbsp;
+            <a *ngIf="item.fileTypeName === 'FOTOGRAFÍA DIGITAL '; else pdf"><i class="fa fa-file-image-o" aria-hidden="true" style="color: green;"></i> Imágen</a>
+            <ng-template #pdf><i class="fa fa-file-pdf-o" aria-hidden="true" style="color: red;"></i> PDF</ng-template>
+          </h5>
+        </div>
+        <div class="row col-md-3" *ngIf="item.commentary">
+          <h5 style="font-size: 12px;">OBS:&nbsp;</h5>
+          <h5 style="text-transform: uppercase; color: red; font-size: 12px;">{{ item.commentary }}</h5>
+        </div>
+        <div class="d-flex no-block align-items-center">
+          <div>
+            <span
+              class="badge"
+              [style.color]="item.fontColor"
+              [style.background-color]="item.backgroundColor">{{ item.statusFileDesc }}
+            </span>
+            <span *ngIf="item.statusFileID === FILE_STATE.REJECTED">
+              <mat-icon [matTooltip]="item.commentary" style="color: red;">help</mat-icon>
+            </span>
+          </div>
+          <div *ngIf="item.statusFileID !== FILE_STATE.NO_FILE && item.statusFileID !== FILE_STATE.REJECTED">
+            <a class="ml-3" style="color: #014898; font-size: 90%;" target="_blank"
+               [href]="item.urlFile">Ver Documento</a>
+          </div>
+
+        <div *ngIf="item.statusFileID === FILE_STATE.NO_FILE || item.statusFileID === FILE_STATE.REJECTED">
+          <div class="ml-3" style="border: 1px solid rgba(0, 0, 0, 0.315); width: 350px; height: 40px; display: flex;">
+            <input
+              style="cursor: pointer;"
+              class="mt-1 mb-1 ml-1 align-self-center"
+              #input
+              id="{{index}}"
+              (change)="onChangeInput(input.files, item);"
+              type="file" [accept]="(item.fileExtension==='img'?'image/*':'application/pdf')">
+          </div>
+          <small
+            *ngIf="form.get(item.fileID.toString()).hasError('required') && form.get(item.fileID.toString()).touched;">
+            Este archivo es requerido</small>
+          <!-- <small
+            *ngIf="form.get(item.fileID.toString()).hasError('invalidMimeType') && form.get(item.fileID.toString()).touched;">
+            Este archivo no es un PDF</small> -->
+          <small
+            *ngIf="form.get(item.fileID.toString()).hasError('sizeError') && form.get(item.fileID.toString()).touched;">
+            El tamaño del archivo no debe ser mayor a 5 MB</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- <div *ngIf="documents.length">
+    <div class="mt-5 d-block">
+      <h4 class="ml-1" style="color: blue;">ESTADOS DE DOCUMENTOS</h4>
+      <div class="col-12 col-sm-6">
+        <div class="mat-elevation-z3">
+
+          <div
+            class="justify-content-between d-flex no-block align-items-center"
+            [ngClass]="last ? 'pb-3 pl-3 pr-3 pt-3' : 'pb-0 pl-3 pr-3 pt-3'"
+            *ngFor="let documentState of documentsStates; let first = first; let last = last;">
+            <div>
+              <span
+                class="badge"
+                [style.background-color]="documentState.backgroundColor"
+                [style.color]="documentState.fontColor">
+                {{ documentState.statusFileDesc }}</span>
+            </div>
+            <div class="pl-3">
+              <p style="font-size: 85%; margin-bottom: 0 !important;">Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
+</section>

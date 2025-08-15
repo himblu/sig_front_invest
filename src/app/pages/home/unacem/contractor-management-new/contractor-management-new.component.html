@@ -1,0 +1,297 @@
+<div class="animated fadeIn fast">
+  <div class="form-row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <div class="form-row">
+            <div class="col-12" style="position: relative;" *ngIf="isLoading; else header;">
+              <spinner-loader></spinner-loader>
+            </div>
+            <ng-template #header>
+              <div class="col-8">
+                <button class="btn btn-sm btn-light text-danger" *ngIf="!onlyRead" (click)="back()">
+                  <i class="fa fa-chevron-left mr-1"></i>Volver
+                </button><strong class="ml-2 text-primary-color">
+                  <span *ngIf="onlyRead">
+                    Información de
+                  </span>
+                  <span *ngIf="!onlyRead">
+                    {{newContractor.contractorID ? 'Editando' : 'Nuevo'}}
+                  </span>
+                  Contratista
+                </strong>
+              </div>
+              <div class="col-4 text-right">
+                <button class="btn btn-sm bg-primary-color" [disabled]="newContractorForm.invalid" (click)="saveChanges()">
+                  <i class="fa fa-save mr-1"></i>Guardar Cambios
+                </button>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+        <div class="card-body">
+          <form #newContractorForm="ngForm">
+            <div class="form-row">
+              <div class="col-12">
+                <div class="alert alert-info">
+                  <span *ngIf="!onlyRead">
+                    <i class="fa fa-warning mr-1"></i>Ingrese los datos del contratista.
+                  </span>
+                  <span *ngIf="onlyRead">
+                    <i class="fa fa-info mr-1"></i>Visualiza la información.
+                  </span>
+                  <strong class="float-right">* Todos los campos son necesarios.</strong>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="card mb-2">
+                  <div class="card-hader p-2 bg-primary-color">
+                    <i class="fa fa-cog mr-1"></i>Datos Generales
+                  </div>
+                  <div class="card-body p-2">
+                    <div class="form-row">
+                      <div class="col-12">
+                        <label for="companyName">Nombre de la Empresa *</label>
+                        <input type="text" class="form-control form-control-sm text-uppercase" (keypress)="alphaNumeric($event)" [(ngModel)]="newContractor.businessName" name="businessName" id="companyName" required>
+                      </div>
+                      <div class="col-6">
+                        <label for="companyAddress">Dirección *</label>
+                        <input type="text" class="form-control form-control-sm text-uppercase" (keypress)="alphaNumeric($event)" [(ngModel)]="newContractor.businessAddress" name="businessAddress" id="companyAddress" required>
+                      </div>
+                      <div class="col-6">
+                        <label for="companyPhone">Teléfono *</label>
+                        <input type="text" class="form-control form-control-sm" maxlength="10" (keypress)="onlyNumbers($event)" [(ngModel)]="newContractor.businessPhone" name="businessPhone" id="companyPhone" required>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card mb-2">
+                  <div class="card-header bg-primary-color p-2">
+                    <i class="fa fa-money mr-1"></i>Datos para Facturación
+                  </div>
+                  <div class="card-body p-2">
+                    <div class="form-row">
+                      <div class="col-7">
+                        <label for="billingName">Razon Social *</label>
+                        <input type="text" name="billingName" class="form-control form-control-sm text-uppercase" (keypress)="alphaNumeric($event)" [(ngModel)]="newContractor.billingName" id="billingName" required>
+                      </div>
+                      <div class="col-5">
+                        <label for="billingAddress">Dirección *</label>
+                        <input type="text" name="billingAddress" class="form-control form-control-sm text-uppercase" (keypress)="alphaNumeric($event)" [(ngModel)]="newContractor.billingAddress" id="billingAddress" required>
+                      </div>
+                      <div class="col-4">
+                        <label for="billingPhone">Teléfono *</label>
+                        <input type="text" name="billingPhone" maxlength="10" class="form-control form-control-sm" (keypress)="onlyNumbers($event)" [(ngModel)]="newContractor.billingPhone" id="billingPhone" required>
+                      </div>
+                      <div class="col-4">
+                        <label for="billingDocumentType">Tipo de Documento *</label>
+                        <select name="billingDocumentType" (change)="selectDocumentType()" [(ngModel)]="newContractor.billingDocumentType" class="form-control form-control-sm">
+                          <option [ngValue]="undefined">--SELECCIONE--</option>
+                          <option *ngFor="let t of documentTypes" [ngValue]="t.typeDocId">{{t.typeDocName | uppercase}}</option>
+                        </select>
+                      </div>
+                      <div class="col-4">
+                        <label for="billingDocumentNumber">Número de Documento *</label>
+                        <input type="text" name="billingDocumentNumber" [disabled]="!newContractor.billingDocumentType" [maxlength]="newContractor.typeDocLong" class="form-control form-control-sm" (keypress)="onlyNumbers($event)" [(ngModel)]="newContractor.billingDocumentNumber" id="billingPhone" required>
+                      </div>
+                      <div class="col-12">
+                        <label for="billingEmail">Correo Electrónico *</label>
+                        <input type="email" name="billingEmail" class="form-control form-control-sm" (keypress)="alphaNumericToEmail($event)" [(ngModel)]="newContractor.billingEmail" id="billingEmail" required>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card mb-2">
+                  <div class="card-header bg-primary-color p-2">
+                    <div class="form-row">
+                      <div class="col-3 pt-1">
+                        <i class="fa fa-bookmark mr-1"></i>Responsables
+                      </div>
+                      <div class="col-2" [ngClass]="{'pt-1': newResponsibles.length}">
+                        <!-- <span class="text-white" *ngIf="newResponsibles.length">Ya tiene usuario</span> -->
+                      </div>
+                      <div class="col-1"></div>
+                      <div class="col-6 text-right">
+                        <!-- <button class="btn btn-sm bg-light mr-2" *ngIf="!onlyRead" (click)="toggleInBulk('newResponsibles', 'Responsables')">
+                          <i class="fa fa-copy mr-1"></i>Agregar en Lote
+                        </button> -->
+                        <button class="btn btn-sm bg-light" *ngIf="!onlyRead || rolID !== 24" (click)="searchPerson(newResponsibles)">
+                          <i class="fa fa-plus mr-1"></i>Agregar Responsable
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item p-1" *ngFor="let i of newResponsibles; let k = index" style="line-height: 90%;">
+                      <div class="form-row">
+                        <div class="col-md-3">
+                          <strong>{{i.personFullName | uppercase}}</strong> <br>
+                          <span><span *ngIf="i.userName">@{{i.username || i.userName}} - </span><i class="fa fa-phone mr-1"></i>{{i.numberPhone}}</span>
+                        </div>
+                        <div class="col-md-2" [ngClass]="{'pt-2 pl-3': i.users.length === 1}">
+                          <span *ngIf="i.users.length === 1">@{{i.userName}}</span>
+                          <select name="responsible-userName-{{k}}" [disabled]="onlyRead" (change)="selectUser(i)" [(ngModel)]="i.userName" *ngIf="i.users.length > 1" class="form-control form-control-sm" required>
+                            <option [ngValue]="undefined">--SELECCIONE--</option>
+                            <option *ngFor="let u of i.users" [ngValue]="u.userName">@{{u.userName}}</option>
+                          </select>
+                        </div>
+                        <div class="col-md-2">
+                          <input type="text" name="responsible-emailDesc-{{k}}" [disabled]="onlyRead" [(ngModel)]="i.emailDesc" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="col-md-1">
+                          <button class="btn btn-sm" [disabled]="onlyRead" [ngClass]="{'btn-light': !i.isMain, 'bg-primary-color': i.isMain}" (click)="toggleIsMain(i)">
+                            <i class="fa mr-1" [ngClass]="{'fa-circle-o': !i.isMain, 'fa-circle': i.isMain}"></i>{{i.isMain ? 'Principal' : 'Secondario'}}
+                          </button>
+                        </div>
+                        <div class="col-md-2">
+                          <!-- <select name="responsible-professionID-{{k}}" [disabled]="onlyRead" [(ngModel)]="i.professionID" class="form-control form-control-sm" required>
+                            <option [ngValue]="undefined">--SELECCIONE--</option>
+                            <option *ngFor="let p of professions" [ngValue]="p.professionID">{{p.professionName | uppercase}}</option>
+                          </select> -->
+                        </div>
+                        <div class="col-md-2 text-right">
+                          <button class="btn btn-sm btn-danger" *ngIf="!onlyRead" (click)="deleteItem(newResponsibles, i)">
+                            <i class="fa fa-trash mr-1"></i>Quitar
+                          </button>
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="card mb-2">
+                  <div class="card-header bg-primary-color p-2">
+                    <div class="form-row">
+                      <div class="col-3 pt-1">
+                        <i class="fa fa-users mr-1"></i>Colaboradores
+                      </div>
+                      <div class="col-2" [ngClass]="{'pt-1': newCollaborators.length}">
+                        <!-- <span class="text-white" *ngIf="newCollaborators.length">Ya tiene usuario</span> -->
+                      </div>
+                      <div class="col-1"></div>
+                      <div class="col-6 text-right">
+                        <button class="btn btn-sm bg-light mr-2" (click)="toggleInBulk('newCollaborators', 'Colaboradores')">
+                          <i class="fa fa-copy mr-1"></i>Agregar en Lote
+                        </button>
+                        <button class="btn btn-sm bg-light" (click)="searchPerson(newCollaborators)">
+                          <i class="fa fa-plus mr-1"></i>Agregar Colaborador
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item p-1" *ngFor="let i of newCollaborators; let k = index" style="line-height: 90%;">
+                      <div class="form-row">
+                        <div class="col-md-3">
+                          <strong>{{i.personFullName | uppercase}}</strong> <br>
+                          <span>@{{i.username || i.userName}} - <i class="fa fa-phone mr-1"></i>{{i.numberPhone}}</span>
+                        </div>
+                        <div class="col-md-2" [ngClass]="{'pt-2 pl-3': i.users.length === 1}">
+                          <span *ngIf="i.users.length === 1">@{{i.userName}}</span>
+                          <select name="collaborator-userName-{{k}}" (change)="selectUser(i)" [(ngModel)]="i.userName" *ngIf="i.users.length > 1" class="form-control form-control-sm" required>
+                            <option [ngValue]="undefined">--SELECCIONE--</option>
+                            <option *ngFor="let u of i.users" [ngValue]="u.userName">@{{u.userName}}</option>
+                          </select>
+                        </div>
+                        <div class="col-md-2">
+                          <input type="text" name="collaborator-emailDesc-{{k}}" [(ngModel)]="i.emailDesc" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="col-md-2">
+                          <select name="collaborator-professionID-{{k}}" [(ngModel)]="i.professionID" class="form-control form-control-sm">
+                            <option [ngValue]="undefined">--SELECCIONE--</option>
+                            <option *ngFor="let p of professions" [ngValue]="p.professionID">{{p.professionName | uppercase}}</option>
+                          </select>
+                        </div>
+                        <div class="col-1 pt-1">
+                          <span class="badge badge-warning float-right font-nm" *ngIf="i.existsInITCA">
+                            EN ITCA
+                          </span>
+                        </div>
+                        <div class="col-md-2 text-right">
+                          <button class="btn btn-sm btn-danger" (click)="deleteItem(newCollaborators, i)">
+                            <i class="fa fa-trash mr-1"></i>Quitar
+                          </button>
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" bsModal #inBulkModal="bs-modal" [config]="{backdrop: 'static'}" tabindex="-1" role="dialog" aria-labelledby="dialog-static-name">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="form-row mb-3" *ngIf="modal">
+          <div class="col-9 pt-1">
+            <strong class="text-primary-color">
+              Agregar Información en Lote
+            </strong>
+          </div>
+          <div class="col-3 text-right">
+            <button class="btn btn-sm btn-danger" (click)="toggleInBulk()">
+              <i class="fa fa-times mr-1"></i>Cancelar
+            </button>
+          </div>
+          <div class="col-12">
+            <hr>
+          </div>
+          <div class="col-7">
+            <input type="file" name="fileInBulk" accept=".xlsx" [(ngModel)]="fileInBulk" id="file-in-bulk" class="form-control form-control-sm">
+          </div>
+          <div class="col-1">
+            <button class="btn btn-sm bg-primary-color" [disabled]="!fileInBulk" (click)="uploadFormatXLSX()">
+              <i class="fa fa-upload mr-1"></i>Subir Archivo
+            </button>
+          </div>
+          <div class="col-4 text-right">
+            <a class="btn btn-sm bg-primary-color text-white" href="assets/Doc/formato-en-lote.xlsx" target="_blank">
+              <i class="fa fa-download mr-1"></i>Descargar formato
+            </a>
+          </div>
+          <ng-container *ngIf="modal.uploadList && modal.uploadList.length">
+            <div class="col-12">
+              <hr>
+            </div>
+            <div class="col-12">
+              <ul class="list-group">
+                <li class="list-group-item p-2" *ngFor="let p of modal.uploadList">
+                  <div class="form-row">
+                    <div class="col-6 pt-1">
+                      {{p.personFullName}}
+                    </div>
+                    <div class="col-5 pt-1 text-center">
+                      <span class="badge bg-primary-color mr-2" title="A esta persona no se creara su usuario" *ngIf="p.existsInITCA">
+                        EXISTE EN ITCA
+                      </span>
+                      <span class="badge bg-primary-color" title="Esta persona ya esta incluida como colaborador" *ngIf="p.exclude">
+                        YA ES COLABORADOR
+                      </span>
+                    </div>
+                    <div class="col-1 text-right">
+                      <button class="btn btn-sm btn-danger rounded-circle" (click)="deleteItem(modal.uploadList, p)">
+                        <i class="fa fa-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="col-12 text-center mt-3">
+              <button class="btn btn-sm bg-primary-color" (click)="addToList()">
+                <i class="fa fa-plus mr-1"></i>Agregar a {{modal.title}}
+              </button>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

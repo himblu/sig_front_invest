@@ -1,0 +1,28 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+<div *ngIf="!charging">
+  <mat-tab-group>
+    <mat-tab label="Seguimiento / Evaluación Docente">
+      <ng-template matTabContent>
+        <app-follow-reports [periods]="periods" [currentPeriod]="currentPeriod"></app-follow-reports>
+      </ng-template>
+    </mat-tab>
+    <mat-tab label="Informe de Asignatura">
+      <ng-template matTabContent>
+        <app-subject-reports [periods]="periods" [currentPeriod]="currentPeriod"></app-subject-reports>
+      </ng-template>
+    </mat-tab>
+    <mat-tab label="Informe del proceso Docente">
+      <ng-template matTabContent>
+        <app-teacher-reports [periods]="periods" [currentPeriod]="currentPeriod"></app-teacher-reports>
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
+</div>

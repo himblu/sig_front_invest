@@ -1,0 +1,50 @@
+<div class="animated fadeIn fast">
+  <div class="form-row mt-5">
+    <div class="col-4"></div>
+    <div class="col-4 mt-5">
+      <div class="card">
+        <div class="card-body p-3">
+          <div class="form-row p-4">
+            <div class="col-12 text-center">
+              <strong class="font-xl text-secondary">
+                Usted cuenta con más de 1 perfil
+              </strong> <br>
+              <span class="font-nm">Seleccione el perfil con el que desea continuar:</span>
+            </div>
+            <div class="col-12 mt-3" *ngIf="profiles.length > 4">
+              <input type="text" name="filter.text" [(ngModel)]="filter.text" class="form-control text-uppercase" placeholder="BUSCAR UN PERFIL EN ESPECIFICO">
+            </div>
+            <div class="col-12 mt-3" style="max-height: 400px; overflow: auto;">
+              <ul class="list-group">
+                <li class="list-group-item hand p-2" [ngClass]="{'list-group-item-info': profileSelected && profileSelected.rolID === p.rolID}" style="line-height: 95%;" (click)="toggleSelectProfile(p)" *ngFor="let p of profiles | filter:filter.text">
+                  <div class="form-row">
+                    <div class="col-1 text-center">
+                      <i class="fa fa-2x" [ngClass]="{'fa-circle text-primary-color': profileSelected && profileSelected.rolID === p.rolID, 'fa-circle-o': !(profileSelected && profileSelected.rolID === p.rolID)}"></i>
+                    </div>
+                    <div class="col-11">
+                      <div class="form-row">
+                        <div class="col-1">
+                          <img src="assets/images/current-user.png" class="rounded-circle" width="100%" alt="">
+                        </div>
+                        <div class="col-11">
+                          <strong>{{p.rolName | uppercase}}</strong><br>
+                          <small>Click para seleccionar</small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="col-12 mt-3 text-center">
+              <button class="btn bg-primary-color" *ngIf="profileSelected.rolID" (click)="continueToDashboard()">
+                <i class="fa fa-chevron-right mr-1"></i>Continuar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-4"></div>
+  </div>
+</div>

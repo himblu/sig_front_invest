@@ -1,0 +1,133 @@
+<body>
+  <img src="../../../../../../assets/images/library_space.png" class="img-bg">
+  <div class="cont row mat-elevation-z6">
+    <div class="col-md-12" *ngIf="isLoading; else body;">
+      <div class="alert alert-info text-center">
+        <h4 class="alert-heading">Cargando</h4>
+        <i class="fa fa-spin fa-refresh fa-3x"></i>
+        <p class="mb-0">Por favor esperar...</p>
+      </div>
+    </div>
+    <ng-template #body>
+      <div class="col-12" style="text-align: right;">
+        <a style="cursor: pointer; color: red;" (click)="logOut();"><i class="fa fa-power-off mr-1"></i>Salir</a>
+      </div>
+      <div class="col-12" style="text-align: center;">
+        <h2>Espacio de Biblioteca</h2>
+      </div>
+      <div class="col-12" style="text-align: center;">
+        <h3>{{librarySpace?.librarySpaceName}}</h3>
+      </div>
+      <div class="col-12" style="text-align: center;">
+        <h3>Capacidad: {{librarySpace?.capacity}}</h3>
+      </div>
+      <div class="col-12"><hr></div>
+      <ng-container [formGroup]="filtersForm">
+        <div class="col-1"></div>
+        <div class="col-5">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Tipo de usuario</mat-label>
+            <mat-select formControlName="applicantTypeID" (selectionChange)="getLibrarySpacesAttendance();">
+              <mat-option *ngFor="let item of users" [value]="item.applicantTypeID" (onSelectionChange)="selectedUser($event, item);">
+                {{item.applicantTypeDesc}}
+              </mat-option>
+            </mat-select>
+            <mat-error>Campo requerido</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-5">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Buscador por cédula</mat-label>
+            <input type="text" matInput formControlName="search" #search [maxlength]="10"
+            (input)="getLibrarySpacesAttendance();" onKeypress="if (event.keyCode < 45 || event.keyCode > 57) event.returnValue = false;">
+            <mat-error>Campo requerido</mat-error>
+            <mat-icon
+              *ngIf="search.value.length === 10"
+              matSuffix
+              style="color: red; cursor: pointer;"
+              (click)="filtersForm.reset();
+              filtersForm.get('search')?.enable();
+              filtersForm.get('applicantTypeID')?.enable();
+              externalForm.reset();
+              selectedStudentCareer= null;
+              isExternal= false;">
+              delete_forever
+            </mat-icon>
+          </mat-form-field>
+        </div>
+        <div class="col-1"></div>
+
+        <div class="col-12" style="text-align: center;">
+          <mat-form-field class="width" appearance="outline" style="max-width: 500px;">
+            <mat-label>Seleccione la carrera</mat-label>
+            <mat-select formControlName="studentID">
+              <mat-option [disabled]="!filtersForm.get('applicantTypeID').value || studentCareers.length < 2 && studentCareers.length !== 0" *ngFor="let item of studentCareers" [value]="item.studentID"
+              (onSelectionChange)="selectedCareer(item, $event);">
+                {{item.careerName}}
+              </mat-option>
+            </mat-select>
+            <mat-error>Campo requerido</mat-error>
+          </mat-form-field>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="isExternal" [formGroup]="externalForm">
+        <div class="col-1"></div>
+        <div class="col-5">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Número de documento</mat-label>
+            <input matInput onKeypress="if (event.keyCode < 45 || event.keyCode > 57) event.returnValue = false;"
+            formControlName="documentNumberExternal" readonly="true">
+            <mat-error>Campo requerido</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-5">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Nombres</mat-label>
+            <input matInput formControlName="fullNamesExternal">
+            <mat-error>Campo requerido</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-1"></div>
+        <div class="col-1"></div>
+        <div class="col-5">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Teléfono</mat-label>
+            <input matInput onKeypress="if (event.keyCode < 45 || event.keyCode > 57) event.returnValue = false;"
+            formControlName="phoneExternal">
+            <mat-error>Campo requerido</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-5">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="emailExternal">
+            <mat-error>Campo requerido</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-1"></div>
+      </ng-container>
+      <div class="col-12" style="text-align: right;">
+        <button *ngIf="!selectedStudentCareer?.stateAttendance"
+          mat-raised-button
+          matTooltip="Ingreso"
+          class="styleButton_sml"
+          style="max-width: 150px; min-width: 100px;"
+          type="button"
+          (click)="onSubmit(true);">
+          Ingreso
+        </button>
+        <button *ngIf="selectedStudentCareer?.stateAttendance"
+          mat-raised-button
+          matTooltip="Salida"
+          class="styleButton_sml"
+          style="max-width: 150px; min-width: 100px;"
+          type="button"
+          (click)="onSubmit(false);">
+          Salida
+        </button>
+      </div>
+      <div class="col-12"><br></div>
+    </ng-template>
+  </div>
+</body>

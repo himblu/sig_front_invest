@@ -1,0 +1,191 @@
+<div class="form-row">
+  <div class="col-9">
+    <h2 mat-dialog-title *ngIf="roleLoged === 7 || roleLoged === 8">Información de Documentos del Postulante</h2>
+    <h2 mat-dialog-title *ngIf="roleLoged === 9">Validación de Pagos</h2>
+  </div>
+  <div class="col-3">
+    <div style="display: flex; justify-content: end; align-items: center; background: transparent;" class="p-2 mb-3">
+      <mat-icon style="cursor: pointer; color: red;" [matDialogClose]="false" class="red-icon" matRipple>close</mat-icon>
+    </div>
+  </div>
+</div>
+
+<mat-dialog-content>
+
+  <div *ngIf="loading">
+    <spinner-loader></spinner-loader>
+  </div>
+  <div class="form-row" *ngIf="!loading">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="form-row">
+            <div class="col-4">
+              <small class="text-primary-color">NOMBRE</small> <br>
+              {{postulant.personFullName | uppercase}} <br>
+              <small class="text-primary-color">IDENTIFICACIÓN</small> <br>
+              {{postulant.personDocumentNumber}}<br>
+            </div>
+            <div class="col-5">
+              <div class="form-row">
+                <div class="col-6">
+                  <small class="text-primary-color">PERIODO</small> <br>
+                  {{postulant.admissionPeriodName | uppercase}} <br>
+                  <small class="text-primary-color">MODALIDAD</small> <br>
+                  {{postulant.modalityDesc | uppercase}} <br>
+                </div>
+                <div class="col-6">
+                  <small class="text-primary-color">ESCUELA</small> <br>
+                  {{postulant.schoolDesc | uppercase}} <br>
+                  <small class="text-primary-color">CARRERA PROFESIONAL</small> <br>
+                  {{postulant.careerDesc | uppercase}} <br>
+                </div>
+              </div>
+            </div>
+            <div class="col-3 text-center">
+              <img *ngIf="personImage" width="150" height="150" src="{{personImage}}" alt="Imagen de perfil del estudiante">
+              <img *ngIf="!personImage" width="150" height="150" src="../../../assets/images/avatar.jpg" alt="Imagen de perfil del estudiante">
+            </div>
+            <div class="col-12">
+              <div class="form-check">
+                <input type="checkbox" name="sendMail" [disabled]="postulant.isApproved" id="sendMail" class="form-check-input" [(ngModel)]="postulant.sendEmail">
+                <label class="form-check-label" for="sendMail">
+                  Notificar por correo al estudiante el cambio de estado
+                </label>
+              </div>
+            </div>
+            <div class="col-12" *ngIf="studentAssigned"></div>
+            <div class="col-12">
+              <hr>
+            </div>
+            <div class="col-12" *ngIf="roleLoged === 7 || roleLoged === 8">
+              <div class="text-center" *ngIf="!postulant.files.length">
+                <i class="fa fa-times mr-1"></i>No se tienen archivos que validar.
+              </div>
+              <form #documentDetailForm="ngForm" *ngIf="postulant.files.length">
+                <table class="table table-bordered table-sm">
+                  <thead>
+                    <tr class="text-white">
+                      <th class="text-center bg-primary-color text-white">Detalle</th>
+                      <th class="text-center bg-primary-color text-white">Archivo</th>
+                      <th class="text-center bg-primary-color text-white">Observación</th>
+                      <th class="text-center bg-primary-color text-white">Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let a of postulant.files; let f_index = index">
+                      <td class="pt-1">{{a.fileTypeName | uppercase}}</td>
+                      <td class="text-center">
+                        <button class="btn btn-light btn-sm text-primary-color" (click)="viewFile(a)">
+                          <i class="fa fa-file mr-1"></i>Visualizar
+                        </button>
+                        <!-- <a target="_blank" href="{{a.url}}" class="btn btn-sm btn-light text-primary-color">
+                          <i class="fa fa-file mr-1"></i>Visualizar
+                        </a> -->
+                      </td>
+                      <td>
+                        <!-- [ngClass]="{ 'invalid': documentsFormArray.get(index.toString())?.hasError('required', 'commentary') && getDocumentFormGroup(index).get('commentary')?.touched }" -->
+                        <input class="w-100" type="text" placeholder="DESCRIBA BREVEMENTE" [disabled]="a.statusFileID === 3" [ngClass]="{'is-invalid': a.newStatusFileID === 4}" name="commentary-{{f_index}}" (keyup)="validForm()"  [required]="a.newStatusFileID === 4" [(ngModel)]="a.commentary" class="form-control text-uppercase">
+
+                      </td>
+                      <td>
+                        <select class="form-control" name="newStatusFileID-{{f_index}}" [disabled]="a.statusFileID === 3" required (change)="validForm(a)" [(ngModel)]="a.newStatusFileID">
+                          <option [ngValue]="undefined">--SELECCIONE--</option>
+                          <option *ngFor="let s of fileStatuses;" [ngValue]="s.statusFileID">{{s.statusFileDesc | uppercase}}</option>
+                        </select>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </form>
+            </div>
+            <div class="col-12" *ngIf="roleLoged === 9">
+              <div class="text-center" *ngIf="!postulant.files.length">
+                <i class="fa fa-times mr-1"></i>No se tienen archivos que validar.
+              </div>
+              <form #documentDetailForm="ngForm" *ngIf="postulant.files.length">
+                <table class="table table-bordered">
+                  <thead>
+                  <tr>
+                    <th class="bg-primary-color text-white col-2"><small><strong>Detalle</strong></small></th>
+                    <th class="bg-primary-color text-white col-1"><small><strong>Archivo</strong></small></th>
+                    <th class="bg-primary-color text-white" style="width: 150px;"><small><strong>Fecha de Pago</strong></small></th>
+                    <th class="bg-primary-color text-white col-1"><small><strong>Comprobante</strong></small></th>
+                    <th class="bg-primary-color text-white" style="width: 200px;"><small><strong>Institución</strong></small></th>
+                    <th class="bg-primary-color text-white" style="width: 150px;"><small><strong>Transacción</strong></small></th>
+                    <th class="bg-primary-color text-white col-2"><small><strong>Observación</strong></small></th>
+                    <th class="bg-primary-color text-white" style="width: 150px;"><small><strong>Estado</strong></small></th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let i of postulant.files; let f_index = index">
+                      <td class="">
+                        <small>
+                          {{i.fileTypeName}}
+                        </small>
+                      </td>
+                      <td>
+                        <button class="btn btn-light btn-sm text-primary-color" (click)="viewFile(i)">
+                          <i class="fa fa-file mr-1"></i>Visualizar
+                        </button>
+                        <!-- <a href="{{i.url}}" target="_blank" class="btn btn-sm btn-light text-primary-color">
+                          <i class="fa fa-file-mr-1"></i>Archivo
+                        </a> -->
+                      </td>
+                      <td class="">
+                        <input type="date" name="payDay-{{f_index}}" [(ngModel)]="i.payDay" class="form-control" required>
+                      </td>
+                      <td>
+                        <input type="text" name="voucher-{{f_index}}" id="" class="form-control" [(ngModel)]="i.voucherNumber" required>
+                      </td>
+                      <td>
+                        <select name="financialEntity-{{f_index}}" [(ngModel)]="i.financialEntity" class="form-control" required>
+                          <option [ngValue]="undefined">--SELECCIONE--</option>
+                          <option *ngFor="let f of financialEntities" [ngValue]="f.financialEntityID">{{f.financialEntityDesc}}</option>
+                        </select>
+                      </td>
+                      <td>
+                        <select name="transactionType-{{f_index}}" [(ngModel)]="i.transactionType" class="form-control" required>
+                          <option [ngValue]="undefined">--SELECCIONE--</option>
+                          <option *ngFor="let t of transactionTypes" [ngValue]="t.transactionTypeID">{{t.transactionTypeDesc}}</option>
+                        </select>
+                      </td>
+                      <td class="">
+                        <input type="text" name="commentary-{{f_index}}" [(ngModel)]="i.commentary" [ngClass]="{'is-invalid': i.newStatusFileID === 4}" class="form-control text-uppercase" (keyup)="validForm()" [required]="i.newStatusFileID === 4">
+                      </td>
+                      <td>
+                        <select name="fileStatus-{{f_index}}" class="form-control" required (change)="validForm(i)" [(ngModel)]="i.newStatusFileID">
+                          <option [ngValue]="undefined">--SELECCIONE--</option>
+                          <option *ngFor="let s of fileStatuses" [ngValue]="s.statusFileID">{{s.statusFileDesc | uppercase}}</option>
+                        </select>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="!loading" class="d-flex no-block w-100 mt-3 justify-content-between">
+      <div class="col-6 pl-3">
+        <button
+          class="btn btn-sm btn-danger"
+          style="letter-spacing: 0;" color="warn" [mat-dialog-close]="false">
+          Cerrar
+        </button>
+      </div>
+      <div class="col-6 pr-3 text-right">
+        <button
+          *ngIf="!postulant.isApproved"
+          class="btn btn-sm bg-primary-color text-white"
+          (click)="saveDocuments()"
+          [disabled]="formInvalid"
+          style="letter-spacing: 0;" color="primary">
+          Validar Documentos
+        </button>
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>

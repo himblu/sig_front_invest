@@ -1,0 +1,108 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+<div class="row animated fadeIn fast" *ngIf="!charging">
+  <div class="col-md-12">
+    <h1 style="text-align: center; color: #004899;">LISTADO DE PEA</h1>
+    <div class="card" style="border-radius: 15px;">
+      <div class="card-body">
+        <div class="row pl-3 pr-3">
+          <div class="col-3">
+            <section [formGroup]="filtersForm">
+              <mat-form-field appearance="outline">
+                <mat-label>Periodo Académico</mat-label>
+                <mat-select formControlName="periodID" placeholder="Seleccione un periodo">
+                  <mat-option *ngFor="let period of periods" [value]="period.periodID" (onSelectionChange)="getSchools(period.periodID)">
+                    {{period.periodName}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </section>
+          </div>
+          <div class="col-3">
+            <section [formGroup]="filtersForm">
+              <mat-form-field appearance="outline">
+                <mat-label>Escuela</mat-label>
+                <mat-select formControlName="schoolID" placeholder="Seleccione una escuela">
+                  <mat-option *ngFor="let school of schools" [value]="school.schoolID" (onSelectionChange)="getCareers(school.schoolID)">
+                    {{school.schoolName}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </section>
+          </div>
+          <div class="col-3">
+            <section [formGroup]="filtersForm">
+              <mat-form-field appearance="outline">
+                <mat-label>Carrera</mat-label>
+                <mat-select formControlName="careerID" placeholder="Seleccione una carrera">
+                  <mat-option *ngFor="let career of careers" [value]="career.careerID" (onSelectionChange)="getStudyPlan(career.careerID)">
+                    {{career.careerName}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </section>
+          </div>
+          <div class="col-3">
+            <section [formGroup]="filtersForm">
+              <mat-form-field appearance="outline">
+                <mat-label>Malla Curricular</mat-label>
+                <mat-select formControlName="studyPlanID" placeholder="Seleccione una malla">
+                  <mat-option *ngFor="let study of study_plan" [value]="study.studyPlanID" (onSelectionChange)="getPeaList(study.studyPlanID)">
+                    {{study.studyPlanDesc}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </section>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table id="demo-foo-addrow"
+                 class="table m-t-0 table-hover no-wrap contact-list footable-loaded footable"
+                 data-page-size="5">
+            <thead style="background-color: #004899; color: white;">
+            <tr>
+              <th class="footable-sortable">
+                Periodo (nivel)
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable">
+                Asignatura
+                <span class="footable-sort-indicator"></span>
+              </th>
+              <th class="footable-sortable" style="text-align: center;">
+                Acciones
+                <span class="footable-sort-indicator"></span>
+              </th>
+            </tr>
+            </thead>
+            <tbody style="color: black;">
+            <tr *ngFor="let item of peaList; let i=index;" class="footable-even" style="text-transform: uppercase;">
+              <td>{{item.cycleDesc}}</td>
+              <td>{{item.courseName}}</td>
+              <td style="text-align: center;">
+                <a type="button"
+                    matTooltipPosition="above"
+                    matTooltip="PDF"
+                    (click)="getPdf(item.courseID)"
+                    style="cursor: pointer; color: red;">
+                    <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                </a>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <mat-paginator
+          #paginator
+          [length]="length"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions"
+          (page)="pageEvent = changePagePea($event)">
+        </mat-paginator>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,15 @@
+.fx-spacer {
+  flex: 1 1 auto;
+}
+
+.custom-close-button {
+  height: 50px;
+  right: -16px;
+  border-radius: 0;
+  box-shadow: none !important;
+}
+
+.toolbar-title {
+  padding-left: 7px;
+  font-size: smaller;
+}

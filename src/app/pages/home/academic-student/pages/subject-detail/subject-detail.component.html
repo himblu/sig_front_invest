@@ -1,0 +1,56 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="!charging">
+  <div class="card" *ngIf="subject">
+    <div class="card-body">
+      <div class="row pl-2 pr-2">
+        <div class="col-10"><h4 style="color: #004899;">{{subject.courseName}}</h4></div>
+      </div>
+      <div class="row pl-3 pr-3">
+        <div class="col-md-10">
+          <div class="row">
+            <div class="col-12">
+              <h4>
+                <strong style="color: #004899;">Docente:</strong> {{subject.teacher}}
+              </h4>
+            </div>
+            <div class="col-12">
+              <h4>
+                <strong style="color: #004899;">Contenido del Curso:</strong>
+              </h4>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<br>
+<div *ngIf="!charging">
+  <div class="card" *ngIf="subject">
+    <div class="card-body">
+      <ng-container *ngFor="let item of tasks">
+        <div class="row pl-3 pr-3" >
+          <div class="col-12" style="background-color: #004899; color: white;">
+            <p>{{item.evaluationName}}</p>
+          </div>
+          <ng-container *ngFor="let activity of item.activities; let i=index;">
+            <div class="col-12 element">
+              <div *ngIf="i == 0"><br></div>
+              <h4 (click)="getStudentActivity(activity, item)"><a style="color: #8dbdf5;"><i class="fa fa-file" aria-hidden="true"></i></a>&nbsp;<a>{{activity.taskName}}</a></h4>
+            </div>
+          </ng-container>
+        </div>
+        <br>
+      </ng-container>
+    </div>
+  </div>
+</div>

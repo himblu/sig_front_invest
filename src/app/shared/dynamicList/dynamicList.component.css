@@ -1,0 +1,59 @@
+.panel-title {
+	background: #014898;
+	color: white;
+	padding: 10px;
+	text-align: center;
+	border-radius: 5px;
+	font-size: 18px;
+	font-weight: bold;
+}
+
+.container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.list-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 20px;
+}
+
+.list-panel {
+	width: 550px;
+	background: white;
+	padding: 10px;
+	border-radius: 8px;
+	box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+	min-height: 400px;
+	max-height: 400px;
+	overflow-y: auto;
+}
+
+.filter {
+	width: 100%;
+}
+
+.fixed-size {
+	min-height: 300px;
+	max-height: 400px;
+	overflow-y: auto;
+}
+
+.buttons {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+}
+
+button {
+	background: #014898;
+	color: white;
+	border: none;
+	padding: 8px 12px;
+	border-radius: 4px;
+	cursor: pointer;
+}

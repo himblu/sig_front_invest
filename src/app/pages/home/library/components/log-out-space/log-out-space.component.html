@@ -1,0 +1,50 @@
+<mat-dialog-content>
+  <div *ngIf="isLoading; else form">
+    <spinner-loader></spinner-loader>
+  </div>
+
+  <ng-template #form>
+      <div class="card">
+        <div class="card-body">
+          <div class="row" [formGroup]="filtersForm">
+            <div class="col-6">
+              <h4>Ingrese la contraseña para salir</h4>
+            </div>
+            <div class="col-6">
+              <mat-form-field class="width" appearance="outline">
+                <input #password [type]="passwordVisible ? 'text' : 'password'" matInput formControlName="p_librarySpacePassword" [minlength]="6">
+                <mat-icon matSuffix (click)="passwordVisible = !passwordVisible" [attr.aria-label]="'Hide password'"
+                  [attr.aria-pressed]="!passwordVisible" style="cursor: pointer;">
+                  {{passwordVisible ? 'visibility_off' : 'visibility'}}
+                </mat-icon>
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+      </div>
+  </ng-template>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <div class="d-flex no-block w-100 justify-content-between">
+    <div class="pl-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="warn"
+        [mat-dialog-close]="false">
+        Cancelar
+      </button>
+    </div>
+    <div class="pr-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="primary"
+        (click)="onSubmit();">
+        Salir
+      </button>
+    </div>
+  </div>
+</mat-dialog-actions>

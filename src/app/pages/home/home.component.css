@@ -1,0 +1,20 @@
+.footer-button-no-outline {
+    background: none;
+    border: none;
+    color: #398bf7;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.footer-button-no-outline:focus {
+    outline: none;
+    box-shadow: none;
+    text-decoration: none;
+}
+
+.footer-button-no-outline:hover {
+    text-decoration: none;
+    color: #0056b3;
+}
+
+  

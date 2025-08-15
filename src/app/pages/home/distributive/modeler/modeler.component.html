@@ -1,0 +1,512 @@
+<div class="row mt-4 mb-4 d-flex justify-content-end">
+  <div class="col-10" style="text-align: right;">
+    <button mat-raised-button color="primary" style="background: #014898;" (click)="sendForm();">CREAR DISTRIBUTIVO</button>
+  </div>
+  <div class="col-2">
+    <a
+      style="background-color: rgb(84, 158, 77);
+      color: white;"
+      mat-raised-button
+      matTooltipPosition="above"
+      matTooltip="Descargar"
+      href="https://tecnologicoitcaeduec-my.sharepoint.com/personal/encuba_itca_edu_ec/_layouts/15/onedrive.aspx?ga=1&id=%2Fpersonal%2Fencuba%5Fitca%5Fedu%5Fec%2FDocuments%2FCONTRATO%20SISTEMA%20INFORM%C3%81TICO%20DE%20GESTI%C3%93N%20%28SIG%29%20%2D%20ENCUBA%2FMANUALES%20DE%20USUARIO%20%28SIG%29%2FDISTRIBUTIVO%2F13%5FMU%5FPROCESO%20DISTRIBUTIVO%5F%20VICERRECTORADO%2Epdf&parent=%2Fpersonal%2Fencuba%5Fitca%5Fedu%5Fec%2FDocuments%2FCONTRATO%20SISTEMA%20INFORM%C3%81TICO%20DE%20GESTI%C3%93N%20%28SIG%29%20%2D%20ENCUBA%2FMANUALES%20DE%20USUARIO%20%28SIG%29%2FDISTRIBUTIVO"
+      target="_blank">
+        <small>Manual Usuario</small>
+    </a>
+  </div>
+</div>
+<div class="animated fadeIn fast" [formGroup]="form">
+  <div class="row" formGroupName="filters">
+    <div class="card">
+      <div class="row card-body ml-1 mt-4 mr-1">
+        <div class="col-md-3">
+          <!-- La lista de sucursales viene desde el Resolver -->
+          <!-- Al seleccionar una sucursal, se traen los periodos académicos -> Sucursal -->
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Sede</mat-label>
+            <mat-select (openedChange)="showMessageToPreventFormReset($event, 'campus');" formControlName="campus"
+                        (selectionChange)="getPeriodsByCampus($event, 'campus'); getBuildingsByCampus($event);">
+              <mat-option *ngFor="let item of campuses"
+                          [value]="item.campusID">{{ item.campusDetail }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+          <div class="col-md-3">
+          <!-- Al seleccionar un edificio, se traen las aulas de ese edificio -> Edificio -->
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Edificio</mat-label>
+            <mat-select (openedChange)="showMessageToPreventFormReset($event, 'building');" formControlName="building"
+                        (selectionChange)="getClassroomsByBuilding($event, 'building');">
+              <mat-option *ngFor="let item of buildings"
+                          [value]="item.buildingID">{{ item.buildingDesc }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+          <div class="col-md-3">
+          <!-- Al seleccionar un edificio, se traen las aulas de ese edificio -> Edificio -->
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Aula</mat-label>
+            <mat-select (openedChange)="showMessageToPreventFormReset($event, 'classroom');" formControlName="classroom"
+                        (selectionChange)="removeScheduleFromClassroom($event);">
+              <mat-option *ngFor="let item of classrooms | filterClassrooms: false"
+                          [value]="item.classroomID">{{ item.classroomName }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col-md-3">
+          <!-- Al seleccionar el periodo, se traen las escuelas de ese periodo. -> Periodo -->
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Periodo Académico</mat-label>
+            <mat-select (openedChange)="showMessageToPreventFormReset($event, 'period');" formControlName="period"
+                        (selectionChange)="getSchoolsByPeriod($event, 'period');">
+              <mat-option *ngFor="let item of periods" [value]="item.periodID">{{ item.periodName }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col-md-3">
+          <!-- Al seleccionar la escuela, se traen las carreras -> Periodo y Escuela -->
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Escuela</mat-label>
+            <mat-select
+              (openedChange)="showMessageToPreventFormReset($event, 'school');" formControlName="school"
+              (selectionChange)="getCareersBySchool($event, 'school');">
+              <mat-option *ngFor="let item of schools" [value]="item.schoolID">{{ item.schoolName }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col-md-3">
+          <mat-form-field class="width" appearance="outline">
+            <!-- Al seleccionar una carrera, se traen las mallas de esa carrera -->
+            <!-- Al seleccionar una carrera, se traen las modalidades -> Carrera -->
+            <mat-label>Carrera</mat-label>
+            <mat-select
+              (openedChange)="showMessageToPreventFormReset($event, 'career');" formControlName="career"
+              (selectionChange)="getStudyPlansByCareer($event, 'career'); getModalitiesByCareer($event, 'career');">
+              <mat-option *ngFor="let item of careers" [value]="item.careerID">{{item.careerName}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col-md-3">
+          <!-- Al seleccionar una malla, se traen los ciclos -> Periodo, Escuela y Plan de Estudio -->
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Malla Curricular</mat-label>
+            <mat-select
+              (openedChange)="showMessageToPreventFormReset($event, 'studyPlan');" formControlName="studyPlan"
+              (selectionChange)="getCyclesByCareerAndStudyPlan($event, 'studyPlan');">
+              <mat-option *ngFor="let item of studyPlans"
+                          [value]="item.studyPlanID"> {{ item.studyPlanDesc }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col-md-3">
+          <!-- Al seleccionar la modalidad, se traen las jornadas o módulos -->
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Modalidad</mat-label>
+            <mat-select (openedChange)="showMessageToPreventFormReset($event, 'modality');" formControlName="modality"
+                        (selectionChange)="getModulesOrWorkingDaysByModality($event);">
+              <mat-option *ngFor="let item of modalities"
+                          [value]="item.modalityID">{{ item.modalityName }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col-md-3" *ngIf="selectedModality?.workingORmodule === 'M'">
+          <!-- La lista de módulos depende de la modalidad seleccionada -->
+          <!-- Al seleccionar un módulo, se construye la tabla-->
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Módulo</mat-label>
+            <mat-select (openedChange)="showMessageToPreventFormReset($event, 'module');" formControlName="module"
+                        (selectionChange)="getHoursByWorkingDayOrModuleAndModality($event, 'module');">
+              <mat-option *ngFor="let item of modules" [value]="item.classModuleID">
+                {{ item.classModuleDesc }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col-md-3" *ngIf="selectedModality?.workingORmodule === 'J'">
+          <!-- La lista de módulos depende de la modalidad seleccionada -->
+          <!-- Al seleccionar una jornada, se construye la tabla-->
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Sección</mat-label>
+            <mat-select (openedChange)="showMessageToPreventFormReset($event, 'workingDay');" formControlName="workingDay"
+                        (selectionChange)="getHoursByWorkingDayOrModuleAndModality($event, 'workingDay');">
+              <mat-option *ngFor="let item of workingDays"
+                          [value]="item.workingDayID">{{ item.workingDayDesc }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col-md-3">
+          <!-- Depende de Carrera -->
+          <!-- Al seleccionar un nivel, se cargan las materias -->
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Periodo (Nivel)</mat-label>
+            <mat-select
+              (openedChange)="showMessageToPreventFormReset($event, 'cycle');"
+              formControlName="cycle"
+              (selectionChange)="resetScheduleAndEnableSection('cycle');">
+              <mat-option *ngFor="let item of cycles" [value]="item.cycleID">{{ item.cycleName }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col-md-3">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Paralelo</mat-label>
+            <mat-select
+              (openedChange)="showMessageToPreventFormReset($event, 'section');"
+              (selectionChange)="getSubjectsAndBuildSchedule('section', $event);"
+              formControlName="section">
+              <mat-option *ngFor="let item of parallels" [value]="item.parallelCode">{{ item.parallelCode }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col-md-3">
+          <mat-form-field class="width" appearance="outline">
+            <mat-label>Capacidad</mat-label>
+            <input
+              matInput
+              type="text" [mask]="'9*'" [allowNegativeNumbers]="false" formControlName="capacity" autocomplete="off"/>
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-4 mb-3">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <div class="mb-12">
+            <h5 class="text-center" style="font-weight: 500; font-size: 14px;">ASIGNATURAS DISPONIBLES <span *ngIf="maxSubjects > 0">({{ maxSubjects }})</span></h5>
+          </div>
+          <ul class="course-list">
+            <li
+              style="cursor: not-allowed;"
+              *ngIf="!subjects.length"
+              class="border-bottom-1 border-top-1 text-uppercase">
+              No Hay Asignaturas Disponibles
+            </li>
+            <li
+              class="border-bottom-1 text-uppercase"
+              [style.cursor]="disableSubjects ? 'not-allowed' : 'move'"
+              [dndDraggable]="{ subject }"
+              [dndType]="'subject'"
+              *ngFor="let subject of subjects;">
+              <div class="d-flex no-block justify-content-between w-100">
+                <div class="d-flex no-block">
+                  <div>
+                    {{ subject.courseName }} ({{ subject.busyHours }}/{{ subject.hours }})
+                  </div>
+                  <div class="d-flex no-block align-items-center">
+                    <input
+                      [disabled]="allTeachersWereSelectedAndEachOneHasAtLeastOneAvailableHour"
+                      style="width: 40px; height: 20px;"
+                      class="ml-2 mr-2"
+                      type="text"
+                      [mask]="'9*'"
+                      [allowNegativeNumbers]="false"
+                      [ngModelOptions]="{ standalone: true }"
+                      [(ngModel)]="subject.hours" autocomplete="off"/>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center">
+                  <select
+                    [disabled]="allTeachersWereSelectedAndEachOneHasAtLeastOneAvailableHour"
+                    style="height: 20px; width: 200px;"
+                    [ngModelOptions]="{ standalone: true }"
+                    [(ngModel)]="subject.selectedTeacher">
+                    <option [value]="''">Docente Asignado</option>
+                    <option
+                      *ngFor="let teacher of subject.teachers"
+                      [value]="teacher.personID">{{ teacher.teacher }}
+                    </option>
+                  </select>
+<!--                  <mat-form-field class="width" appearance="outline">-->
+<!--                    <mat-label>Docente</mat-label>-->
+<!--                    <mat-select [(ngModel)]="subject.selectedTeacher">-->
+<!--                      <mat-option-->
+<!--                        *ngFor="let teacher of subject.teachers"-->
+<!--                        [value]="teacher.personID">{{ teacher.teacherName }}</mat-option>-->
+<!--                    </mat-select>-->
+<!--                  </mat-form-field>-->
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-1">
+      <div class="d-flex justify-content-center">
+        <button mat-mini-fab color="primary" (click)="setAvailableTeachers();" [disabled]="allTeachersWereSelectedAndEachOneHasAtLeastOneAvailableHour">
+          <mat-icon>double_arrow</mat-icon>
+        </button>
+      </div>
+    </div>
+    <div class="col-md-5">
+      <div class="card">
+        <div class="card-body">
+          <div class="mb-12">
+            <h5 class="text-center" style="font-weight: 500; font-size: 14px;">DOCENTES DISPONIBLES</h5>
+          </div>
+          <ul class="course-list">
+            <li *ngIf="!teachers.length"
+              class="border-bottom-1 border-top-1 text-uppercase">
+              No Hay Docentes Disponibles. Selecciona un Módulo o una Sección para ver el listado de Docentes.
+            </li>
+<!--            <li class="border-bottom-1 text-uppercase"-->
+<!--                [dndDraggable]="{ teacher }"-->
+<!--                [dndType]="'teacher'"-->
+<!--                *ngFor="let teacher of teachers;">-->
+<!--              {{ teacher.PersonFullName }}-->
+<!--            </li>-->
+            <li
+              class="border-bottom-1 text-uppercase"
+              *ngFor="let teacher of teachers;">
+                {{ teacher.teacher }} ({{ teacher.busyHours }}/{{ teacher.availableHours }})
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row" formArrayName="schedule">
+    <div class="col-12 mb-4">
+      <button
+        [disabled]="!allTeachersWereSelectedAndEachOneHasAtLeastOneAvailableHour"
+        mat-raised-button
+        color="primary" style="background: #014898; letter-spacing: 0; color: white;" (click)="addRow();">
+        AGREGAR INTERVALO DE HORA
+      </button>
+    </div>
+    <div class="col-12">
+      <table class="w-100 mat-elevation-z8">
+        <tbody>
+        <tr>
+          <th *ngFor="let header of scheduleHeader;">{{ header }}</th>
+        </tr>
+        <tr *ngIf="!scheduleFormArray.length; else schedule;">
+<!--        <tr *ngIf="!(scheduleFormArray.length && subjects | allTeachersWereSelected: maxSubjects); else schedule;">-->
+          <td [attr.colspan]="scheduleHeader.length" class="text-uppercase">Selecciona una Sección o un Módulo y asigna un docente a cada asignatura para gestionar el distributivo</td>
+        </tr>
+        <ng-template #schedule>
+          <tr *ngFor="let hour of scheduleFormArray.controls; let indexSchedule = index;" [formGroupName]="indexSchedule">
+            <td>
+              <div style="position: absolute;">
+                <mat-icon
+                  style="cursor: pointer; color: red; position: relative; top: -50px;"
+                  (click)="deleteRow(indexSchedule);">
+                  close
+                </mat-icon>
+              </div>
+              <div class="d-block">
+<!--                <input type="time" formControlName="startTime" hidden>-->
+                <div class="d-flex no-block justify-content-center p-3">
+                  <input type="time" matInput formControlName="startTime">
+<!--                  <div>-->
+<!--                    <div><mat-icon (click)="updateHourToRow(indexSchedule, 'startTime', 1);" style="cursor: pointer;">arrow_drop_up</mat-icon></div>-->
+<!--                    <div class="d-flex no-block">-->
+<!--                      <div><span style="font-size: 18px; font-weight: 500;">{{ hour.value.startTime | slice: 0 : 2 }}</span></div>-->
+<!--                    </div>-->
+<!--                    <div><mat-icon (click)="updateHourToRow(indexSchedule, 'startTime', -1);" style="cursor: pointer;">arrow_drop_down</mat-icon></div>-->
+<!--                  </div>-->
+<!--                  <div class="d-flex no-block align-self-center">-->
+<!--                    <span style="font-size: 18px; font-weight: 500; position: relative; top: -3px">:</span>-->
+<!--                  </div>-->
+<!--                  <div>-->
+<!--                    <div><mat-icon (click)="updateHourToRow(indexSchedule, 'startTime', 0, 15);" style="cursor: pointer;">arrow_drop_up</mat-icon></div>-->
+<!--                    <div class="d-flex no-block">-->
+<!--                      <div><span style="font-size: 18px; font-weight: 500;">{{ hour.value.startTime | slice:  3: 5 }}</span></div>-->
+<!--                    </div>-->
+<!--                    <div><mat-icon (click)="updateHourToRow(indexSchedule, 'startTime', 0, -15);" style="cursor: pointer;">arrow_drop_down</mat-icon></div>-->
+<!--                  </div>-->
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="d-block">
+<!--                <input type="time" formControlName="endTime" hidden>-->
+                <div class="d-flex no-block justify-content-center p-3">
+                <input type="time" matInput formControlName="endTime">
+<!--                  <div>-->
+<!--                    <div><mat-icon (click)="updateHourToRow(indexSchedule, 'endTime', 1);" style="cursor: pointer;">arrow_drop_up</mat-icon></div>-->
+<!--                    <div class="d-flex no-block">-->
+<!--                      <div><span style="font-size: 18px; font-weight: 500;">{{ hour.value.endTime | slice: 0 : 2 }}</span></div>-->
+<!--                    </div>-->
+<!--                    <div><mat-icon (click)="updateHourToRow(indexSchedule, 'endTime', -1);" style="cursor: pointer;">arrow_drop_down</mat-icon></div>-->
+<!--                  </div>-->
+<!--                  <div class="d-flex no-block align-self-center">-->
+<!--                    <span style="font-size: 18px; font-weight: 500; position: relative; top: -3px">:</span>-->
+<!--                  </div>-->
+<!--                  <div>-->
+<!--                    <div><mat-icon (click)="updateHourToRow(indexSchedule, 'endTime', 0, 15);" style="cursor: pointer;">arrow_drop_up</mat-icon></div>-->
+<!--                    <div class="d-flex no-block">-->
+<!--                      <div><span style="font-size: 18px; font-weight: 500;">{{ hour.value.endTime | slice:  3: 5 }}</span></div>-->
+<!--                    </div>-->
+<!--                    <div><mat-icon (click)="updateHourToRow(indexSchedule, 'endTime', 0, -15);" style="cursor: pointer;">arrow_drop_down</mat-icon></div>-->
+<!--                  </div>-->
+                </div>
+              </div>
+            </td>
+
+            <td *ngFor="let day of getDaysFormArray(indexSchedule).controls; let indexDay = index;" formArrayName="days">
+              <div [formGroupName]="indexDay">
+                <div
+                  style="min-height: 150px; max-height: 150px; height: 150px; display: block;">
+                  <div
+                    [dndDropzone]="['subject']"
+                    [dndDisableIf]="day.value?.subjectId"
+                    [dndDragoverClass]="'drop-zone'"
+                    class="drop-zone-container"
+                    (dndDrop)="onDrop($event, indexSchedule, indexDay);"
+                    style="height: 90px; min-height: 90px; max-height: 90px;">
+                    <div
+                      *ngIf="!day.value?.subjectId; else subjectInfo;"
+                      style="height: 90px; min-height: 90px; max-height: 90px; display: flex; align-items: center;">
+                      <span>ASIGNATURA</span>
+                    </div>
+                    <ng-template #subjectInfo>
+                      <div style="display: block; width: 100%; height: 100%;">
+                        <div style="display: flex; justify-content: end">
+                          <mat-icon
+                            style="cursor: pointer; color: red;"
+                            (click)="removeSubjectAndTeacher(indexSchedule, indexDay);">
+                            close
+                          </mat-icon>
+                        </div>
+                        <div>{{ day.value?.subject?.courseName }}</div>
+                        <div>{{ day.value?.teacher?.teacher }}</div>
+                      </div>
+                    </ng-template>
+                    <div
+                      style="border: 1px red solid; border-radius: 5px; padding: 15px; height: 90px; min-height: 90px; max-height: 90px;"
+                      dndPlaceholderRef>
+                      AGREGAR ASIGNATURA
+                    </div>
+                  </div>
+<!--                  <div-->
+<!--                    [dndDropzone]="['teacher']"-->
+<!--                    [dndDragoverClass]="'drop-zone'"-->
+<!--                    class="drop-zone-container"-->
+<!--                    [dndDisableIf]="!day.value?.subjectId || day.value?.personId"-->
+<!--                    (dndDrop)="onDrop($event, indexSchedule, indexDay);"-->
+<!--                    style="height: 40px; min-height: 40px; max-height: 40px;">-->
+<!--                    <div-->
+<!--                      *ngIf="!day.value?.personId; else teacherInfo;"-->
+<!--                      style="height: 40px; min-height: 40px; max-height: 40px;">-->
+<!--                      <span>DOCENTE</span>-->
+<!--                    </div>-->
+<!--                    <ng-template #teacherInfo>-->
+<!--                      &lt;!&ndash;                    <span>{{ day.value | json }}</span>&ndash;&gt;-->
+<!--                      <span>{{ day.value?.teacher?.PersonFullName }}</span>-->
+<!--                    </ng-template>-->
+<!--                    <div-->
+<!--                      style="border: 1px orangered solid; border-radius: 5px; padding: 15px; height: 50px; min-height: 50px; max-height: 50px;"-->
+<!--                      dndPlaceholderRef>-->
+<!--                      AGREGAR DOCENTE-->
+<!--                    </div>-->
+<!--                  </div>-->
+                  <div style="height: 30px; min-height: 30px; max-height: 30px;">
+                    <select
+                      #buildingSelect
+                      formControlName="building"
+                      (change)="getScheduleClassroomsByBuilding(buildingSelect.value, indexSchedule, indexDay);">
+                      <option [value]="''">Seleccione</option>
+                      <option *ngFor="let item of buildings" [value]="item.buildingID"> {{ item.buildingDesc }}</option>
+                    </select>
+                  </div>
+                  <div style="height: 30px; min-height: 30px; max-height: 30px;">
+                    <select
+                      (change)="postOrUpdateTemporalSubject(indexSchedule, indexDay);"
+                      formControlName="classroom">
+                      <option [value]="''">Aula</option>
+                      <option *ngFor="let item of scheduleClassrooms[(indexSchedule * weekDays.length) + indexDay]"
+                              [value]="item.classroomID"> {{ item.classroomName }}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </td>
+
+            <!--              <td>-->
+            <!--                <select formControlName="building" (change)="getClassRoomsByBuilding($event, indexSchedule);">-->
+            <!--                  <option *ngFor="let item of buildings" [value]="item.buildingID"> {{ item.buildingName }}></option>-->
+            <!--                </select>-->
+            <!--              </td>-->
+            <!--              <td>-->
+            <!--                <select formControlName="room">-->
+            <!--                  <option *ngFor="let item of classrooms[indexSchedule]" [value]="item.classroomID"> {{ item.classroomName }}></option>-->
+            <!--                </select>-->
+            <!--              </td>-->
+            <!--              <td>-->
+            <!--                <div style="cursor: default; width: 100%;">-->
+            <!--                  <ng-container-->
+            <!--                    [ngTemplateOutletContext]="{ subject: row.get('subject').value }"-->
+            <!--                    [ngTemplateOutlet]="row?.get('subjectId')?.value ? subjectHasData : subjectIsEmpty">-->
+            <!--                  </ng-container>-->
+            <!--                  <ng-template #subjectIsEmpty let-subject="subject">-->
+            <!--                    <div-->
+            <!--                      [dndDropzone]="['subject']"-->
+            <!--                      (dndDrop)="onDrop($event, indexSchedule);"-->
+            <!--                      style="cursor: default; width: 100%; height: 30px;">-->
+            <!--                    </div>-->
+            <!--                  </ng-template>-->
+            <!--                  <ng-template #subjectHasData let-subject="subject">-->
+            <!--                    <div-->
+            <!--                      [matMenuTriggerFor]="subjectOptions"-->
+            <!--                      style="cursor: default; width: 100%; height: 30px;">-->
+            <!--                      {{ subject.courseName }}-->
+            <!--                      <mat-menu #subjectOptions="matMenu" yPosition="above">-->
+            <!--                        <ng-template matMenuContent>-->
+            <!--                          <button mat-menu-item style="color: red;" (click)="removeRow(indexSchedule);">Borrar-->
+            <!--                            Registro-->
+            <!--                          </button>-->
+            <!--                        </ng-template>-->
+            <!--                      </mat-menu>-->
+            <!--                    </div>-->
+            <!--                  </ng-template>-->
+            <!--                  <ng-container-->
+            <!--                    [ngTemplateOutletContext]="{ teacher: row.get('teacher').value }"-->
+            <!--                    [ngTemplateOutlet]="row?.get('personId')?.value ? teacherHasData : teacherIsEmpty">-->
+            <!--                  </ng-container>-->
+            <!--                  <ng-template #teacherIsEmpty let-teacher="teacher">-->
+            <!--                    <div-->
+            <!--                      [dndDropzone]="['teacher']"-->
+            <!--                      (dndDrop)="onDrop($event, indexSchedule);"-->
+            <!--                      style="cursor: default; width: 100%; height: 30px;">-->
+            <!--                    </div>-->
+            <!--                  </ng-template>-->
+            <!--                  <ng-template #teacherHasData let-teacher="teacher">-->
+            <!--                    <div-->
+            <!--                      [matMenuTriggerFor]="teacherOptions"-->
+            <!--                      style="cursor: default; width: 100%; height: 30px;">-->
+            <!--                      {{ teacher.teacherName }}-->
+            <!--                      <mat-menu #teacherOptions="matMenu" yPosition="above">-->
+            <!--                        <ng-template matMenuContent>-->
+            <!--                          <button mat-menu-item style="color: red;" (click)="removeRow(indexSchedule);">Borrar-->
+            <!--                            Registro-->
+            <!--                          </button>-->
+            <!--                        </ng-template>-->
+            <!--                      </mat-menu>-->
+            <!--                    </div>-->
+            <!--                  </ng-template>-->
+            <!--                </div>-->
+            <!--              </td>-->
+          </tr>
+        </ng-template>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

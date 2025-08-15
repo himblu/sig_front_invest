@@ -1,0 +1,22 @@
+<div style="display: flex; justify-content: end; align-items: center; background: transparent;" class="p-2 mb-3">
+  <mat-icon style="cursor: pointer;" [matDialogClose]="false" class="red-icon" matRipple>close</mat-icon>
+</div>
+
+<mat-dialog-content>
+  <div class="p-2">
+    <p style="font-size: 90%; color: black; letter-spacing: 0; line-height: normal;">{{ data.message }}</p>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <div>
+  </div>
+  <div>
+    <button mat-raised-button class="mr-2" color="warn" [mat-dialog-close]="false">
+      <span style="font-size: 12px;">No</span>
+    </button>
+    <button mat-raised-button color="primary" [mat-dialog-close]="true">
+      <span style="font-size: 12px">Sí, Seguro</span>
+    </button>
+  </div>
+</mat-dialog-actions>

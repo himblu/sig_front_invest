@@ -1,0 +1,68 @@
+<div class="row animated fadeIn fast" *ngIf="loading">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+<div *ngIf="!loading">
+  <div class="card">
+    <div class="card-body">
+      <div class="row pl-2 pr-2">
+        <div class="col-12">
+          <div class="table-responsive">
+            <table class="table">
+              <thead style="background-color: #004899; color: white;">
+                <tr>
+                  <th>Nombre</th>
+                  <th>Malla Curricular</th>
+                  <th>Asignatura / Proyecto</th>
+                  <th>Nivel</th>
+                  <th>Paralelo</th>
+                  <th>Docente</th>
+                  <th colspan="2" style="text-align: left;">Estado</th>
+                </tr>
+              </thead>
+              <tbody style="color: black;">
+                <tr *ngFor="let item of evaluationInstruments">
+                  <td>{{item.evaluationName}}</td>
+                  <td>{{item.studyPlanDesc}}</td>
+                  <td>
+                    <ng-container *ngIf="item.courseName; else project">{{item.courseName}}</ng-container>
+                    <ng-template #project>{{item.projectPracInformativeDesc}}</ng-template>
+                  </td>
+                  <td>{{item.cycleDesc}}</td>
+                  <td>{{item.parallelCode}}</td>
+                  <td>{{item.teacher}}</td>
+                  <td style="text-align: left;">
+                    <span
+                      style="color: black;"
+                      class="badge"
+                      [ngClass]="{'gray' : item.status === 'PENDIENTE', 'green' : item.status === 'COMPLETADO'}">
+                      {{item.status}}
+                    </span>
+                  </td>
+                  <td style="text-align: right;">
+                    <a *ngIf="item.status === 'PENDIENTE'"
+                       style="cursor: pointer; color: blue;"
+                       matTooltipPosition="above"
+                       matTooltip="Continuar con Evaluación"
+                       (click)="continueEvaluation(item)">
+                      Continuar
+                    </a>
+                  </td>
+
+                </tr>
+                <tr *ngIf="evaluationInstruments.length === 0">
+                  <td style="text-align: center;" colspan="5">No existen registros</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

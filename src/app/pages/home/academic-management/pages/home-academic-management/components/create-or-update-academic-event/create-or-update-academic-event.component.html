@@ -1,0 +1,156 @@
+<div style="display: flex; justify-content: end; align-items: center; background: #014898;" class="p-2 mb-3">
+  <mat-icon style="cursor: pointer; color: white;" [matDialogClose]="false" class="white-icon" matRipple>close</mat-icon>
+</div>
+
+<mat-dialog-content>
+  <h3 class="mb-3 text-center font-18" style="font-weight: 500;">EVENTO ACADÉMICO</h3>
+  <form [formGroup]="form" *ngIf="!isCreating">
+    <div class="container">
+      <div class="row pt-3">
+        <div class="col-5">
+          <div class="d-flex justify-content-center">
+            <mat-card style="max-width: 300px; min-width: 300px">
+              <mat-calendar
+                #mCalendar
+                [selected]="selectedDateRange"
+                [dateFilter]="dateFilter"
+                (selectedChange)="onChangeCalendar($event)"
+                [minDate]="minDate"
+                [maxDate]="maxDate"
+                [startAt]="startAt">
+              </mat-calendar>
+            </mat-card>
+          </div>
+        </div>
+        <div class="col-5 offset-1">
+          <div class="container">
+            <div class="row">
+              <div class="col-12">
+                <mat-form-field appearance="outline">
+                  <mat-label>Tipo de Evento</mat-label>
+                  <mat-select formControlName="eventType">
+                    <mat-option (click)="isCreating= true;">Agregar Evento</mat-option>
+                    <mat-option *ngFor="let item of eventTypes" [value]="item.eventID">
+                      {{ item.eventName }}
+                    </mat-option>
+                  </mat-select>
+                  <mat-error *ngIf="form.hasError('required', 'eventType');">Este campo es requerido</mat-error>
+                </mat-form-field>
+              </div>
+
+              <div class="col-12">
+                <mat-form-field appearance="outline">
+                  <mat-label>Sede</mat-label>
+                  <mat-select
+                    formControlName="campus"
+                    (selectionChange)="getPeriodsByCampus($event, 'campus'); getModalitiesByCampus($event, 'campus');">
+                    <mat-option *ngFor="let item of campuses" [value]="item.campusID">
+                      {{ item.campusDetail }}
+                    </mat-option>
+                  </mat-select>
+                  <mat-error *ngIf="form.hasError('required', 'campus');">Este campo es requerido</mat-error>
+                </mat-form-field>
+              </div>
+
+              <div class="col-12">
+                <mat-form-field appearance="outline">
+                  <mat-label>Periodo Académico</mat-label>
+                  <mat-select formControlName="period">
+                    <mat-option
+                      (onSelectionChange)="onChangePeriod($event, item);"
+                      *ngFor="let item of periods"
+                      [value]="item.periodID">{{ item.periodName }}</mat-option>
+                  </mat-select>
+                  <mat-error *ngIf="form.hasError('required', 'period');">Este campo es requerido</mat-error>
+                </mat-form-field>
+              </div>
+
+              <div class="col-12">
+                <mat-form-field appearance="outline">
+                  <mat-label>Modalidad</mat-label>
+                  <mat-select formControlName="modality" (selectionChange)="getModulesOrWorkingDaysByModality($event);">
+                    <mat-option *ngFor="let item of modalities" [value]="item.modalityID">{{ item.modalityName }}</mat-option>
+                  </mat-select>
+                  <mat-error *ngIf="form.hasError('required', 'modality');">Este campo es requerido</mat-error>
+                </mat-form-field>
+              </div>
+
+              <div class="col-12" *ngIf="selectedModality?.workingORmodule === 'M'">
+                <mat-form-field appearance="outline">
+                  <mat-label>Módulo</mat-label>
+                  <mat-select formControlName="module">
+                    <mat-option *ngFor="let item of modules" [value]="item.classModuleID">
+                      {{ item.classModuleDesc }}
+                    </mat-option>
+                  </mat-select>
+                  <mat-error *ngIf="form.hasError('required', 'module');">Este campo es requerido</mat-error>
+                </mat-form-field>
+              </div>
+
+              <div class="col-12">
+                <mat-form-field appearance="outline">
+                  <mat-label>Observación</mat-label>
+                  <textarea matInput formControlName="observation"></textarea>
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <form *ngIf="isCreating"
+    [formGroup]="eventForm"
+    (ngSubmit)="onSubmit()">
+    <div class="row">
+      <div class="col-6">
+        <mat-form-field appearance="outline">
+          <mat-label>Nombre</mat-label>
+          <input matInput formControlName="eventName">
+          <mat-error>Este campo es requerido</mat-error>
+        </mat-form-field>
+      </div>
+      <div class="col-6">
+        <mat-form-field appearance="outline">
+          <mat-label>Descripción</mat-label>
+          <input matInput formControlName="eventDesc">
+          <mat-error>Este campo es requerido</mat-error>
+        </mat-form-field>
+      </div>
+      <div class="col-6">
+        <mat-form-field appearance="outline">
+          <mat-label>Background</mat-label>
+          <input type="color" matInput formControlName="background">
+          <mat-error>Este campo es requerido</mat-error>
+        </mat-form-field>
+      </div>
+      <div class="col-6">
+        <mat-form-field appearance="outline">
+          <mat-label>Color</mat-label>
+          <input type="color" matInput formControlName="color">
+          <mat-error>Este campo es requerido</mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-2">
+        <button type="submit" mat-raised-button class="styleButton_sml" style="max-width: 140px;">Guardar</button>
+      </div>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions class="justify-content-between" *ngIf="!isCreating">
+  <div>
+    <p *ngIf="form.hasError('required', 'startDate') || form.hasError('required', 'endDate')" style="font-size: 12px; color: #F44335;" class="mb-0 ml-3">Seleccione el rango de fechas para el evento</p>
+  </div>
+  <div>
+    <button mat-raised-button color="primary" class="mr-3" (click)="sendForm()">
+      {{ data?.event ? 'Guardar ' : 'Crear ' }} Evento
+      <!--    <mat-icon>-->
+      <!--      <mat-spinner diameter="20"></mat-spinner>-->
+      <!--    </mat-icon>-->
+    </button>
+  </div>
+</mat-dialog-actions>

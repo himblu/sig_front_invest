@@ -1,0 +1,517 @@
+<div class="animated fadeIn fast">
+  <div class="form-row">
+    <div class="col-12">
+      <form #instrumentForm="ngForm">
+        <div class="card">
+          <div class="card-header text-primary-color">
+            <i class="fa fa-cog mr-1"></i>
+            <strong>Especifique configuración necesaria</strong> <br>
+            Seleccione los parametros necesarios para configurar los instrumentos correspondientes.
+          </div>
+          <div class="card-body">
+            <!-- {{newConfig | json}} -->
+            <div class="form-row">
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Seguimiento / Evaluación</mat-label>
+                  <mat-select name="evaluationOrFollowup" [(ngModel)]="newConfig.evaluationOrFollowup" (selectionChange)="getEvaluationInstrumentsReport(); isActivitiesActive=0; isComponentsActive=0;" required>
+                    <mat-option *ngFor="let c of categoryEvaluationInstruments" [value]="c.categoryInstrumentID">{{c.categoryDesc | uppercase}}</mat-option>
+                  </mat-select>
+                  
+                </mat-form-field>  
+              </div>
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Instrumentos</mat-label>
+                  <mat-select name="typeEvaluationInstrumentID" [disabled]="!newConfig.evaluationOrFollowup && newConfig.evaluationOrFollowup !== 0" [(ngModel)]="newConfig.typeEvaluationInstrumentID" (selectionChange)="showComponentsActivities();" required>
+                    <mat-option *ngFor="let item of evaluationInstrumentsReport" [value]="item.typeEvaluationInstrumentID">{{item.typeEvaluationDesc}}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-3" *ngIf="isActivitiesActive">
+                <mat-form-field appearance="outline">
+                  <mat-label>Actividades</mat-label>
+                  <mat-select name="activity" [disabled]="!newConfig.typeEvaluationInstrumentID" (selectionChange)="selectActivity()" [(ngModel)]="newConfig.activity" required>
+                    <mat-option *ngFor="let item of instrumentEvaluationActivities" [value]="item.activityID">{{item.activityDesc}}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-3" *ngIf="isComponentsActive">
+                <mat-form-field appearance="outline">
+                  <mat-label>Componentes</mat-label>
+                  <mat-select name="component" [(ngModel)]="newConfig.component" [disabled]="!newConfig.activity" (selectionChange)="getEvaluationInstrumentsByPeriodAndComponent();" required>
+                    <mat-option *ngFor="let item of instrumentEvaluationComponents" [value]="item.componentID">{{item.componentDesc}}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Sede</mat-label>
+                  <mat-select name="campus" [(ngModel)]="newConfig.campus" [disabled]="!newConfig.typeEvaluationInstrumentID" (selectionChange)="getPeriodsByCampus();" required>
+                    <mat-option *ngFor="let item of campuses" [value]="item.campusID">{{ item.campusDetail }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Periodo Académico</mat-label>
+                  <mat-select name="period" [(ngModel)]="newConfig.period" (selectionChange)="getDataByPeriod();" [disabled]="!newConfig.campus" required>
+                    <mat-option *ngFor="let item of periods" [value]="item.periodID">{{ item.periodName }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Escuela</mat-label>
+                  <mat-select name="school" [(ngModel)]="newConfig.school" [disabled]="!newConfig.period" (selectionChange)="getCareersBySchool();" required>
+                    <mat-option *ngFor="let item of schools" [value]="item.schoolID">{{ item.schoolName }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Carrera</mat-label>
+                  <mat-select name="career" [(ngModel)]="newConfig.career" (selectionChange)="getDataByCareer()" [disabled]="!newConfig.school" required>
+                    <mat-option *ngFor="let item of careers" [value]="item.careerID">{{item.careerName}}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Malla Curricular</mat-label>
+                  <mat-select name="studyPlan" [(ngModel)]="newConfig.studyPlan" [disabled]="!newConfig.career" (selectionChange)="getCyclesByCareerAndStudyPlan();" required>
+                    <mat-option *ngFor="let item of studyPlans"
+                                [value]="item.studyPlanID"> {{ item.studyPlanDesc }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Modalidad</mat-label>
+                  <mat-select name="modality" [(ngModel)]="newConfig.modality" (selectionChange)="getModulesOrWorkingDaysByModality();" [disabled]="!newConfig.studyPlan" required>
+                    <mat-option *ngFor="let item of modalities"
+                                [value]="item.modalityID">{{ item.modalityName }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Instrumento de Evaluación</mat-label>
+                  <mat-select name="evaluationInstrument" [(ngModel)]="newConfig.evaluationInstrument" (selectionChange)="selectEvaluationInstrument()" [disabled]="!newConfig.modality" required>
+                    <mat-option *ngFor="let item of evaluationInstruments" [value]="item.evaluationInstrumentsID">{{ item.evaluationName }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-3" *ngIf="selectedModality?.workingORmodule === 'M' && newConfig.activity !== 5 && 
+                  !(newConfig.activity === ACTIVITIES.TEACHING && (newConfig.component === EVALUATION_COMPONENT.COEVALUATION_BETWEEN_TEACHERS || newConfig.component === EVALUATION_COMPONENT.COEVALUATION_ADMIN || newConfig.component === EVALUATION_COMPONENT.SELF_EVALUATION) ||
+                  newConfig.activity === ACTIVITIES.ACADEMIC_DIRECTION_OR_MANAGEMENT && (newConfig.component === EVALUATION_COMPONENT.SELF_EVALUATION || newConfig.component === EVALUATION_COMPONENT.COEVALUATION_ADMIN || newConfig.component === EVALUATION_COMPONENT.HETEROEVALUATION_TO_MANAGEMENT_BOSS || newConfig.component === EVALUATION_COMPONENT.COEVALUATION_TWO_MANAGEMENT) 
+                )">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Módulo</mat-label>
+                  <mat-select name="module" [(ngModel)]="newConfig.module" [disabled]="!newConfig.evaluationInstrument" required>
+                    <mat-option *ngFor="let item of modules" [value]="item.classModuleID">
+                      {{ item.classModuleDesc }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-3" *ngIf="newConfig.activity !== ACTIVITIES.ENGAGEMENT && newConfig.component !== EVALUATION_COMPONENT.COEVALUATION_BETWEEN_TEACHERS && newConfig.component !== EVALUATION_COMPONENT.COEVALUATION_ADMIN && newConfig.activity !== ACTIVITIES.ACADEMIC_DIRECTION_OR_MANAGEMENT && !(newConfig.activity === ACTIVITIES.TEACHING && newConfig.component === EVALUATION_COMPONENT.SELF_EVALUATION)">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Periodo (Nivel)</mat-label>
+                  <mat-select name="cycle" [(ngModel)]="newConfig.cycle" (selectionChange)="getSubjectsByPeriodSchoolCareerStudyPlanAndSection();" [disabled]="(selectedModality?.workingORmodule === 'M') && !newConfig.evaluationInstrument" required>
+                    <mat-option *ngFor="let item of cycles" [value]="item.cycleID">{{ item.cycleName }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-3">
+                <mat-form-field class="width" appearance="outline">
+                  <mat-label>Número de Intentos Permitidos</mat-label>
+                  <!-- [disabled]="(newConfig.activity !== 5 && !newConfig.cycle && ) || (newConfig.activity === 5 && !newConfig.evaluationInstrument)" -->
+                  <input matInput type="text" [mask]="'9*'" [allowNegativeNumbers]="false" name="attempts" [(ngModel)]="newConfig.attempts" autocomplete="off" required/>
+                </mat-form-field>
+              </div>
+              <div class="col-12 alert alert-warning alert-dismissible" role="alert" style="display: none;" #messageContainer>
+              </div>
+            </div>
+            <div class="form-row" *ngIf="!instrumentForm.invalid">
+              <div class="col-4">
+                <button class="btn btn-sm text-primary-color" (click)="toggleEvaluatorsModal()" 
+                  *ngIf="!instrumentForm.invalid && (newConfig.component === EVALUATION_COMPONENT.COEVALUATION_BETWEEN_TEACHERS || newConfig.component === EVALUATION_COMPONENT.COEVALUATION_TWO_MANAGEMENT)">
+                  <i class="fa fa-plus mr-1"></i>Agrega Grupo de Evaluación
+                </button>
+              </div>
+              <div class="col-4">
+
+              </div>
+              <div class="col-4 text-right">
+                <ng-container *ngIf="newConfig.component === EVALUATION_COMPONENT.COEVALUATION_BETWEEN_TEACHERS">
+                  <button class="btn btn-sm bg-primary-color" *ngIf="newConfig.evaluators.length" [disabled]="instrumentForm.invalid" (click)="sendForm()">
+                    <i class="fa fa-cog mr-1"></i>Guardar Configuración
+                  </button>
+                </ng-container>
+                <ng-container *ngIf="newConfig.component !== EVALUATION_COMPONENT.COEVALUATION_BETWEEN_TEACHERS">
+                  <ng-container *ngIf="newConfig.activity === ACTIVITIES.ACADEMIC_DIRECTION_OR_MANAGEMENT">
+                    <button class="btn btn-sm bg-primary-color" [disabled]="instrumentForm.invalid" (click)="sendForm()">
+                      <i class="fa fa-cog mr-1"></i>Guardar Configuración
+                    </button>
+                  </ng-container>
+                  <ng-container *ngIf="newConfig.activity !== ACTIVITIES.ACADEMIC_DIRECTION_OR_MANAGEMENT">
+                    <button class="btn btn-sm bg-primary-color" [disabled]="instrumentForm.invalid" (click)="sendForm()">
+                      <i class="fa fa-cog mr-1"></i>Guardar Configuración
+                    </button>
+                  </ng-container>
+                </ng-container>
+                <ng-container *ngIf="newConfig.activity === EVALUATION_COMPONENT.SELF_EVALUATION && newConfig.activity === ACTIVITIES.ACADEMIC_DIRECTION_OR_MANAGEMENT">
+                  <button class="btn btn-sm bg-primary-color" [disabled]="instrumentForm.invalid" (click)="sendForm()">
+                    <i class="fa fa-cog mr-1"></i>Guardar Configuración
+                  </button>
+                </ng-container>
+              </div>
+            </div>
+            <ng-container *ngIf="!instrumentForm.invalid">
+              <ng-container *ngIf="newConfig.evaluationOrFollowup === 0">
+                <div class="form-row">
+                  <div class="col-12">
+                    <div class="alert alert-info">
+                      <i class="fa fa-info mr-1"></i>Esta lista es solo informativa de: <code>COORDINADOR</code> vs <code>DOCENTE</code>.
+                    </div>
+                  </div>
+                  <div class="col-4">
+                    <caption>COORDINADORES</caption>
+                    <ul class="list-group">
+                      <li class="list-group-item" *ngFor="let c of coordinators">
+                        {{c.coordinator}}
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="col-4">
+                    <CAPTION>DOCENTES</CAPTION>
+                    <div class="card" *ngFor="let t of allTeachersByCareer">
+                      <div class="card-body p-2">
+                        {{t.teacher | uppercase}} - <span class="text-primary-color">{{t.courseName | uppercase}}</span>
+                        
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="newConfig.component === EVALUATION_COMPONENT.HETEROEVALUATION_TO_MANAGEMENT_BOSS">
+                <div class="form-row mt-2" *ngIf="newConfig.activity === ACTIVITIES.ACADEMIC_DIRECTION_OR_MANAGEMENT">
+                  <div class="col-12">
+                    <div class="alert alert-info">
+                      <i class="fa fa-info mr-1"></i>Elija a los docentes que los <code>JEFES DE GESTIÓN</code> evaluaran.
+                    </div>
+                  </div>
+                  <div class="col-4">
+                    <span>JEFES DE GESTIÓN</span>
+                    <ul class="list-group">
+                      <li class="list-group-item" *ngFor="let m of managementBoss" (click)="toggleManagementBoss(m)">
+                        {{m.teacher}} | {{m.positionName}}
+                        <i class="fa float-right" [ngClass]="{'fa-circle text-secondary': !m.selected, 'fa-check-circle text-success': m.selected}"></i>
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="col-4">
+                    <ul class="list-group">
+                      <span>DOCENTES</span>
+                      <li class="list-group-item hand" *ngFor="let t of allTeachersByCareer" (click)="toggleSelectTeacher(t, false, true)">
+                        {{t.teacher | uppercase}}
+                        <i class="fa" [ngClass]="{'fa-circle-o text-secondary': !t.selected, 'fa-circle text-primary-color': t.selected}"></i>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="newConfig.component === EVALUATION_COMPONENT.SELF_EVALUATION">
+                <div class="form-row mt-2" *ngIf="newConfig.activity === ACTIVITIES.TEACHING">
+                  <div class="col-12">
+                    <div class="alert alert-info">
+                      <i class="fa fa-info mr-1"></i>Esta lista es solo <strong>INFORMATIVA</strong> sobre los docentes que seran autoevaluados.
+                    </div>
+                  </div>
+                  <div class="col-8">
+                    <ul class="list-group">
+                      <li class="list-group-item" *ngFor="let t of allTeachersByCareer">
+                        {{t.teacher}}
+                        <ng-container *ngIf="t.courseName">
+                          | {{t.courseName}}
+                        </ng-container>
+                        <ng-container *ngIf="t.parallelCode">
+                          | {{t.parallelCode}}
+                        </ng-container>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="form-row mt-2" *ngIf="newConfig.activity === ACTIVITIES.ENGAGEMENT">
+                  <div class="col-12">
+                    <div class="alert alert-info">
+                      <i class="fa fa-info mr-1"></i>En esta sección mostrará a los docentes y los proyectos que se autoevaluarán.
+                    </div>
+                  </div>
+                  <div class="col-4 mb-2" *ngFor="let t of allTeachersByCareer">
+                    <div class="card">
+                      <div class="card-header p-1 text-primary-color">
+                        <strong>
+                          <i class="fa fa-user mr-1"></i>{{t.teacher}}
+                        </strong>
+                      </div>
+                      <div class="card-body p-1">
+                        <span *ngIf="t.projects && t.projects.length">{{t.projects.length > 1 ? 'Proyectos:' : 'Proyecto:'}}</span> <br>
+                        <ol class="p-0 pl-3 m-0">
+                          <li *ngFor="let p of t.projects">
+                            <span class="text-primary-color">{{p.codeProject}}</span> <br>
+                            <small>{{p.nameProyect | uppercase}}</small> <br>
+                            <span class="badge bg-primary-color">{{p.courseName | uppercase}}</span> | <span class="badge bg-primary-color">{{p.cycleID}}</span>
+                          </li>
+                        </ol>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-7"></div>
+                </div>
+                <div class="form-row mt-2" *ngIf="newConfig.activity === ACTIVITIES.ACADEMIC_DIRECTION_OR_MANAGEMENT">
+                  <div class="col-12">
+                    <div class="alert alert-info">
+                      <i class="fa fa-info mr-1"></i>Esta lista solo es <strong>Informativa</strong> ya que se configurará a todos los docentes.
+                    </div>
+                  </div>
+                  <div class="col-4">
+                    <ul class="list-group">
+                      <li class="list-group-item" *ngFor="let t of allTeachersByCareer" (click)="toggleSelectTeacher(t, false, true)">
+                        {{t.teacher}}
+                        <i class="fa float-right" [ngClass]="{'fa-circle text-secondary': !t.selected, 'fa-check-circle text-success': t.selected}"></i>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="newConfig.component === EVALUATION_COMPONENT.COEVALUATION_ADMIN">
+                <div class="form-row mt-2" *ngIf="newConfig.activity === ACTIVITIES.ACADEMIC_DIRECTION_OR_MANAGEMENT">
+                  <div class="col-12">
+                    <div class="alert alert-info">
+                      <i class="fa fa-info mr-1"></i>Estos datos son solo informativos, ya que la configuración es total (<code>ADMINISTRATIVO</code> x <code>DOCENTE</code>).
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    <ul class="list-group">
+                      <caption>ADMINISTRATIVOS</caption>
+                      <li class="list-group-item" *ngFor="let a of administratives" (click)="toggleSelectAdministrative(a)">
+                        {{a.teacher | uppercase}}
+                        <i class="fa float-right" [ngClass]="{'fa-circle text-secondary': !a.selected, 'fa-check-circle text-success': a.selected}"></i>
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="col-3">
+                    <ul class="list-group">
+                      <caption>DOCENTES</caption>
+                      <li class="list-group-item" *ngFor="let t of allTeachersByCareer" (click)="toggleSelectTeacher(t, false, true)">
+                        {{t.teacher | uppercase}}
+                        <i class="fa float-right" [ngClass]="{'fa-circle text-secondary': !t.selected, 'fa-check-circle text-success': t.selected}"></i>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="form-row mt-2" *ngIf="newConfig.activity !== ACTIVITIES.ACADEMIC_DIRECTION_OR_MANAGEMENT">
+                  <div class="col-12">
+                    <div class="alert alert-info">
+                      <i class="fa fa-info mr-1"></i>Estos datos son solo informativos, ya que la configuración es total (<code>ADMINISTRATIVO</code> x <code>DOCENTE</code>).
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    <ul class="list-group">
+                      <caption>ADMINISTRATIVOS</caption>
+                      <li class="list-group-item" *ngFor="let a of administratives" (click)="toggleSelectAdministrative(a)">
+                        {{a.teacher | uppercase}}
+                        <i class="fa float-right" [ngClass]="{'fa-circle text-secondary': !a.selected, 'fa-check-circle text-success': a.selected}"></i>
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="col-3">
+                    <ul class="list-group">
+                      <caption>DOCENTES</caption>
+                      <li class="list-group-item" *ngFor="let t of allTeachersByCareer">
+                        {{t.teacher | uppercase}}
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="newConfig.component === EVALUATION_COMPONENT.COEVALUATION_BETWEEN_TEACHERS || newConfig.component === EVALUATION_COMPONENT.COEVALUATION_TWO_MANAGEMENT">
+                <div class="form-row mt-3">
+                  <div class="col-4" *ngFor="let g of newConfig.evaluators; let i = index">
+                    <div class="card">
+                      <div class="card-header bg-primary-color p-1">
+                        <div class="form-row">
+                          <div class="col-8 pt-1">
+                            <small class="text-white font-nm">Grupo de Evaluación Nro {{g.index}}</small>
+                          </div>
+                          <div class="col-4 text-right">
+                            <button class="btn btn-sm btn-light rounded-circle text-danger" (click)="toggleEvaluatorsModal(false, g)">
+                              <i class="fa fa-trash"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="card-body p-1">
+                        <ol *ngIf="g.teachers.length" class="p-0 pl-4 m-0">
+                          <caption class="text-primary-color">EVALUADORES</caption>
+                          <li *ngFor="let t of g.teachers">
+                            <small>{{t.teacher}}</small>
+                            <!-- <i class="fa fa-trash text-danger float-right" (click)="toggleSelectEvaluator(t, 'teachers', g)"></i> -->
+                          </li>
+                        </ol>
+                        <ol *ngIf="g.teachers.length && g.evaluateds" class="p-0 pl-4 m-0">
+                          <caption class="text-primary-color">EVALUADOS</caption>
+                          <li *ngFor="let t of g.evaluateds">
+                            <small>{{t.teacher}}</small>
+                            <!-- <i class="fa fa-trash text-danger float-right" (click)="toggleSelectEvaluator(t, 'evaluateds', g)"></i> -->
+                          </li>
+                        </ol>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="newConfig.component === EVALUATION_COMPONENT.STUDENT_EVALUATION">
+                <div class="form-row" *ngIf="newConfig.activity === ACTIVITIES.TEACHING">
+                  <ng-container *ngIf="subjects.length">
+                    <div class="col-3">
+                      <ul class="list-group">
+                        <caption>CURSOS</caption>
+                        <li class="list-group-item" *ngFor="let s of subjects" (click)="toggleSelectSubject(s)">
+                          {{s.courseName | uppercase}}
+                          <span class="fa float-right" [ngClass]="{'fa-circle-o text-secondary': !s.selected, 'fa-circle text-primary-color': s.selected}"></span>
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="col-4" *ngIf="subjectSelected.courseID">
+                      <ng-container *ngIf="subjectSelected.teachers && subjectSelected.teachers.length">
+                        <caption>DOCENTES</caption>
+                        <div class="card" *ngFor="let t of subjectSelected.teachers">
+                          <div class="card-header p-2 hand" (click)="toggleSelectTeacher(t, false)">
+                            {{t.teacher}}
+                            <span class="fa float-right" [ngClass]="{'fa-square-o text-secondary': !t.selected, 'fa-square text-primary-color': t.selected}"></span>
+                          </div>
+                        </div>
+                      </ng-container>
+                    </div>
+                    <div class="col-3" *ngIf="teacherSelected.teacherID && newConfig.component !== EVALUATION_COMPONENT.COEVALUATION_BETWEEN_TEACHERS">
+                      <ul class="list-group">
+                        <caption>PARALELO</caption>
+                        <li class="list-group-item hand p-2" (click)="toggleSelectParallel(p)" *ngFor="let p of teacherSelected.parallels">
+                          {{p.parallelCode | uppercase}}
+                          <span class="fa float-right" [ngClass]="{'fa-square-o text-secondary': !p.selected, 'fa-square text-primary-color': p.selected}"></span>
+                        </li>
+                      </ul>
+                    </div>
+                  </ng-container>
+                </div>
+                <div class="form-row" *ngIf="newConfig.activity === ACTIVITIES.ENGAGEMENT">
+                  <ng-container *ngIf="!instrumentForm.invalid && projects.length && newConfig.projectSearcheds">
+                    <div class="col-3">
+                      <caption>PROYECTOS</caption>
+                      <div class="card m-0" (click)="toggleSelectProject(p)" *ngFor="let p of projects">
+                        <div class="card-body p-2">
+                          <i class="fa float-right ml-2" [ngClass]="{'fa-circle-o text-secondary': !p.selected, 'fa-circle text-primary-color': p.selected}"></i>
+                          <p>
+                            {{p.nameProyect | uppercase}}
+                          </p>
+                        </div>
+                      </div>
+                      <!-- <ul class="list-group">
+                        <caption>PROYECTOS</caption>
+                        <li class="list-group-item hand p-2" (click)="toggleSelectProject(p)" *ngFor="let p of projects">
+                          <p>
+                            {{p.nameProyect | uppercase}}
+                          </p>
+                          <i class="fa float-right" [ngClass]="{'fa-circle-o text-secondary': !p.selected, 'fa-circle text-primary-color': p.selected}"></i>
+                        </li>
+                      </ul> -->
+                    </div>
+                    <div class="col-4" *ngIf="projectSelected.projectPracInformativeID">
+                      <ul class="list-group">
+                        <caption>DOCENTES</caption>
+                        <li class="list-group-item hand p-2" (click)="toggleSelectTeacher(t)" *ngFor="let t of projectSelected.teachers">
+                          {{t.teacher | uppercase}}
+                          <span class="fa float-right" [ngClass]="{'fa-square-o text-secondary': !t.selected, 'fa-square text-primary-color': t.selected}"></span>
+                        </li>
+                      </ul>
+                    </div>
+                    
+                  </ng-container>
+                  <div class="col-12 text-center" *ngIf="instrumentForm.invalid && !projects.length && newConfig.projectSearcheds">
+                    <i class="fa fa-times fa-3x"></i><br>
+                    No se tienen proyectos
+                  </div>
+                </div>
+              </ng-container>
+            </ng-container>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div bsModal #evaluatorModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name2">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        Elija evaluadores
+        <button class="btn btn-sm float-right btn-light text-danger" (click)="toggleEvaluatorsModal()">
+          <i class="fa fa-times mr-1"></i>Cerrar
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row" *ngIf="!teachersByCareer.length">
+          <div class="col-12 text-center text-danger">
+            <i class="fa fa-times fa-2x"></i><br>
+            No se tienen docentes para realizar la Coevaluación en Pares
+          </div>
+        </div>
+        <div class="form-row" *ngIf="teachersByCareer.length">
+          <div class="col-12">
+            <input type="text" class="form-control text-uppercase" placeholder="FILTRAR POR TEXTO" name="filterText" [(ngModel)]="newConfig.filterText">
+          </div>
+          <div class="col-12 mt-2 text-right">
+            <button class="btn btn-sm btn-center bg-primary-color" (click)="toggleAddEvaluator()">
+              <i class="fa fa-check mr-1"></i>Listo!
+            </button>
+          </div>
+          <div class="col-12 mt-2" style="max-height: 450px; overflow: auto;">
+            <div class="form-row">
+              <div class="col-6">
+                <ul class="list-group">
+                  <caption>EVALUADORES</caption>
+                  <li class="list-group-item p-1" [ngClass]="{'bg-primary-color': t.selected}" *ngFor="let t of evaluatorsByCareer | filter:newConfig.filterText">
+                    <small>
+                      {{t.teacher | uppercase}}
+                    </small>
+                    <button class="btn btn-sm" [ngClass]="{'btn-light text-primary-color': !t.selected, 'btn-danger': t.selected}" (click)="toggleSelectEvaluator(t,'teachers')">
+                      <i class="fa mr-1" [ngClass]="{'fa-times': t.selected}"></i>{{t.selected ? 'Quitar' : 'Incluir'}}
+                    </button>
+                  </li>
+                </ul>
+              </div>
+              <div class="col-6">
+                <ul class="list-group">
+                  <caption>DOCENTES A EVALUAR</caption>
+                  <li class="list-group-item p-1" [ngClass]="{'bg-primary-color': t.selected}" *ngFor="let t of teachersByCareer | filter:newConfig.filterText">
+                    <small>
+                      {{t.teacher | uppercase}}
+                    </small>
+                    <button class="btn btn-sm" [ngClass]="{'btn-light text-primary-color': !t.selected, 'btn-danger': t.selected}" (click)="toggleSelectEvaluator(t,'evaluateds')">
+                      <i class="fa mr-1" [ngClass]="{'fa-times': t.selected}"></i>{{t.selected ? 'Quitar' : 'Incluir'}}
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

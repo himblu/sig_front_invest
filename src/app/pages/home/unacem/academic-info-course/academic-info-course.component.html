@@ -1,0 +1,217 @@
+<div class="animated fadeIn fast">
+  <div class="form-row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="form-row">
+            <!-- Sección de Información Básica del Estudiante -->
+            <div class="col-md-3">
+              <div class="card">
+                <img src="https://via.placeholder.com/150" class="card-img-top rounded-circle mx-auto mt-3"
+                     alt="Imagen de Perfil" style="width: 100px;">
+                <div class="card-body">
+                  <div class="form-row">
+                    <div class="col-12 mb-2">
+                      <div class="text-center">
+                        <strong class="card-title text-center text-primary-color font-nm">Información del
+                          Estudiante</strong>
+                      </div>
+                      <p class="card-text"><strong>Nombres:</strong>&nbsp;{{ person.firstName }}</p>
+                      <p class="card-text">
+                        <strong>Apellidos:</strong> {{ person.middleName | uppercase }} {{ person.lastName | uppercase }}
+                      </p>
+                      <p class="card-text"><strong>Tipo de Documento:</strong> {{ person.documentTypeName }}</p>
+                      <p class="card-text"><strong>Número de Documento:</strong> {{ person.identity }}</p>
+                      <!-- <p class="card-text"><strong>Estado:</strong> Activo</p> -->
+                    </div>
+                    <div class="col-12 mb-2" *ngFor="let c of contractors">
+                      <div class="card">
+                        <div class="card-header p-2">
+                          <small>{{ c.businessName | uppercase }}</small>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                          <li class="list-group-item p-2">
+                            <small>Responsable</small>
+                            <span class="fa pull-right"
+                                  [ngClass]="{'fa-check text-primary-color': c.responsibleID, 'fa-times text-danger': !c.responsibleID}"></span>
+                          </li>
+                          <li class="list-group-item p-2">
+                            <small>Colaborador</small>
+                            <span class="fa pull-right"
+                                  [ngClass]="{'fa-check text-primary-color': c.collaboratorID, 'fa-times text-danger': !c.collaboratorID}"></span>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sección de Cursos Matriculados -->
+            <div class="col-md-9">
+
+              <!-- Lista de Cursos -->
+              <div class="card">
+                <div class="card-header p-2">
+                  <div class="form-row">
+                    <div class="col-7 pt-1">
+                      Filtros de Busqueda de Cursos
+                    </div>
+                    <div class="col-5">
+                      <input type="text" name="text" [(ngModel)]="filter.text"
+                             class="form-control form-control-sm text-uppercase" placeholder="FILTRAR POR TEXTO">
+                    </div>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div class="form-row">
+                    <div class="col-12 text-center text-secondary" *ngIf="!history.length && searched">
+                      <i class="fa fa-times mr-1 fa-3x"></i><br>
+                      No tienes ningún curso matriculado
+                    </div>
+                    <!-- Card de un Curso -->
+                    <ng-container *ngIf="history.length && searched">
+                      <div class="col-md-4 mb-4" *ngFor="let h of history | filter:filter.text">
+                        <div class="card">
+                          <img src="{{h.urlImage || 'https://via.placeholder.com/150'}}" height="180" width="50"
+                               class="card-img-top" alt="Imagen del Curso">
+                          <div class="card-body">
+                            <h5 class="card-title single-line"
+                                matTooltipPosition="above"
+                                matTooltip="{{h.courseName | uppercase}}">
+                              {{ h.courseName | uppercase }}</h5>
+                            <p class="text-right">
+                              <button class="btn btn-light border-primary-color" (click)="toggleUsersModal(h);"
+                                      *ngIf="h.flgSchedule; else certificate;">
+                                <i class="fa fa-list-alt mr-1"></i>
+                                Horario
+                              </button>
+                              <ng-template #certificate>
+                                <button class="btn btn-light border-primary-color"
+                                        (click)="openFile('api/unacem-certificate/with-template', h.classSectionNumber, h.periodID);">
+                                  <i class="fa fa-list-alt mr-1"></i>
+                                  Generar certificado
+                                </button>
+                              </ng-template>
+                            </p>
+                            <p class="card-text single-line"
+                               matTooltipPosition="above"
+                               matTooltip="{{h.courseDesc | uppercase}}">
+                              {{ h.courseDesc }}</p>
+                            <!-- <p class="card-text"><strong>Componentes:</strong></p>
+                            <ul>
+                                <li>Video - Nota: 85</li>
+                                <li>PDF - Nota: 90</li>
+                                <li>Quiz - Nota: 80</li>
+                            </ul> -->
+                            <p class="card-text">
+                              <strong>Estado:</strong> {{ h.statusGrade }} <br>
+                              <strong>Nota Virtual:</strong> {{ h.gradeTheory }} <em
+                              class="float-right">({{ h.NumberIntentsTheory }}
+                              intento{{ h.NumberIntentsTheory > 1 ? 's' : '' }})</em><br>
+                              <strong>Nota Presencial:</strong> {{ h.gradePractice || 0 }} <em
+                              class="float-right">({{ h.NumberIntentsPractice }}
+                              intento{{ h.NumberIntentsPractice > 1 ? 's' : '' }})</em> <br>
+                              <strong>Fecha de Inscripción:</strong> {{ h.startDate }} <br>
+                              <strong>Valido hasta:</strong> {{ h.validityDate }} <br>
+                              <!-- <strong>Duración:</strong> {{h.durationHour || 0}} -->
+                            </p>
+                            <div class="progress mb-2">
+                              <div class="progress-bar" role="progressbar" [style.width.%]="h.progress"
+                                   [attr.aria-valuenow]="h.progress" aria-valuemin="0" aria-valuemax="100">
+                                {{ h.progress }}%
+                              </div>
+                            </div>
+                            <!-- <div class="progress-circle" data-progress="50">
+                                50%
+                            </div> -->
+                          </div>
+                        </div>
+                      </div>
+                      <!-- Fin de Card de un Curso -->
+                    </ng-container>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="schedule-modal modal fade" bsModal #usersModal="bs-modal" tabindex="-1" aria-labelledby="usersModalLabel"
+     role="dialog">
+  <div class="modal-dialog modal-dialog-centered schedule-modal__dialog">
+    <div class="modal-content">
+      <div class="modal-header schedule-modal__header">
+        <h3 class="modal-title text-center w-100" id="usersModalLabel">Horarios</h3>
+        <button type="button" class="btn-close" aria-label="Close" (click)="toggleUsersModal()">X</button>
+      </div>
+
+      <div class="modal-body schedule-modal__body">
+        <!-- Información general -->
+        <div class="schedule-info">
+          <div><strong>Docente:</strong> {{ schedule?.teachers[0].teacher }}</div>
+          <div><strong>Duración del curso:</strong> {{ schedule?.durationHours }}</div>
+          <div><strong>Curso:</strong> {{ schedule?.courseName }}</div>
+          <div><strong>Sección:</strong> {{ schedule?.classSessionDesc }}</div>
+        </div>
+
+        <!-- Navegación por semanas -->
+        <div class="schedule-navigation">
+          <button
+            *ngIf="week > 0"
+            type="button"
+            class="schedule-navigation__btn"
+            (click)="decreaseWeek()"
+            aria-label="Semana anterior">
+            ‹
+          </button>
+
+          <span class="schedule-navigation__text">
+           Semana del {{ schedule?.dataSource[week]?.startDate }} al {{ schedule?.dataSource[week]?.endDate }}
+         </span>
+
+          <button
+            *ngIf="week < schedule?.dataSource.length - 1"
+            type="button"
+            class="schedule-navigation__btn"
+            (click)="increaseWeek()"
+            aria-label="Semana siguiente">
+            ›
+          </button>
+        </div>
+
+
+        <!-- Tabla de horarios -->
+        <table mat-table [dataSource]="schedule?.dataSource[week].days" class="schedule-table mat-elevation-z8">
+          <ng-container matColumnDef="horario">
+            <th mat-header-cell *matHeaderCellDef>Horario</th>
+            <td mat-cell *matCellDef="let el">{{ el.horario }}</td>
+          </ng-container>
+
+          <ng-container *ngFor="let day of ['lunes','martes','miercoles','jueves','viernes','sabado','domingo']"
+                        [matColumnDef]="day">
+            <th mat-header-cell *matHeaderCellDef>{{ day | titlecase | slice:0:3 }}.</th>
+            <td mat-cell *matCellDef="let el"
+                [ngClass]="el[day] ? 'schedule-table__cell--active' : 'schedule-table__cell--inactive'">
+              {{ el[day] ? '✓' : '–' }}
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
+
+      <div class="modal-footer schedule-modal__footer">
+        <button type="button" class="btn btn-secondary" (click)="toggleUsersModal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+

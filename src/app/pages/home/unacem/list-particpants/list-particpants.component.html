@@ -1,0 +1,174 @@
+<div class="animated fadeIn fast">
+  <div class="form-row">
+    <div class="col-12">
+      <div class="card" *ngIf="!allowed">
+        <div class="card-body text-center text-danger">
+          <div class="form-row">
+            <div class="col-12">
+              <i class="fa fa-times fa-3x"></i><br>
+              <span class="font-xl">
+                No estas permitido para visualizar los reportes de esta sección.
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card" *ngIf="allowed">
+        <div class="card-header bg-primary-color">
+          <div class="form-row">
+            <div class="col-9">
+              <i class="fa fa-cog mr-1"></i>Reportería
+              <span class="badge bg-white font-nm text-primary-color float-right" *ngIf="entitySelected.contractorID"><strong>ENTIDAD:</strong>&nbsp;{{entitySelected.businessName | uppercase}}</span>
+            </div>
+            <div class="col-3 text-right">
+              <button class="btn btn-sm btn-light text-primary-color" *ngIf="rolID === 22 && personID === 569" [disabled]="!filter.periodSection" (click)="credentialReport()">
+                <i class="fa fa-key mr-1"></i>Credenciales
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="form-row">
+            <!-- <div class="col-12">
+              <label for="reportTypeID">Tipo de Reporte</label>
+              <select name="reportTypeID" [(ngModel)]="filter.reportTypeID" (change)="resetResult()" class="form-control form-control-sm">
+                <option [ngValue]="undefined">--SELECCIONE--</option>
+                <option *ngFor="let r of reportTypes" [ngValue]="r.id">{{r.name | uppercase}}</option>
+              </select>
+            </div> -->
+            <!-- FILTROS -->
+            <div class="col-12" *ngIf="filter.reportTypeID">
+              <div class="card">
+                <div class="card-header">
+                  Filtros
+                </div>
+                <div class="card-body" *ngIf="filter.reportTypeID === 1">
+                  <div class="form-row">
+                    <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2">
+                      <label for="periodSection">Periodo</label>
+                      <select name="periodSection" [(ngModel)]="filter.periodSection" class="form-control form-control-sm">
+                        <option [ngValue]="undefined">--SELECCIONE--</option>
+                        <option *ngFor="let y of currentYear-10 | range:currentYear" [ngValue]="y">{{y}}</option>
+                      </select>
+                    </div>
+                    <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2">
+                      <label for="startDate">Inicio</label>
+                      <input type="date" name="startDate" [(ngModel)]="filter.startDate" class="form-control form-control-sm">
+                    </div>
+                    <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2">
+                      <label for="endDate">Fin</label>
+                      <input type="date" [disabled]="!filter.startDate" [min]="filter.startDate" name="endDate" [(ngModel)]="filter.endDate" class="form-control form-control-sm">
+                    </div>
+                    <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2">
+                      <label for="contractorID">Contratista</label>
+                      <select name="contractorID" [(ngModel)]="filter.contractorID" [disabled]="filter.isMain" class="form-control form-control-sm" (change)="selectContractor()">
+                        <option [ngValue]="undefined">--TODOS--</option>
+                        <option *ngFor="let c of contractors" [ngValue]="c.contractorID">{{c.businessName | uppercase}}</option>
+                      </select>
+                    </div>
+                    <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2">
+                      <label for="personID">Colaborador</label>
+                      <select name="personID" [(ngModel)]="filter.personID" [disabled]="!filter.contractorID" class="form-control form-control-sm">
+                        <option [ngValue]="undefined">--TODOS--</option>
+                        <option *ngFor="let c of collaborators" [ngValue]="c.personID">{{c.personDocumentNumber}} - {{c.personFullName | uppercase}}</option>
+                      </select>
+                    </div>
+                    <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2">
+                      <label for="statusGradeID">Estado</label>
+                      <select name="statusGradeID" [(ngModel)]="filter.statusGradeID" class="form-control form-control-sm">
+                        <option *ngFor="let c of statusGrades" [ngValue]="c.statusGradeID">{{c.statusGrade | uppercase}}</option>
+                      </select>
+                    </div>
+                    <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2">
+                      <button class="btn btn-sm btn-block mt-2 bg-primary-color" [disabled]="!filter.periodSection" (click)="search()">
+                        <i class="fa fa-cog mr-1"></i>Generar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12" *ngIf="results.length && searched">
+              <div class="form-row">
+                <div class="col-12">
+                  <hr>
+                </div>
+                <div class="col-lg-4 col-sm-4 col-md-4 col-xs-12">
+                  <input type="text" name="filter.text" [(ngModel)]="filter.text" placeholder="BUSCAR POR DOCUMENTO, CONTRATISTA, CURSO, ESTUDIANTE" class="form-control form-control-sm mt-1 text-uppercase">
+                </div>
+                <div class="col-lg-2 col-sm-2 col-md-2 col-xs-12 mt-2">
+                  <button class="btn btn-sm bg-primary-color btn-block" (click)="downloadReport()">
+                    <i class="fa fa-download mr-1"></i>Descargar
+                  </button>
+                </div>
+                <div class="col-lg-6 col-sm-6 col-md-6 col-xs-12 text-right pt-1">
+                  <span class="badge bg-light border-primary-color text-primary-color mr-2 font-sm hand">
+                    TOTAL: {{results.length}}
+                  </span>
+                  <span class="badge {{t.bg}} mr-2 font-sm hand" (click)="toggleTotalSelected(t)" *ngFor="let t of totals">
+                    {{t.title}}: {{t.value}}
+                    <i class="fa fa-circle ml-2" *ngIf="t.statusGradeID === totalSelected.statusGradeID"></i>
+                  </span>
+                </div>
+                <div class="col-12 mt-3">
+                </div>
+                <div class="col-12 ">
+                  <div class="table-responsive">
+                    <table class="table table-bordered table-sm">
+                      <thead class="bg-primary-color">
+                      <tr>
+                        <th style="vertical-align: middle;" class="font-sm" *ngFor="let f of fields">{{f.name | uppercase}}</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      <tr class="{{totalSelected.statusGradeID === r.statusGradeID ? r.bg+' text-white' : ''}}" *ngFor="let r of results | filter:filter.text; let i = index">
+                        <td *ngFor="let f of fields">{{r[f.field]}}</td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" bsModal #entityModal="bs-modal" [config]="{backdrop: 'static'}" tabindex="-1" role="dialog" aria-labelledby="dialog-static-name">
+  <div class="modal-dialog modal-nm">
+    <div class="modal-content">
+      <div class="modal-body p-5">
+        <form #enrollInBulkForm="ngForm">
+          <div class="form-row">
+            <div class="col-12 text-center">
+              <strong class="text-primary-color font-lg">Seleccione la Entidad con la que trabajara:</strong>
+            </div>
+            <div class="col-12 mt-5">
+              <div class="form-row">
+                <div class="" [ngClass]="{'col': entities.length<=2, 'col-4': entities.length>3}" *ngFor="let e of entities" (click)="toggleSelectEntity(e)">
+                  <div class="card hand" [ngClass]="{'bg-primary-color': e.isSelected, 'text-primary-color': !e.isSelected}">
+                    <div class="card-body pt-5 pb-5 text-center">
+                      <i class="fa fa-building fa-4x"></i><br>
+                      <p class="mt-3 text-center">
+                        <strong class="font-xl">{{e.businessName | uppercase}}</strong><br>
+                        <span>{{e.businessAddress | uppercase}}</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 mt-5 text-right" *ngIf="entitySelected">
+              <button class="btn bg-primary-color"  (click)="toggleEntityModal()">
+                <i class="fa fa-check mr-1"></i>Continuar
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

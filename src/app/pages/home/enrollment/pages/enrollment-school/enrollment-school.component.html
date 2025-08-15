@@ -1,0 +1,595 @@
+<div class="row animated fadeIn fast" *ngIf="isLoading">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid" *ngIf="!isLoading">
+  <section>
+    <mat-stepper class="mat-elevation-z2" #stepper [linear]="true">
+      <mat-step [stepControl]="careerStep">
+
+        <form [formGroup]="signatureRepeatForm">
+          <ng-template matStepLabel>Paso 1</ng-template>
+
+          <!-- Matrícula de arrastre para estudiantes de 2 nivel en adelante -->
+          <!-- ------------------------------------------------------------- -->
+          <!-- ------------------------------------------------------------- -->
+
+
+
+
+
+          <!-- ------------------------------------------------------------- -->
+          <!-- ------------------------------------------------------------- -->
+          <!-- ------------------------------------------------------------- -->
+        </form>
+        <div [formGroup]="careerStep" *ngIf="statusStudent">
+          <div class="row">
+            <div class="col-md-4 align-self-center" *ngIf="statusStudent">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label><small>Periodo Académico:</small></mat-label>
+                <input maxlength="9" matInput mask="S*" [value]="statusStudent.periodID" readonly="true">
+              </mat-form-field>
+            </div>
+            <div class="col-md-4">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label><small>Carrera:</small></mat-label>
+                <input maxlength="9" matInput mask="S*" [value]="statusStudent.careerName" readonly="true">
+              </mat-form-field>
+            </div>
+            <div class="col-md-4">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label><small>Modalidad:</small></mat-label>
+                <input maxlength="9" matInput mask="S*" [value]="statusStudent.modalityName" readonly="true">
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4" *ngIf="statusStudent.modalityName ==='PRESENCIAL'">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label><small>Sección:</small></mat-label>
+                <input maxlength="9" matInput mask="S*" [value]="statusStudent.workingDayDesc" readonly="true">
+              </mat-form-field>
+            </div>
+            <div class="col-md-4 align-self-center">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label><small>Nivel:</small></mat-label>
+                <input maxlength="9" matInput mask="S*" [value]="statusStudent.v_level|numberToWords" readonly="true">
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12 mt-5">
+              <div class="d-flex justify-content-end">
+                <button style="background: #014898; color: white;" mat-stroked-button
+                  (click)="stepper.next(); getRetrieveAvailable();">Siguiente</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-step>
+
+
+      <mat-step [stepControl]="careerStep">
+        <ng-template matStepLabel>Paso 2</ng-template>
+        <!-- <div class="row mb-3 p-4 animated fadeIn fast" *ngIf="showMessageLost">
+          <div class="col">
+            <div class="h4 text-center">
+              Usted ha superado el límite máximo de asignaturas de arrastre.
+            </div>
+          </div>
+        </div> -->
+        <div class="row mb-1">
+          <div class="col-md-12">
+            <h3 class="text-center mt-3 mb-2">HORARIOS</h3>
+          </div>
+        </div>
+
+        <!-- retrieveAvailable -->
+        <div class="row" [formGroup]="retrieveForm">
+          <div class="col-12">
+            <div class="table-responsive" formArrayName="courses">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Nivel</th>
+                    <th>Asignatura</th>
+                    <th>Malla</th>
+                    <th>Sección</th>
+                    <th>Paralelo</th>
+                    <th>Horario</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngIf="!retrieveAvailable.length; else list;">
+                    <td colspan="7">Sin registros</td>
+                  </tr>
+                  <ng-template #list>
+                    <tr *ngFor="let item of retrieveAvailable; let i=index;" [formGroupName]="i" [ngClass]="{'disable' : item.flgDisabled === 1}">
+                      <td>{{item.level}}</td>
+                      <td>{{item.courseName}}</td>
+                      <td>{{item.studyPlanDesc}}</td>
+                      <td>{{item.sectionModule}}</td>
+                      <td>{{item.parallelCode}}</td>
+                      <td>
+                        <ng-container *ngIf="item.schedule">
+                          <div class="row" *ngFor="let schedule of item.schedule">
+                            <div class="col-12">
+                              {{schedule.day}} {{schedule.startTime}} - {{schedule.endTime}}
+                            </div>
+                          </div>
+                        </ng-container>
+                      </td>
+                      <td>
+                        <mat-checkbox color="primary" formControlName="flgCheck" (change)="verifySchedulesConflicts();"></mat-checkbox>
+                      </td>
+                    </tr>
+                  </ng-template>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- arrastres -->
+        <!-- <div class="row p-4 animated fadeIn fast" *ngIf="signatureRepeatList.length > 0 && !showMessageLost">
+          <div class="col-md-3">
+            <div class="row">
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Asignaturas de Arrastre</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of signatureRepeatList; let i = index">
+                      <td><button mat-button (click)="signature(item, i)">{{item.courseName}}</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="col-2"></div>
+          <div class="col-6" *ngIf="scheduleSignatureRepeat.length > 0">
+            <div class="">
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Horario</th>
+                      <th scope="col">Curso</th>
+                      <th scope="col">Accion</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of scheduleSignatureRepeat; let i = index">
+
+                      <td>
+                        <div *ngFor="let hours of item.hours let index = index">
+                          <p>
+                            <small *ngIf="hours.mon">
+                              Lunes
+                            </small>
+                            <small *ngIf="hours.tue">
+                              Martes
+                            </small>
+                            <small *ngIf="hours.wed">
+                              Miércoles
+                            </small>
+                            <small *ngIf="hours.thu">
+                              Jueves
+                            </small>
+                            <small *ngIf="hours.fri">
+                              Viernes
+                            </small>
+                            <small *ngIf="hours.sat">
+                              Sábado
+                            </small>
+                            <small *ngIf="hours.sun">
+                              Domingo
+                            </small>
+                            {{hours.startTime}} - {{ hours.endTime }}
+                          </p>
+                        </div>
+                      </td>
+                      <td>
+                        <p *ngIf="item.hours[i].mon">
+                          {{ item.hours[i].mon }}
+                        </p>
+                        <p *ngIf="item.hours[i].tue">
+                          {{ item.hours[i].tue }}
+                        </p>
+                        <p *ngIf="item.hours[i].wed">
+                          {{ item.hours[i].wed }}
+                        </p>
+                        <p *ngIf="item.hours[i].thu">
+                          {{ item.hours[i].thu }}
+                        </p>
+                        <p *ngIf="item.hours[i].fri">
+                          {{ item.hours[i].fri }}
+                        </p>
+                        <p *ngIf="item.hours[i].sat">
+                          {{ item.hours[i].sat }}
+                        </p>
+                        <p *ngIf="item.hours[i].sun">
+                          {{ item.hours[i].sun }}
+                        </p>
+                        <p>
+                          {{ item.careerDesc }}
+                        </p>
+                        <p>
+                          {{ item.modalityDesc }}
+                        </p>
+                        <p>
+                          {{ item.spaceSession}}
+                        </p>
+                      </td>
+                      <td style="cursor: pointer;"  style="vertical-align: middle;">
+                        <button mat-mini-fab color="primary" (click)="cargaMateria(item)">
+                          <i class="fa fa-plus-circle"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row ml-4">
+          <div class="col-md-11" *ngIf="scheduleSignatureRepeatSave.length > 0 && !showMessageLost">
+
+            <div class="row">
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th colspan="3">Asignaturas de Arrastre Horario</th>
+                    </tr>
+                    <tr>
+                      <th>Aula</th>
+                      <th>Horario</th>
+                      <th>Lunes</th>
+                      <th>Martes</th>
+                      <th>Miércoles</th>
+                      <th>Jueves</th>
+                      <th>Viernes</th>
+                      <th>Sábado</th>
+                      <th>Domingo</th>
+                      <th>Accion</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <ng-container *ngFor="let item of scheduleSignatureRepeatSave; let i = index">
+                      <tr style="background-color: #dddddd;">
+                        <td>
+                          {{ item.spaceSession}}
+                        </td>
+                        <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                        <td>
+                          <button mat-mini-fab color="primary" (click)="deleteSignature(item, i)">
+                            <i class="fa fa-trash"></i>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr *ngFor="let hours of item.hours; let index = index">
+                        <td></td>
+                      <td>
+                        {{hours.startTime}} - {{ hours.endTime }}
+                      </td>
+                      <td>
+                        {{ hours.mon }}
+                      </td>
+                      <td>
+                        {{ hours.tue }}
+                      </td>
+                      <td>
+                        {{ hours.wed }}
+                      </td>
+                      <td>
+                        {{ hours.thu }}
+                      </td>
+                      <td>
+                        {{ hours.fri }}
+                      </td>
+                      <td>
+                        {{ hours.sat }}
+                      </td>
+                      <td>
+                        {{ hours.sun }}
+                      </td>
+                      <td></td>
+                      </tr>
+                    </ng-container>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-1"></div>
+        </div> -->
+
+        <!-- horarios modulos -->
+        <!-- <ng-container *ngFor="let schedule of schedulesModule">
+          <div class="row mt-2 p-4">
+            <h2 *ngIf="statusStudent.modalityID != 1"> {{ schedule[0].classModuleDesc }} </h2>
+            <table mat-table [dataSource]="schedule" class="mat-elevation-z8">
+
+              <ng-container matColumnDef="startTime">
+                <th mat-header-cell *matHeaderCellDef [style.width]="'50px'" [style.background-color]="'#014898'"
+                  [style.text-align]="'center'" [style.color]="'white'"> Horario </th>
+                <td mat-cell *matCellDef="let element" class="text-center" style="font-size: 10px;"> {{element.startTime}} - {{element.endTime}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="mon">
+                <th mat-header-cell *matHeaderCellDef [style.width]="'100px'" [style.background-color]="'#014898'"
+                  [style.text-align]="'center'" [style.color]="'white'"> Lunes </th>
+                <td mat-cell *matCellDef="let element" class="text-center" style="font-size: 10px;"> {{element.mon}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="tue">
+                <th mat-header-cell *matHeaderCellDef [style.width]="'100px'" [style.background-color]="'#014898'"
+                  [style.text-align]="'center'" [style.color]="'white'"> Martes </th>
+                <td mat-cell *matCellDef="let element" class="text-center" style="font-size: 10px;"> {{element.tue}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="wed">
+                <th mat-header-cell *matHeaderCellDef [style.width]="'100px'" [style.background-color]="'#014898'"
+                  [style.text-align]="'center'" [style.color]="'white'"> Miercoles </th>
+                <td mat-cell *matCellDef="let element" class="text-center" style="font-size: 10px;"> {{element.wed}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="thu">
+                <th mat-header-cell *matHeaderCellDef [style.width]="'100px'" [style.background-color]="'#014898'"
+                  [style.text-align]="'center'" [style.color]="'white'"> Jueves </th>
+                <td mat-cell *matCellDef="let element" class="text-center" style="font-size: 10px;"> {{element.thu}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="fri">
+                <th mat-header-cell *matHeaderCellDef [style.width]="'100px'" [style.background-color]="'#014898'"
+                  [style.text-align]="'center'" [style.color]="'white'"> Viernes </th>
+                <td mat-cell *matCellDef="let element" class="text-center" style="font-size: 10px;"> {{element.fri}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="sat">
+                <th mat-header-cell *matHeaderCellDef [style.width]="'100px'" [style.background-color]="'#014898'"
+                  [style.text-align]="'center'" [style.color]="'white'"> Sabado </th>
+                <td mat-cell *matCellDef="let element" class="text-center" style="font-size: 10px;"> {{element.sat}} </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="columnsSchedule"></tr>
+              <tr mat-row *matRowDef="let row; columns: columnsSchedule;"></tr>
+            </table>
+          </div>
+        </ng-container>
+        <div class="col-12" style="text-align: center;" *ngIf="schedulesModule.length === 0">
+          <h3>No existe configuración de horarios comuníquese con el departamento de Tics</h3>
+        </div> -->
+        <div class="col-12 mt-5">
+          <div class="d-flex justify-content-end">
+            <button style="background: #014898; color: white;" mat-stroked-button
+              (click)="postFailedSubjects()" [disabled]="schedulesModule?.length === 0">
+              Siguiente
+            </button>
+          </div>
+        </div>
+      </mat-step>
+      <mat-step [stepControl]="paymentStep">
+        <div [formGroup]="paymentStep">
+          <h3 class="text-center mt-3 mb-5">OPCIONES DE PAGO</h3>
+          <div class="row mt-3">
+            <div class="col-6">
+              <ng-template matStepLabel>Paso 3</ng-template>
+              <ng-container *ngIf="paymentInfo?.length">
+                <h3> MENSUALIDADES DE LA MATRÍCULA</h3>
+                <mat-form-field appearance="outline">
+                  <mat-label>Selecciona una de las Opciones de Pago</mat-label>
+                  <mat-select formControlName="paymentOption">
+                    <mat-option *ngFor="let paymentOption of paymentInfo;" [value]="paymentOption.paymentOptionID">
+                      {{ paymentOption.paymentOptionDesc }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </ng-container>
+            </div>
+            <div class="col-12 mt-1" *ngIf="paymentInfo?.length && paymentStep.value?.paymentOption">
+              <table>
+                <thead>
+                  <tr>
+                    <th colspan="2">Costo Nivel</th>
+                    <th rowspan="2">Detalle</th>
+                    <th rowspan="2">Cuota 1</th>
+                    <th rowspan="2">Cuota 2</th>
+                    <th rowspan="2">Cuota 3</th>
+                    <th rowspan="2">Cuota 4</th>
+                    <th rowspan="2">Cuota 5</th>
+                    <th rowspan="2">Costo final del nivel</th>
+                  </tr>
+
+                  <tr>
+                    <th>Matrícula</th>
+                    <th>Arancel</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ paymentInfoId.Matricula_Cuota1 | currency: 'USD':'symbol':'.2-2':'en-US' }}</td>
+                    <td>{{ paymentInfoId.cuotaMatricula | currency: 'USD':'symbol':'.2-2':'en-US' }}</td>
+                    <td>{{ paymentInfoId.paymentOptionDesc }}</td>
+                    <td>{{ paymentInfoId.cuota1 }}</td>
+                    <td>{{ paymentInfoId.cuota2 }}</td>
+                    <td>{{ paymentInfoId.cuota3 }}</td>
+                    <td>{{ paymentInfoId.cuota4 }}</td>
+                    <td>{{ paymentInfoId.cuota5 }}</td>
+                    <td>{{ paymentInfoId.totalAmount | currency: 'USD':'symbol':'.2-2':'en-US' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="col-12 mt-5" *ngIf="failedSubjects?.length">
+              <h3> MENSUALIDADES DE LA{{failedSubjects.length > 1 ? 'S' : ''}} ASIGNATURA{{failedSubjects.length > 1 ? 'S' : ''}} DE ARRASTRE</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th rowspan="2">Asignatura</th>
+                    <th colspan="2">Costo Nivel</th>
+                    <th rowspan="2">Detalle</th>
+                    <th rowspan="2">Cuota 1</th>
+                    <th rowspan="2">Cuota 2</th>
+                    <th rowspan="2">Cuota 3</th>
+                    <th rowspan="2">Cuota 4</th>
+                    <th rowspan="2">Cuota 5</th>
+                    <th rowspan="2">Costo final del nivel</th>
+                  </tr>
+
+                  <tr>
+                    <th>Matrícula</th>
+                    <th>Arancel</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of failedSubjects">
+                    <td>{{ item.courses }}</td>
+                    <td>{{ item.Matricula_Cuota1 | currency: 'USD':'symbol':'.2-2':'en-US' }}</td>
+                    <td>{{ item.cuotaMatricula | currency: 'USD':'symbol':'.2-2':'en-US' }}</td>
+                    <td>{{ item.paymentOptionDesc }}</td>
+                    <td>{{ item.cuota1 }}</td>
+                    <td>{{ item.cuota2 }}</td>
+                    <td>{{ item.cuota3 }}</td>
+                    <td>{{ item.cuota4 }}</td>
+                    <td>{{ item.cuota5 }}</td>
+                    <td>{{ item.totalAmount | currency: 'USD':'symbol':'.2-2':'en-US' }}</td>
+                  </tr>
+                  <tr>
+                    <td colspan="9" style="text-align: right;"><strong>TOTAL:</strong>&nbsp;</td>
+                    <td>{{ failedSubjectsTotal | currency: 'USD':'symbol':'.2-2':'en-US' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- <div class="col-12 mt-5" *ngIf="scheduleSignatureRepeatSave.length>0">
+              <h3> PAGO DE ASIGNATURA/S DE ARRASTRE</h3>
+              <div class="d-flex justify-content-center">
+                <div class=" col d-flex align-items-center">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th colspan="2" style="width: 50px;">Costo Asignatura</th>
+                        <th rowspan="2">Asignatura</th>
+                        <th rowspan="2" style="width: 50px;">Total</th>
+                      </tr>
+                      <tr>
+                        <th style="width: 20px;">Matrícula</th>
+                        <th style="width: 20px;">Arancel</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of conceptsPayments">
+                        <td style="width: 20px;"> $ {{item.conceptsPaymentDesc}}</td>
+                        <td style="width: 20px;"> $ {{item.monto}}</td>
+                        <td>{{item.courseName}}</td>
+                        <td style="width: 50px;"> $ {{item.total}} </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+              </div>
+            </div> -->
+
+            <div class="col-12 mt-5">
+              <div class="d-flex justify-content-end">
+                <button style="background: #014898; color: white;" mat-stroked-button
+                  (click)="stepper.next();">Siguiente</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-step>
+      <mat-step [stepControl]="confirmationStep">
+        <div [formGroup]="confirmationStep">
+          <ng-template matStepLabel>Paso 4</ng-template>
+
+          <h3 class="text-center mt-3 mb-5">CONFIRMACIÓN DE MATRÍCULA</h3>
+          <div class="animated fadeIn fast">
+            <ng-container *ngIf="statusStudent">
+              <div class="row mb-3">
+                <div class="col-md-3">
+                  <span style="color: rgb(0, 122, 237);">Apellidos:</span>
+                </div>
+                <div class="col-md-9 border-info">
+                  <span>{{ nameMiddleName }}</span>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-3">
+                  <span style="color: rgb(0, 122, 237);">Nombres:</span>
+                </div>
+                <div class="col-md-9 border-info">
+                  <span>{{ name }}</span>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-3">
+                  <span style="color: rgb(0, 122, 237);">Periodo Académico:</span>
+                </div>
+                <div class="col-md-9 border-info">
+                  <span>{{statusStudent.periodID}}</span>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-3">
+                  <span style="color: rgb(0, 122, 237);">Carrera:</span>
+                </div>
+                <div class="col-md-9 border-info">
+                  <span>{{statusStudent.careerName}}</span>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-3">
+                  <span style="color: rgb(0, 122, 237);">Modalidad:</span>
+                </div>
+                <div class="col-md-9 border-info">
+                  <span>{{statusStudent.modalityName}}</span>
+                </div>
+              </div>
+              <div class="row mb-3" *ngIf="statusStudent.modalityName ==='PRESENCIAL'">
+                <div class="col-md-3">
+                  <span style="color: rgb(0, 122, 237);">Sección:</span>
+                </div>
+                <div class="col-md-9 border-info">
+                  <span>{{statusStudent.workingDayDesc}}</span>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-3">
+                  <span style="color: rgb(0, 122, 237);">Nivel:</span>
+                </div>
+                <div class="col-md-9 border-info">
+                  <span>{{statusStudent.v_level|numberToWords}}</span>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+          <div class="col-12 mt-5">
+            <div class="d-flex justify-content-end">
+              <button style="background: #014898; color: white;" mat-stroked-button
+                (click)=" sendForm(); ">Siguiente</button>
+            </div>
+          </div>
+        </div>
+      </mat-step>
+
+    </mat-stepper>
+  </section>
+</div>

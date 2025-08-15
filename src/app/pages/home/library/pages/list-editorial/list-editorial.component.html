@@ -1,0 +1,132 @@
+<div class="animated fadeIn fast">
+  <div class="container-fluid">
+    <h2 class="text-center mt-3">EDITORIALES</h2>
+    <br>
+    <section [formGroup]="filtersForm">
+      <div class="row pl-2 pr-2 justify-content-between no-gutters">
+        <div class="col-12 col-lg-4">
+          <mat-form-field appearance="outline">
+            <mat-label>Buscar por Nombre, Año de Fundación...</mat-label>
+            <input matInput formControlName="search" autocomplete="off">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+        </div>
+
+
+        <div class="col-12 col-lg-3 d-flex justify-content-end">
+          <button class="button add-button" color="primary" style="background: #014898;" mat-raised-button (click)="createOrUpdateEditorial();">Crear Editorial<mat-icon>add</mat-icon></button>
+        </div>
+
+<!--        <div class="col-3">-->
+<!--          <mat-form-field appearance="outline">-->
+<!--            <mat-label>País</mat-label>-->
+<!--            <mat-select (selectionChange)="getEditorials();" formControlName="country" placeholder="Filtrar por País">-->
+<!--              <mat-option value="">Todos</mat-option>-->
+<!--              <mat-option *ngFor="let country of countries; trackBy: trackByCountryId" [value]="country.countryID">-->
+<!--                {{ country.countryName }}-->
+<!--              </mat-option>-->
+<!--            </mat-select>-->
+<!--          </mat-form-field>-->
+<!--        </div>-->
+      </div>
+    </section>
+
+    <section>
+      <div style="position: relative;">
+        <spinner-loader [absolute]="true" *ngIf="isLoadingEditorialList"></spinner-loader>
+        <mat-table
+          [dataSource]="dataSource" matSort (matSortChange)="getEditorials($event);">
+
+          <!--        'name', 'country', 'address', 'foundationYear', 'website', 'publications', 'actions'-->
+          <!-- name -->
+          <ng-container matColumnDef="editorialDesc">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>Editorial</mat-header-cell>
+            <mat-cell *matCellDef="let row; let i = index;"> {{ row.editorialDesc }} </mat-cell>
+          </ng-container>
+
+          <!-- country -->
+          <ng-container matColumnDef="cityCountryDesc">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>Ciudad/País</mat-header-cell>
+            <mat-cell *matCellDef="let row;"> {{ row.cityCountryDesc }} </mat-cell>
+          </ng-container>
+
+          <!-- address -->
+          <!--        <ng-container matColumnDef="address">-->
+          <!--          <mat-header-cell *matHeaderCellDef>Dirección</mat-header-cell>-->
+          <!--          <mat-cell *matCellDef="let row"> {{ row.address }} </mat-cell>-->
+          <!--        </ng-container>-->
+
+          <!-- foundationYear -->
+          <ng-container matColumnDef="yearPublication">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>Año Fundación</mat-header-cell>
+            <mat-cell *matCellDef="let row">{{ row.yearPublication || 'N/D' }}</mat-cell>
+          </ng-container>
+
+          <!-- website -->
+          <!--        <ng-container matColumnDef="website">-->
+          <!--          <mat-header-cell *matHeaderCellDef>Sitio Web</mat-header-cell>-->
+          <!--          <mat-cell *matCellDef="let row">-->
+          <!--            <ng-container [ngTemplateOutlet]="row.website ? website : withoutWebsite" [ngTemplateOutletContext]="{ row }"></ng-container>-->
+          <!--            <ng-template #withoutWebsite>-->
+          <!--              <span>N/A</span>-->
+          <!--            </ng-template>-->
+          <!--            <ng-template #website let-row="row">-->
+          <!--              <a [href]="row.website" target="_blank">{{ row.website }}</a>-->
+          <!--            </ng-template>-->
+          <!--          </mat-cell>-->
+          <!--        </ng-container>-->
+
+          <!-- publications -->
+          <ng-container matColumnDef="publications">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>Publicaciones</mat-header-cell>
+            <mat-cell *matCellDef="let row">{{ row.publications }}</mat-cell>
+          </ng-container>
+
+          <!-- actions -->
+          <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef><span>Acciones</span></mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              <button
+                class="blue-icon"
+                mat-icon-button
+                (click)="$event.stopPropagation();" [matMenuTriggerFor]="menu" #menuTrigger="matMenuTrigger">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu [xPosition]="'before'" #menu="matMenu">
+                <button mat-menu-item (click)="createOrUpdateEditorial(row);">
+                  <mat-icon class="blue-icon">edit</mat-icon>
+                  <span class="item">Editar</span>
+                </button>
+
+                <button mat-menu-item (click)="deleteEditorial(row);">
+                  <mat-icon class="red-icon">delete</mat-icon>
+                  <span class="item">Eliminar</span>
+                </button>
+              </mat-menu>
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
+
+          <!-- noData -->
+          <ng-container matColumnDef="noData">
+            <mat-footer-cell *matFooterCellDef>
+              <p *ngIf="!editorials.length">No hay resultados que coincidan con los términos de búsqueda</p>
+            </mat-footer-cell>
+          </ng-container>
+
+          <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+          <mat-row matRipple *matRowDef="let row; columns: displayedColumns;" class="mat-row"></mat-row>
+          <mat-footer-row *matFooterRowDef="['noData']" [ngClass]="{'hide': editorials.length }"></mat-footer-row>
+        </mat-table>
+
+        <mat-paginator
+          #paginator
+          [length]="length"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions"
+          (page)="pageEvent = getEditorialsPaginator($event)">
+        </mat-paginator>
+      </div>
+    </section>
+  </div>
+</div>

@@ -1,0 +1,120 @@
+<div class="row animated fadeIn fast" *ngIf="isLoading; else body;">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+<ng-template #body>
+  <div class="card">
+    <div class="card-body">
+      <div class="row pl-2 pr-2">
+        <ng-container [formGroup]="filtersForm">
+          <div class="col-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Tipo de usuario</mat-label>
+              <mat-select formControlName="applicantTypeID" (selectionChange)="getLibrarySpaceAttendance()">
+                <mat-option [value]="0">TODOS</mat-option>
+                <mat-option *ngFor="let item of users" [value]="item.applicantTypeID">
+                  {{item.applicantTypeDesc}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Espacio</mat-label>
+              <mat-select formControlName="librarySpaceID" (selectionChange)="getLibrarySpaceAttendance()">
+                <mat-option [value]="0">TODOS</mat-option>
+                <mat-option *ngFor="let item of librarySpaces" [value]="item.librarySpaceID">
+                  {{item.librarySpaceName}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Fecha inicio</mat-label>
+              <input type="date" formControlName="initDate" #initDate matInput
+              (click)="initDate.showPicker()" (change)="getLibrarySpaceAttendance()">
+              <mat-icon style="cursor: pointer;" matSuffix (click)="initDate.showPicker()">calendar_month</mat-icon>
+              <mat-hint>dd/mm/aaaa</mat-hint>
+            </mat-form-field>
+          </div>
+          <div class="col-3">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Fecha fin</mat-label>
+              <input type="date" formControlName="endDate" #endDate matInput [min]="initDate.value"
+              (click)="endDate.showPicker()" (change)="getLibrarySpaceAttendance()">
+              <mat-icon style="cursor: pointer;" matSuffix (click)="endDate.showPicker()">calendar_month</mat-icon>
+              <mat-hint>dd/mm/aaaa</mat-hint>
+            </mat-form-field>
+          </div>
+          <div class="col-6">
+            <mat-form-field class="width" appearance="outline">
+              <mat-label>Buscador</mat-label>
+              <input type="text" matInput formControlName="search">
+              <mat-icon matSuffix>search</mat-icon>
+            </mat-form-field>
+          </div>
+          <div class="col-2">
+            <button
+              class="download-button"
+              mat-raised-button
+              matTooltipPosition="above"
+              matTooltip="Descargar Excel"
+              (click)="downloadReport()">
+              Reporte
+              <mat-icon class="green-icon">assignment</mat-icon>
+            </button>
+          </div>
+        </ng-container>
+      </div>
+      <div class="row pl-2 pr-2">
+        <div class="col-12">
+          <div class="table-responsive">
+            <table class="table">
+              <thead style="background-color: #004899; color: white;">
+                <tr>
+                  <th>Usuario</th>
+                  <th>Nro Documento</th>
+                  <th>Nombres</th>
+                  <th>Espacio</th>
+                  <th>Fecha/Hora ingreso</th>
+                  <th>Fecha/Hora salida</th>
+                  <th style="text-align: center;">Acciones</th>
+                </tr>
+              </thead>
+              <tbody style="color: black;">
+                <tr *ngFor="let item of librarySpaceAttendance">
+                  <td>{{item.userDesc}}</td>
+                  <td>{{item.PersonDocumentNumber}}</td>
+                  <td>{{item.PersonFullName}}</td>
+                  <td>{{item.librarySpaceName}}</td>
+                  <td>{{item.dateAttendanceEntry}}</td>
+                  <td>{{item.dateAttendanceDeparture}}</td>
+                  <td style="text-align: center;">
+                    <a style="cursor: pointer;"
+                      matTooltip="Salir"
+                      *ngIf="item.flgAttendance"
+                      (click)="postLibrarySpacesAttendance(item);">
+                      <i class="fa fa-sign-out" style="color: #004899;" aria-hidden="true"></i>
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <mat-paginator
+            #paginator
+            [length]="length"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="pageSizeOptions"
+            (page)="pageEvent = changePage($event)">
+          </mat-paginator>
+        </div>
+      </div>
+    </div>
+  </div>

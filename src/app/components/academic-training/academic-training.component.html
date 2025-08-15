@@ -1,0 +1,228 @@
+<div class="row animated fadeIn fast">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <form [formGroup]="myForm"
+                    autocomplete="off"
+                    (submit)="charge()">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Tipo de título</mat-label>
+                                <mat-select formControlName="type">
+                                    <mat-option value="">Seleccione una opción</mat-option>
+                                    <mat-option [value]="title.degreeID" *ngFor="let title of titleList">{{ title.degreeDesc }}</mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="isValidField('type')">{{getFielError('type')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-3">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Titulo</mat-label>
+                                <input formControlName="thirdLevelDegree" type="text" matInput>
+                                <mat-error *ngIf="isValidField('thirdLevelDegree')">{{getFielError('thirdLevelDegree')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-3">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Fecha registro Senescyt</mat-label>
+                                <input matInput [matDatepicker]="picker" formControlName="recordDate" readonly>
+                                <mat-hint>dd/mm/aaaa</mat-hint>
+                                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                                <mat-datepicker #picker></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-3">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Universidad</mat-label>
+                                <input formControlName="university" type="text" matInput>
+                                <mat-error *ngIf="isValidField('university')">{{getFielError('university')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-3">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Registro Senescyt</mat-label>
+                                <input formControlName="recordSenescyt" type="text" matInput>
+                                <mat-error *ngIf="isValidField('recordSenescyt')">{{getFielError('recordSenescyt')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-3">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Campo de Conocimiento</mat-label>
+                                <input formControlName="subAreaKnowledge" type="text" matInput>
+                                <mat-error *ngIf="isValidField('subAreaKnowledge')">{{getFielError('subAreaKnowledge')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-3">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>Tipo de Universidad/Instituto</mat-label>
+                                <mat-select formControlName="sector">
+                                    <mat-option value="">Seleccione una opción</mat-option>
+                                    <mat-option *ngFor="let item of sectorList" [value]="item.sectorID">{{item.sectorName}}</mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="isValidField('sector')">{{getFielError('sector')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-3">
+                            <mat-form-field class="width" appearance="outline">
+                                <mat-label>País</mat-label>
+                                <mat-select formControlName="country">
+                                    <mat-option value="">Seleccione una opción</mat-option>
+                                    <mat-option *ngFor="let item of countryList" [value]="item.countryID">{{item.countryName}}</mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="isValidField('country')">{{getFielError('country')}}</mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="col-md-9">
+
+                        </div>
+                        <div class="col-md-1"></div>
+                        <div class="col-md-2" style="text-align: right;">
+                            <button mat-raised-button class="styleButton_sml" style="max-width: 150px; min-width: 100px;" type="submit">Agregar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div><br>
+    </div>
+    <form [formGroup]="recordForm" (submit)="saveRecord()">
+        <div *ngFor="let item of dynamicsArr.controls; let i = index">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div formArrayName="dynamics">
+                            <!-- <h1 class="text-warning">Registro N°:{{i + 1}}</h1> -->
+                            <div class="row" [formGroupName]="i">
+                                <div class="col-md-3">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Título de</mat-label>
+                                        <mat-select formControlName="type" (selectionChange)="putAcademicTraining(i);">
+                                            <mat-option value="">Seleccione una opción</mat-option>
+                                            <mat-option [value]="title.degreeID" *ngFor="let title of titleList">{{ title.degreeDesc }}</mat-option>
+                                        </mat-select>
+                                        <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-icon matSuffix>home</mat-icon>
+                                        <mat-label>Titulo</mat-label>
+                                        <input formControlName="thirdLevelDegree" type="text" matInput (blur)="putAcademicTraining(i);">
+                                        <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                  <mat-form-field class="width" appearance="outline">
+                                    <mat-label>Fecha registro Senescyt</mat-label>
+                                    <input type="date" formControlName="recordDate" #recordDate matInput (click)="recordDate.showPicker()" (blur)="putAcademicTraining(i);">
+                                    <mat-icon style="cursor: pointer;" matSuffix (click)="recordDate.showPicker()">calendar_month</mat-icon>
+                                    <mat-hint>dd/mm/aaaa</mat-hint>
+                                    <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-icon matSuffix>home</mat-icon>
+                                        <mat-label>Universidad</mat-label>
+                                        <input formControlName="university" type="text" matInput (blur)="putAcademicTraining(i);">
+                                        <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-icon matSuffix>home</mat-icon>
+                                        <mat-label>Registro Senescyt</mat-label>
+                                        <input formControlName="recordSenescyt" type="text" matInput (blur)="putAcademicTraining(i);">
+                                        <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>Sub Área del Conocimiento</mat-label>
+                                        <input formControlName="subAreaKnowledge" type="text" matInput (blur)="putAcademicTraining(i);">
+                                        <mat-error *ngIf="isValidField('subAreaKnowledge')">{{getFielError('subAreaKnowledge')}}</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                  <mat-form-field class="width" appearance="outline">
+                                      <mat-label>Tipo de Universidad/Instituto</mat-label>
+                                      <mat-select formControlName="sector" (selectionChange)="putAcademicTraining(i);">
+                                          <mat-option value="">Seleccione una opción</mat-option>
+                                          <mat-option *ngFor="let item of sectorList" [value]="item.sectorID">{{item.sectorName}}</mat-option>
+                                      </mat-select>
+                                      <mat-error *ngIf="isValidField('sector')">{{getFielError('sector')}}</mat-error>
+                                  </mat-form-field>
+                              </div>
+                                <div class="col-md-3">
+                                    <mat-form-field class="width" appearance="outline">
+                                        <mat-label>País</mat-label>
+                                        <mat-select formControlName="country" (selectionChange)="putAcademicTraining(i);">
+                                            <mat-option value="">Seleccione una opción</mat-option>
+                                            <mat-option *ngFor="let item of countryList" [value]="item.countryID">{{item.countryName}}</mat-option>
+                                        </mat-select>
+                                        <mat-error *ngIf="isValidFieldInArray(dynamicsArr, i)">Campo Obligatorio no puede ir en blanco!</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3" style="display: inline-flex;">
+                                  <mat-label>Título Profesional</mat-label>&nbsp;
+                                  <input
+                                    *ngIf="!academicTraining[i]?.urlDocument"
+                                    style="cursor: pointer;"
+                                    #input
+                                    (change)="onChangeInput(input.files, input, i+1);"
+                                    formControlName="fileTraining"
+                                    type="file"
+                                    accept="application/pdf">
+                                  <div *ngIf="academicTraining[i]?.urlDocument" class="w-100" (click)="openFile(academicTraining[i].urlDocument);" style="cursor: pointer;">
+                                    <img style="width: 20px;" src="assets/images/file.png" alt="Payment File">
+                                    <span style="color: #5090f5;">Ver Archivo</span>
+                                  </div>
+                                </div>
+                                <div class="col-md-3" style="display: inline-flex;">
+                                  <mat-label>Registro Senescyt</mat-label>&nbsp;
+                                  <input
+                                    *ngIf="!academicTraining[i]?.urlSenescyt"
+                                    style="cursor: pointer;"
+                                    #inputSenescyt
+                                    (change)="onChangeSenescytInput(inputSenescyt.files, inputSenescyt, i+1);"
+                                    type="file"
+                                    accept="application/pdf">
+                                  <div *ngIf="academicTraining[i]?.urlSenescyt" class="w-100" (click)="openFile(academicTraining[i].urlSenescyt);" style="cursor: pointer;">
+                                    <img style="width: 20px;" src="assets/images/file.png" alt="Payment File">
+                                    <span style="color: #5090f5;">Ver Archivo</span>
+                                  </div>
+                                </div>
+                                <div class="col-3">
+                                  <mat-label>Estado</mat-label>
+                                  <mat-checkbox formControlName="statusID" color="primary" (change)="putAcademicTraining(i);"></mat-checkbox>
+                                </div>
+                                <div class="col-md-2">
+                                    <button mat-raised-button class="styleButton_sml" style="max-width: 150px; min-width: 100px;" type="button" (click)="deleteDynamic(i)" *ngIf="!isLoadingInfo">Eliminar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><br>
+        </div>
+        <div class="row">
+          <div class="col-12" style="position: relative;" *ngIf="isLoading; else row">
+            <spinner-loader></spinner-loader>
+          </div>
+          <ng-template #row>
+            <div class="col-md-8"></div>
+            <div class="col-md-2" style="text-align: right;" *ngIf="dynamicsArr.length > 0">
+                <button mat-raised-button #tooltip="matTooltip"
+                matTooltip="Anterior: Datos Personales" class="styleButton_sml" style="max-width: 150px; min-width: 100px;" type="button" matStepperPrevious >Regresar</button>
+            </div>
+            <div class="col-md-2" style="text-align: left;" *ngIf="dynamicsArr.length > 0">
+                <button mat-raised-button #tooltip="matTooltip"
+                matTooltip="Siguiente: Experiencia Laboral" type="submit" class="styleButton_sml" style="max-width: 150px; min-width: 100px;">Guardar</button>
+            </div>
+          </ng-template>
+        </div>
+      </form>
+
+
+</div>

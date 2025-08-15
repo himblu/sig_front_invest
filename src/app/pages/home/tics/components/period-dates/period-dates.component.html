@@ -1,0 +1,69 @@
+<div style="display: flex; justify-content: end; align-items: center; background: transparent;" class="p-2">
+  <mat-icon style="cursor: pointer; color: red;" [matDialogClose]="false" class="red-icon" matRipple>close</mat-icon>
+</div>
+
+<mat-dialog-content>
+  <div *ngIf="isLoading; else form">
+    <spinner-loader></spinner-loader>
+  </div>
+
+  <ng-template #form>
+      <div class="card">
+        <div class="card-body" *ngIf="currentPeriod">
+          <div class="row">
+            <div class="col-6">
+              <h3>{{data.item.careerName}}</h3>
+            </div>
+            <div class="col-6">
+              <h3>{{data.item.modulePeriod}}</h3>
+            </div>
+          </div>
+          <div class="row" [formGroup]="datesForm">
+            <div class="col-6">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Fecha inicio</mat-label>
+                <input type="date" formControlName="startDate" #startDate matInput (click)="startDate.showPicker()"
+                [min]="currentPeriod.periodDateStart" [max]="currentPeriod.periodDateEnd">
+                <mat-icon style="cursor: pointer;" matSuffix (click)="startDate.showPicker()">calendar_month</mat-icon>
+                <mat-hint>dd/mm/aaaa</mat-hint>
+                <mat-error>Campo Requerido</mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-6">
+              <mat-form-field class="width" appearance="outline">
+                <mat-label>Fecha fin</mat-label>
+                <input type="date" formControlName="endDate" #endDate matInput (click)="endDate.showPicker()"
+                [min]="startDate.value" [max]="currentPeriod.periodDateEnd">
+                <mat-icon style="cursor: pointer;" matSuffix (click)="endDate.showPicker()">calendar_month</mat-icon>
+                <mat-hint>dd/mm/aaaa</mat-hint>
+                <mat-error>Campo Requerido</mat-error>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+      </div>
+  </ng-template>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <div class="d-flex no-block w-100 justify-content-between">
+    <div class="pl-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="warn"
+        [mat-dialog-close]="false">
+        Cerrar
+      </button>
+    </div>
+    <div class="pr-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="primary"
+        (click)="onSubmit();">
+        Actualizar
+      </button>
+    </div>
+  </div>
+</mat-dialog-actions>

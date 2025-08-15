@@ -1,0 +1,129 @@
+table {
+  background: white;
+  width: 100%;
+  thead {
+    th {
+      line-height: 14px;
+      height: 30px;
+      font-size: 12px;
+      background: #014898;
+      color: white;
+      width: 150px;
+      text-align: center;
+      text-transform: uppercase;
+      border: 1px solid #ccc;
+    }
+  }
+  tbody {
+    tr {
+      cursor: pointer;
+      td {
+        line-height: 14px;
+        height: 60px;
+        max-height: 60px;
+        font-size: 12px;
+        color: black;
+        width: 150px;
+        text-align: center;
+        border: 1px solid #ccc;
+        font-size: 10px;
+      }
+
+      //&:hover {
+      //  background: #ccc;
+      //}
+    }
+
+    tr.selected {
+      background: #ccc;
+      //color: white;
+    }
+  }
+}
+
+h3 {
+  color: #014898;
+  font-weight: 500;
+  font-size: large;
+  letter-spacing: 0;
+}
+
+h4 {
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.dates {
+  div {
+    //.selected {
+    //  background: #014898;
+    //  color: white;
+    //}
+    cursor: default;
+    width: 150px;
+    text-align: center;
+    border: 1px solid #ccc;
+    color: white;
+    background: #014898;
+    border-radius: 7px;
+    margin-left: 10px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: #014898;
+      color: white;
+    }
+  }
+}
+
+::ng-deep {
+  .mat-stepper-horizontal-line {
+    //color: none !important;
+    border-top-color: transparent !important;
+  }
+
+  // .mat-step-header {
+  //   background: white;
+  //   border-radius: 4px;
+  //   height: 50px !important;
+  //   border-bottom: 1px solid white;
+  // }
+
+  mat-step-header {
+    height: 48px !important;
+  }
+}
+
+.mat-stepper-horizontal {
+  margin-top: 8px;
+}
+
+.mat-mdc-form-field {
+  margin-top: 16px;
+}
+
+// ::ng-deep .mat-step-header:hover {
+//   background: white !important;
+// }
+
+
+// ::ng-deep .mat-step-header[aria-selected="true"]  {
+//   background: white !important;
+// }
+
+// ::ng-deep .mat-step-icon-selected {
+//   background: #014898 !important;
+// }
+.mat-header-cell {
+  background: #014898 !important;
+  text-align: center !important;
+}
+.border-info{
+  border: 1px solid; 
+  border-color: rgba(0, 122, 237, 0.186);
+}

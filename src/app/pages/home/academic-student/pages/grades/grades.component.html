@@ -1,0 +1,122 @@
+<div class="row animated fadeIn fast" *ngIf="charging">
+  <div class="col-md-12">
+    <div class="alert alert-info text-center">
+      <h4 class="alert-heading">Cargando</h4>
+      <i class="fa fa-spin fa-refresh fa-3x"></i>
+      <p class="mb-0">Por favor esperar...</p>
+    </div>
+  </div>
+</div>
+
+<div class="card" *ngIf="!charging">
+  <div class="card-body">
+    <div class="row pl-3 pr-3" [formGroup]="filtersForm">
+      <div class="col-4">
+        <mat-form-field appearance="outline">
+          <mat-label>Periodo Académico</mat-label>
+          <mat-select formControlName="periodID" placeholder="Filtrar por Periodo Académico">
+            <mat-option *ngFor="let period of periods;" [value]="period.periodID" (click)="getGradesReport(period.periodID)">
+              {{ period.periodName }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="col-4">
+        <button
+          class="download-button"
+          mat-raised-button
+          matTooltipPosition="above"
+          matTooltip="Descargar PDF"
+          (click)="openFile('api/student/record-academic/'+ studentID);">
+          Record Académico
+          <mat-icon class="red-icon">picture_as_pdf</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<br>
+<div class="card" *ngIf="!charging">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table id="demo-foo-addrow"
+             class="table m-t-0 table-hover no-wrap contact-list footable-loaded footable"
+             data-page-size="5">
+        <thead>
+          <tr>
+            <td colspan="2"></td>
+            <td class="head" colspan="6"><small>PARCIAL 1</small></td>
+            <td class="head" colspan="6"><small>PARCIAL 2</small></td>
+          </tr>
+          <tr class="head" style="background-color: #004899; color: white;">
+            <th><small>No.</small></th>
+            <th><small>Asignatura</small></th>
+            <th style="text-align: center;"><small>Paralelo</small></th>
+            <th style="text-align: center;"><small>N1</small></th>
+            <th style="text-align: center;"><small>N2</small></th>
+            <th style="text-align: center;"><small>N3</small></th>
+            <th style="text-align: center;"><small>N4</small></th>
+            <th style="text-align: center;"><small>Exam</small></th>
+            <th style="text-align: center;"><small>Prom</small></th>
+            <th style="text-align: center;"><small>N1</small></th>
+            <th style="text-align: center;"><small>N2</small></th>
+            <th style="text-align: center;"><small>N3</small></th>
+            <th style="text-align: center;"><small>N4</small></th>
+            <th style="text-align: center;"><small>Exam</small></th>
+            <th style="text-align: center;"><small>Prom</small></th>
+            <th style="text-align: center;"><small>Logros</small></th>
+            <th style="text-align: center;"><small>Sum</small></th>
+            <th style="text-align: center;"><small>Recup</small></th>
+            <th style="text-align: center;"><small>Grac</small></th>
+            <th style="text-align: center;"><small>Prom Final</small></th>
+            <th style="text-align: center;"><small>Asistencia</small></th>
+            <th style="text-align: center;"><small>Estado</small></th>
+          </tr>
+        </thead>
+        <tbody style="color: black;">
+        <tr *ngFor="let item of grades">
+          <td><small>{{item.nro}}</small></td>
+          <td><small>{{item.courseName}}</small></td>
+          <td><small>{{item.parallelCode}}</small></td>
+          <td><small>{{item.n1}}</small></td>
+          <td><small>{{item.n2}}</small></td>
+          <td><small>{{item.n3}}</small></td>
+          <td><small>{{item.n4}}</small></td>
+          <td><small>{{item.n5}}</small></td>
+          <td><small>{{item.avg1}}</small></td>
+          <td><small>{{item.n6}}</small></td>
+          <td><small>{{item.n7}}</small></td>
+          <td><small>{{item.n8}}</small></td>
+          <td><small>{{item.n9}}</small></td>
+          <td><small>{{item.n10}}</small></td>
+          <td><small>{{item.avg2}}</small></td>
+          <td><small>{{item.exL}}</small></td>
+          <td><small>{{item.sum}}</small></td>
+          <td><small>{{item.gradeSustentSup}}</small></td>
+          <td><small>{{item.gradeSustentGra}}</small></td>
+          <td><small>{{item.avgTot}}</small></td>
+          <td><small>{{item.attendance}}%</small></td>
+          <td>
+            <span
+              *ngIf="item.eq === 'R'"
+              matTooltipPosition="above"
+              matTooltip="Reprobado, no ha alcanzado el promedio mayor o igual a 7."
+              class="badge"
+              style="background-color: red; cursor: pointer;">
+              Reprobado
+            </span>
+            <span
+              *ngIf="item.eq === 'A'"
+              matTooltipPosition="above"
+              matTooltip="Aprobado con un promedio mayor a 7."
+              class="badge"
+              style="background-color: green; cursor: pointer;">
+              Aprobado
+            </span>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

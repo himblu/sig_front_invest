@@ -1,0 +1,99 @@
+<div style="display: flex; justify-content: end; align-items: center; background: transparent;" class="p-2">
+  <mat-icon style="cursor: pointer; color: red;" [matDialogClose]="false" class="red-icon" matRipple>close</mat-icon>
+</div>
+
+<mat-dialog-content>
+  <div *ngIf="isLoading; else form;">
+    <spinner-loader></spinner-loader>
+  </div>
+
+  <ng-template #form>
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12" style="text-align: center;">
+            <h2 style="color: #014898;">
+              <ng-container *ngIf="!isUpdating; else update">Agregar espacio</ng-container>
+              <ng-template #update>Actualizar espacio</ng-template>
+            </h2>
+          </div>
+        </div>
+        <div class="row" [formGroup]="spaceForm">
+          <div class="col-3">
+            <h3>Nombre:</h3>
+          </div>
+          <div class="col-8">
+            <mat-form-field class="width" appearance="outline">
+              <input type="text" matInput formControlName="librarySpaceName">
+              <mat-error>Campo requerido</mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-3">
+            <h3>Descripción:</h3>
+          </div>
+          <div class="col-8">
+            <mat-form-field class="width" appearance="outline">
+              <input type="text" matInput formControlName="librarySpaceDesc">
+              <mat-error>Campo requerido</mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-3">
+            <h3>Máxima capacidad:</h3>
+          </div>
+          <div class="col-8">
+            <mat-form-field class="width" appearance="outline">
+              <input type="number" matInput formControlName="capacityMax" [min]="1">
+              <mat-error>Campo requerido</mat-error>
+            </mat-form-field>
+          </div>
+          <ng-container *ngIf="isUpdating">
+            <div class="col-3">
+              <h3>Actualizar contraseña:</h3>
+            </div>
+            <div class="col-8">
+              <mat-checkbox color="primary" [checked]="isUpdatingPassword" (change)="isUpdatingPassword = !isUpdatingPassword"></mat-checkbox>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="!isUpdating || isUpdatingPassword">
+            <div class="col-3">
+              <h3>Contraseña:</h3>
+            </div>
+            <div class="col-8">
+              <mat-form-field class="width" appearance="outline">
+                <input #password [type]="passwordVisible ? 'text' : 'password'" matInput formControlName="librarySpacePassword" [minlength]="6">
+                <mat-icon matSuffix (click)="passwordVisible = !passwordVisible" [attr.aria-label]="'Hide password'"
+                  [attr.aria-pressed]="!passwordVisible" style="cursor: pointer;">
+                  {{passwordVisible ? 'visibility_off' : 'visibility'}}
+                </mat-icon>
+                <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <div class="d-flex no-block w-100 justify-content-between">
+    <div class="pl-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="warn"
+        [mat-dialog-close]="false">
+        Cerrar
+      </button>
+    </div>
+    <div class="pr-3">
+      <button
+        mat-raised-button
+        style="letter-spacing: 0;"
+        color="primary"
+        (click)="onSubmit();">
+        Enviar
+      </button>
+    </div>
+  </div>
+</mat-dialog-actions>

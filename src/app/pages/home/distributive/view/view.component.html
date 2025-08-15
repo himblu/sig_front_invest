@@ -1,0 +1,93 @@
+<div class="row">
+    <div class="col text-center">
+        <h2>Vista Distributivo</h2>
+    </div>
+</div>
+<div class="card">
+    <form [formGroup]="formFilters">
+        <div class="row mt-4">
+            <div class="col"></div>
+            <div class="col-md-2">
+                <mat-form-field class="width" appearance="outline">
+                    <mat-label>Periodo Académico</mat-label>
+                    <mat-select formControlName="periodID">
+                        <mat-option value="">Seleccione una opción</mat-option>
+                        <mat-option [value]="period.periodID" *ngFor="let period of periods">{{ period.periodName
+                            }}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="col-md-2">
+                <mat-form-field class="width" appearance="outline">
+                    <mat-label>Carrera</mat-label>
+                    <mat-select formControlName="careerID">
+                        <mat-option *ngFor="let item of careers" [value]="item.careerID">{{
+                            item.careerName
+                            }}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="col-md-2">
+                <mat-form-field class="width" appearance="outline">
+                    <mat-label>Niveles</mat-label>
+                    <mat-select formControlName="levelID">
+                        <mat-option *ngFor="let cycle of cycles" [value]="cycle.cycleID">{{
+                            cycle.cycleDesc
+                            }}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="col">
+                <button mat-raised-button color="primary" style="background: #014898" (click)="searchDistibutive()">
+                    BUSCAR
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+<br>
+<div class="card p-5">
+    <div class="row">
+        <table class="w-100 mat-elevation-z8">
+            <tbody>
+                <tr>
+                    <ng-container *ngFor="let head of distributiveHeader">
+                        <th>
+                            {{ head }}
+                        </th>
+                    </ng-container>
+                </tr>
+                <tr *ngFor="let dist of distibutive">
+                    <td>
+                        {{ dist.schoolName }}
+                    </td>
+                    <td>
+                        {{ dist.careerName }}
+                    </td>
+                    <td>
+                        {{ dist.studyPlanDesc }}
+                    </td>
+                    <td>
+                        {{ dist.modalityName }}
+                    </td>
+                    <td>
+                        {{ dist.sectionModule }}
+                    </td>
+                    <td>
+                        {{ transformNumber(dist.levelParallel) }}
+                    </td>
+                    <td>
+                        {{ dist.classroomName }}
+                    </td>
+                  <td>
+                    <!-- <button mat-raised-button color="primary" style="background: #014898;" (click)="showSchedule(dist)">Ver</button> -->
+                    <mat-icon (click)="showSchedule(dist)" [matTooltip]="'Ver Horario'" style="margin-right: 17px">
+                      remove_red_eye
+                    </mat-icon>
+                    <mat-icon (click)="showAddVacancies(dist)" [matTooltip]="'Aumentar cupos'">library_add</mat-icon>
+                  </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
